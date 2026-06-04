@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>안녕, 등대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+<!-- config.js 먼저 불러오기 (API 키) -->
+<script src="config.js"></script>
+<script src="lighthouses.js"></script>  
+<script src="stamp_data.js"></script>
+<script src="year_data.js"></script> 
+</head>
+<body>
+
+<!-- 링크 모음 오버레이 -->
+<div id="links-overlay">
+  <div id="links-card">
+    <div id="links-title">🔗 바로가기 모음</div>
+    <button id="links-close">✕</button>
+    <div id="links-body">
+      <a href="https://cafe.naver.com/lighthousetour" target="_blank" class="link-item">
+        <span class="link-icon">☕</span>
+        <div class="link-info">
+          <div class="link-name">커뮤니티 바로가기</div>
+          <div class="link-desc">네이버 카페에서 등대 여행자들과 소통해요</div>
+        </div>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="https://www.lighthouse-museum.or.kr/sea/passport" target="_blank" class="link-item">
+        <span class="link-icon">🏆</span>
+        <div class="link-info">
+          <div class="link-name">스탬프투어 신청하기</div>
+          <div class="link-desc">전국 등대 스탬프 투어에 참여하세요</div>
+        </div>
+        <span class="link-arrow">→</span>
+        </a>
+    </div>
+  </div>
+</div>
+
+<!-- 온보딩 오버레이 -->
+<div id="onboarding">
+  <div id="onboarding-card">
+    <div id="onboarding-title">🔆 안녕, 등대 사용법</div>
+    <div id="onboarding-body">
+      <div class="ob-row">
+        <div class="ob-highlight">옵션 필터</div>
+        <div class="ob-desc">등대 위치 확인</div>
+      </div>
+    </div>
+    <button id="onboarding-close">확인했어요</button>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header id="header">
+  <a href="index.html" class="logo">
+    <img src="문어등대.png" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+    <span>안녕, 등대</span>
+  </a>
+
+  <div class="header-search" style="position:relative;">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="search-input" placeholder="검색: 등대 이름 입력" autocomplete="off">
+  <!-- ★ 추가: 검색 결과 드롭다운 -->
+  <div id="search-dropdown"></div>
+</div>
+
+  <nav>
+    <a href="#" class="active">등대 지도</a>
+    <a href="news.html">실시간 등대 식별</a>
+    <a href="#" id="btn-links">관련 사이트</a>
+  </nav>
+</header>
+
+<!-- ── APP LAYOUT ── -->
+<div id="app">
+
+  <!-- 패널 토글 버튼 -->
+  <button id="panel-toggle" title="패널 접기/펼치기">◀</button>
+
+  <!-- LEFT PANEL -->
+  <aside id="panel">
+
+    <!-- 옵션 필터 -->
+    <div class="panel-section">
+      <div class="panel-section-title">옵션 필터</div>
+      <div class="filter-list" id="filter-list">
+
+        <!-- 모든 등대 표시 -->
+        <div class="filter-item" id="btn-all">
+          <div class="filter-check" id="check-all">✓</div>
+          <div class="filter-dot" style="background:#6b7280;"></div>
+          모든 등대 표시
+        </div>
+
+        <!-- 스탬프 투어 -->
+        <div class="filter-group">
+          <div class="filter-item filter-parent" id="toggle-stamp">
+            <div class="filter-dot" style="background:#f59e0b;"></div>
+            등대 스탬프 투어
+            <span class="filter-arrow" id="arrow-stamp">▶</span>
+          </div>
+          <div class="filter-children" id="stamp-group">
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-all">
+              <div class="filter-check">✓</div>모두 표시
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-beautiful">
+              <div class="filter-check">✓</div>아름다운 등대
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-history">
+              <div class="filter-check">✓</div>역사가 있는 등대
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-fun">
+              <div class="filter-check">✓</div>재미있는 등대
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-rich">
+              <div class="filter-check">✓</div>풍요의 등대
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-healing">
+              <div class="filter-check">✓</div>힐링의 등대
+            </div>
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-sunrise">
+              <div class="filter-check">✓</div>일출이 멋진 등대
+            </div>
+            <a href="https://www.lighthouse-museum.or.kr/sea/passport" target="_blank" class="stamp-site-link">
+              → 관련 사이트 보러가기
+            </a>
+          </div>
+        </div>
+
+        <!-- 올해의 등대 -->
+        <div class="filter-group">
+          <div class="filter-item filter-parent" id="toggle-year">
+            <div class="filter-dot" style="background:#10b981;"></div>
+            올해의 등대
+            <span class="filter-arrow" id="arrow-year">▶</span>
+          </div>
+          <div class="filter-children" id="year-group">
+            <div class="filter-item filter-child" data-group="year" data-key="year-all">
+              <div class="filter-check">✓</div>모두 표시
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2025">
+              <div class="filter-check">✓</div>2025
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2024">
+              <div class="filter-check">✓</div>2024
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2023">
+              <div class="filter-check">✓</div>2023
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2022">
+              <div class="filter-check">✓</div>2022
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2021">
+              <div class="filter-check">✓</div>2021
+            </div>
+            <div class="filter-item filter-child" data-group="year" data-key="year-2019">
+              <div class="filter-check">✓</div>2019
+            </div>
+          </div>
+        </div>
+
+        <!-- 이달의 등대 -->
+        <div class="filter-group">
+          <div class="filter-item filter-parent" id="toggle-month">
+            <div class="filter-dot" style="background:#3b82f6;"></div>
+            이달의 등대
+            <span class="filter-arrow" id="arrow-month">▶</span>
+          </div>
+          <div class="filter-children" id="month-group">
+            <div class="filter-item filter-child" data-group="month" data-key="month-all">
+              <div class="filter-check">✓</div>모두 표시
+            </div>
+            <div class="month-selects">
+              <select id="month-year-select" class="month-select">
+                <option value="">년도 선택</option>
+                <option>2025</option><option>2024</option><option>2023</option>
+                <option>2022</option><option>2021</option><option>2020</option>
+                <option>2019</option>
+              </select>
+              <select id="month-month-select" class="month-select">
+                <option value="">월 선택</option>
+                <option value="1">1월</option><option value="2">2월</option>
+                <option value="3">3월</option><option value="4">4월</option>
+                <option value="5">5월</option><option value="6">6월</option>
+                <option value="7">7월</option><option value="8">8월</option>
+                <option value="9">9월</option><option value="10">10월</option>
+                <option value="11">11월</option><option value="12">12월</option>
+              </select>
+              <a href="https://www.lighthouse-museum.or.kr/sea/article/lighthouse/list" target="_blank" class="stamp-site-link">
+              → 관련 사이트 보러가기
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <!-- 추천 등대 목록 -->
+    <div class="lh-list-title">추천 등대 목록</div>
+    <div id="lh-list"></div>
+
+  </aside>
+
+  <!-- MAP -->
+  <div id="map-wrap">
+    <div id="map-container">
+
+      <!-- 해안선 SVG (장식) -->
+      <svg class="map-coast" viewBox="0 0 900 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <path d="M500,0 C480,80 510,160 490,240 C470,320 440,360 460,440 C480,520 510,580 490,700 L900,700 L900,0 Z"
+              fill="rgba(168,216,168,0.25)" />
+        <path d="M520,0 C500,80 530,160 510,240 C490,320 460,360 480,440 C500,520 530,580 510,700 L900,700 L900,0 Z"
+              fill="rgba(144,200,144,0.15)" />
+        <text x="680" y="350" fill="rgba(100,150,100,0.3)" font-size="11" font-family="sans-serif">육지</text>
+        <text x="180" y="400" fill="rgba(255,255,255,0.25)" font-size="11" font-family="sans-serif">동해</text>
+      </svg>
+
+      <!-- 마커들 -->
+      <div id="markers-layer"></div>
+
+      <!-- 팝업 -->
+      <div id="popup">
+        <div class="popup-img" id="popup-img">
+          <div class="popup-img-placeholder" id="popup-emoji">🏛️</div>
+          <button class="popup-close" id="popup-close">✕</button>
+        </div>
+        <div class="popup-body">
+          <div class="popup-header-link" id="popup-header-link">
+            <div class="popup-name" id="popup-name">등대 이름</div>
+            <div class="popup-desc" id="popup-desc">설명</div>
+          </div>
+          <div class="popup-dist" id="popup-dist">📍 내 위치에서 — km</div>
+          <div class="popup-meta" id="popup-meta"></div>
+          <div class="popup-divider"></div>
+
+<!-- 개방시간 / 문의 / 문화공간 -->
+<div class="popup-info-rows" id="popup-info-rows">
+  <div class="popup-info-row">
+    <span class="popup-info-icon">🕐</span>
+    <div class="popup-info-content">
+      <span class="popup-info-label">개방시간</span>
+      <span class="popup-info-value" id="popup-open-time">정보 준비 중</span>
+    </div>
+  </div>
+  <div class="popup-info-row">
+    <span class="popup-info-icon">📞</span>
+    <div class="popup-info-content">
+      <span class="popup-info-label">문의</span>
+      <span class="popup-info-value" id="popup-contact">정보 준비 중</span>
+    </div>
+  </div>
+  <div class="popup-info-row">
+    <span class="popup-info-icon">🏛</span>
+    <div class="popup-info-content">
+      <span class="popup-info-label">문화공간</span>
+      <span class="popup-info-value" id="popup-culture">정보 준비 중</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- 정보 더보기 버튼 -->
+<button id="btn-detail" style="
+  width:100%; padding:.65rem;
+  margin-top:.8rem;
+  background:var(--white);
+  color:var(--navy);
+  border:1.5px solid var(--gray2);
+  border-radius:8px;
+  font-family:var(--font-sans);
+  font-size:.82rem; font-weight:600;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:.4rem;
+  transition:background .15s, border-color .15s;
+" onmouseover="this.style.background='var(--sky)';this.style.borderColor='var(--ocean)'"
+   onmouseout="this.style.background='var(--white)';this.style.borderColor='var(--gray2)'">
+  정보 더보기 &nbsp;›
+</button>
+
+<div class="popup-divider"></div>
+
+<!-- 길찾기 버튼 -->
+<div class="dir-buttons">
+  <button class="dir-btn dir-naver" id="btn-naver">
+    네이버지도 길찾기
+  </button>
+  <button class="dir-btn dir-kakao" id="btn-kakao">
+    카카오맵 길찾기
+  </button>
+</div>
+
+<div class="popup-divider"></div>
+
+<!-- 날씨 -->
+<div class="popup-weather">
+  <div class="weather-icon">☀️</div>
+  <div class="weather-info">
+    <div class="weather-temp" id="popup-temp">—°</div>
+    <div class="weather-desc" id="popup-weather-desc">날씨 정보 준비 중</div>
+  </div>
+</div>
+
+<div class="popup-bottom-buttons">
+  <button class="popup-cctv-btn" id="btn-cctv">📹 실시간 CCTV</button>
+</div>
+        </div>
+      </div>
+
+      <!-- 지도 컨트롤 -->
+      <div class="map-controls">
+        <button class="map-ctrl-btn" title="레이어">🗂</button>
+        <button class="map-ctrl-btn" title="현위치">📍</button>
+        <button class="map-ctrl-btn" title="확대">＋</button>
+        <button class="map-ctrl-btn" title="축소">－</button>
+        <button class="map-ctrl-btn" title="전체화면">⤢</button>
+      </div>
+
+      <div class="map-scale">— 50 km</div>
+      <div class="map-attr">© 카카오맵 / 네이버 지도 연동 예정</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- toast -->
+<div id="toast"></div>
+<div id="marker-tooltip"></div>
+
+<script>
+  // stamp_data.js 전역 변수로 연결
+window.STAMP_DATA = (typeof STAMP_DATA !== "undefined") ? STAMP_DATA : [];
+
+// 올해의 등대 데이터 매칭 (이름 + 좌표 오차범위)
+function findYearData(name, lat, lng) {
+  if (!window.YEAR_DATA) return null;
+  const clean = n => n.replace(/\s/g, "").replace(/\(.*?\)/g, "");
+  return window.YEAR_DATA.find(y => {
+    const nameMatch = clean(y.name) === clean(name);
+    if (!nameMatch) return false;
+    if (!y.lat || !y.lng) return true;
+    return Math.abs(y.lat - lat) <= 0.01 && Math.abs(y.lng - lng) <= 0.01;
+  }) || null;
+}
+
+function findStampData(name, lat, lng) {
+  if (!window.STAMP_DATA) return null;
+  const clean = n => n.replace(/\s/g, "").replace(/\(.*?\)/g, "");
+  const cleanName = clean(name);
+
+  // 1순위: 이름 일치하는 후보 먼저 필터
+  const nameCandidates = window.STAMP_DATA.filter(s =>
+    s.name === name || clean(s.name) === cleanName
+  );
+
+  if (!nameCandidates.length) return null;
+
+  // 좌표가 없으면 이름만으로 첫 번째 반환
+  if (!lat || !lng) return nameCandidates[0];
+
+  // 2순위: 좌표 0.001도 이내인 것 찾기
+  const stampLat = s => parseFloat((s.gps || "").split(",")[0]?.trim());
+  const stampLng = s => parseFloat((s.gps || "").split(",")[1]?.trim());
+
+  const matched = nameCandidates.find(s => {
+    const sLat = stampLat(s);
+    const sLng = stampLng(s);
+    if (isNaN(sLat) || isNaN(sLng)) return true; // 좌표 없으면 이름 일치만으로 허용
+    return Math.abs(sLat - lat) <= 0.001 && Math.abs(sLng - lng) <= 0.001;
+  });
+
+  return matched || null;
+}
+// 두 좌표 사이 거리 계산 (Haversine 공식, 단위: km)
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// 내 위치 저장 (페이지 로드 시 한 번만 요청)
+let myLat = null;
+let myLng = null;
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      myLat = pos.coords.latitude;
+      myLng = pos.coords.longitude;
+    },
+    err => {
+      console.log("위치 권한 거부 또는 오류:", err.message);
+    }
+  );
+}
+
+// ════════════════════════════════════════
+//  데이터 — 나중에 API로 교체할 부분
+// ════════════════════════════════════════
+const LIGHTHOUSES = [ ];
+
+// 태그 정보
+const TAG_INFO = {
+  stamp: { label: "스탬프 투어", color: "#fef3c7", text: "#92400e", dot: "#f59e0b" },
+  month: { label: "이달의 등대", color: "#dbeafe", text: "#1e40af", dot: "#3b82f6" },
+  year:  { label: "올해의 등대", color: "#d1fae5", text: "#065f46", dot: "#10b981" },
+};
+
+// 스탬프 카테고리 → 라벨 매핑
+const STAMP_CAT_LABEL = {
+  "아름": "아름다운 등대",
+  "역사": "역사가 있는 등대",
+  "재미": "재미있는 등대",
+  "풍요": "풍요의 등대",
+  "힐링": "힐링의 등대",
+  "일출": "일출이 멋진 등대",
+};
+
+// ════════════════════════════════════════
+//  상태
+// ════════════════════════════════════════
+let activeId = null;
+let searchQuery = "";
+
+// ════════════════════════════════════════
+//  유틸
+// ════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function getFilteredList() {
+  const showStamp = filterState.stamp.size > 0;
+  const showYear  = filterState.year.size  > 0;
+  const showMonth = filterState.month.size > 0;
+
+  const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
+
+  // 스탬프 카테고리 필터 키 → category 매핑
+  const stampCatMap = {
+    "stamp-beautiful": "아름",
+    "stamp-history":   "역사",
+    "stamp-fun":       "재미",
+    "stamp-rich":      "풍요",
+    "stamp-healing":   "힐링",
+    "stamp-sunrise":   "일출",
+  };
+  // 현재 체크된 스탬프 카테고리 목록
+  const activeStampCats = Object.entries(stampCatMap)
+    .filter(([key]) => filterState.stamp.has(key))
+    .map(([, cat]) => cat);
+
+  return allData.filter(lh => {
+    const matchSearch = !searchQuery || lh.name.includes(searchQuery) || (lh.region || "").includes(searchQuery);
+    if (!matchSearch) return false;
+    if (!searchQuery) {
+      // 스탬프 투어: 카테고리 매칭
+      let matchStamp = false;
+      if (lh.tags.includes("stamp") && showStamp) {
+        const stampInfo = window.STAMP_DATA
+          ? window.STAMP_DATA.find(s => {
+              const clean = n => n.replace(/\s/g, "").replace(/등대$/, "");
+              return clean(s.name) === clean(lh.name);
+            })
+          : null;
+        if (stampInfo) {
+          matchStamp = activeStampCats.includes(stampInfo.category);
+        } else {
+          matchStamp = filterState.stamp.size > 0;
+        }
+      }
+      const matchFilter =
+        matchStamp ||
+        (lh.tags.includes("year")  && showYear)  ||
+        (lh.tags.includes("month") && showMonth);
+      return matchFilter;
+    }
+    return true;
+  });
+}
+// ════════════════════════════════════════
+//  마커 렌더링
+// ════════════════════════════════════════
+const MARKER_COLORS = {
+  stamp: "#f59e0b",
+  month: "#3b82f6",
+  year:  "#10b981",
+  default: "#6b7280",
+};
+
+function getMarkerColor(lh) {
+  if (lh.tags.includes("stamp")) return MARKER_COLORS.stamp;
+  if (lh.tags.includes("month")) return MARKER_COLORS.month;
+  if (lh.tags.includes("year"))  return MARKER_COLORS.year;
+  return MARKER_COLORS.default;
+}
+
+function renderMarkers() {
+  const layer = document.getElementById("markers-layer");
+  layer.innerHTML = "";
+  const filtered = getFilteredList();
+
+  filtered.forEach(lh => {
+    const el = document.createElement("div");
+    el.className = "marker" + (lh.id === activeId ? " active" : "");
+    el.style.left = lh.mapX + "%";
+    el.style.top  = lh.mapY + "%";
+
+    const color = getMarkerColor(lh);
+    el.innerHTML = `
+      <div class="marker-pin" style="background:${color};">
+        <span>${lh.emoji}</span>
+      </div>
+      <div class="marker-label">${lh.name}</div>
+    `;
+    el.addEventListener("click", () => openPopup(lh, el));
+    layer.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════
+//  팝업
+// ════════════════════════════════════════
+function openPopup(lh, markerEl) {
+  activeId = lh.id;
+  if (typeof renderList === "function") renderList();
+
+  const popup = document.getElementById("popup");
+
+  // 내용 채우기
+  document.getElementById("popup-emoji").textContent = lh.emoji;
+
+document.getElementById("popup-name").textContent = lh.name;
+document.getElementById("popup-desc").textContent = (lh.region ? lh.region + " · " : "") + (lh.desc || "");
+document.getElementById("popup-header-link").onclick = () => {
+  window.location.href = `detail.html?id=${lh.id}`;
+};
+
+  // 태그 배지
+  const metaEl = document.getElementById("popup-meta");
+  const badges = [];
+
+  // 스탬프 투어 라벨: 카테고리가 있으면 세부 테마로, 없으면 표시 안 함
+  if (lh.tags && lh.tags.includes("stamp") && lh.stampCategory) {
+    const catLabel = STAMP_CAT_LABEL[lh.stampCategory] || "스탬프 투어";
+    badges.push(`<span class="popup-badge" style="background:#fef3c7;color:#92400e;">스탬프 투어 - ${catLabel}</span>`);
+  }
+
+  // 올해의 등대, 이달의 등대 라벨
+  (lh.tags || []).filter(t => t !== "stamp").forEach(t => {
+    const info = TAG_INFO[t];
+    if (!info) return;
+    badges.push(`<span class="popup-badge" style="background:${info.color};color:${info.text};">${info.label}</span>`);
+  });
+
+  metaEl.innerHTML = badges.join("");
+
+  document.getElementById("btn-detail").onclick = () => {
+    window.open(`detail.html?id=${lh.id}&name=${encodeURIComponent(lh.name)}`, "_blank");
+  };
+
+  // 길찾기 딥링크
+  document.getElementById("btn-naver").onclick = () => {
+    const url = `https://map.naver.com/v5/search/${encodeURIComponent(lh.name)}`;
+    window.open(url, "_blank");
+    showToast("네이버 지도로 이동합니다");
+  };
+  document.getElementById("btn-kakao").onclick = () => {
+    const url = `https://map.kakao.com/?q=${encodeURIComponent(lh.name)}`;
+    window.open(url, "_blank");
+    showToast("카카오맵으로 이동합니다");
+  };
+
+  const distEl = document.getElementById("popup-dist");
+if (myLat !== null && myLng !== null) {
+  const km = calcDistance(myLat, myLng, lh.lat, lh.lng);
+  const display = km >= 10
+    ? Math.round(km) + " km"
+    : km.toFixed(1) + " km";
+  distEl.textContent = "📍 내 위치에서 " + display;
+} else {
+  distEl.textContent = "📍 내 위치에서 — km";
+}
+
+  const stamp = findStampData(lh.name, lh.lat, lh.lng);
+  document.getElementById("popup-open-time").textContent = stamp?.contact   || lh.openTime || "정보 준비 중";
+  document.getElementById("popup-contact").textContent   = stamp?.contact   || lh.contact  || "정보 준비 중";
+  document.getElementById("popup-culture").textContent   = stamp?.intro     || lh.culture  || "정보 준비 중";  
+
+  // 팝업 표시 (오른쪽 고정)
+  popup.classList.add("visible");
+  popup.style.animation = "none";
+  popup.offsetHeight;
+  popup.style.animation = "";
+
+  // 클릭한 마커를 지도 중앙으로 이동 (시각적 효과)
+  const layer = document.getElementById("markers-layer");
+const mapWrap = document.getElementById("map-wrap");
+if (markerEl && layer && mapWrap) {
+  const mapRect = mapWrap.getBoundingClientRect();
+  const markerRect = markerEl.getBoundingClientRect();
+  const markerCenterX = markerRect.left - mapRect.left + markerRect.width / 2;
+  const markerCenterY = markerRect.top  - mapRect.top  + markerRect.height / 2;
+  const mapCenterX = (mapRect.width - 300) / 2;
+  const mapCenterY = mapRect.height / 2;
+  const offsetX = mapCenterX - markerCenterX;
+  const offsetY = mapCenterY - markerCenterY;
+  const currentLeft = parseFloat(layer.style.left || 0);
+  const currentTop  = parseFloat(layer.style.top  || 0);
+  layer.style.transition = "left .5s cubic-bezier(.4,0,.2,1), top .5s cubic-bezier(.4,0,.2,1)";
+  layer.style.left = (currentLeft + offsetX) + "px";
+  layer.style.top  = (currentTop  + offsetY) + "px";
+}
+}
+
+function closePopup() {
+  document.getElementById("popup").classList.remove("visible");
+  activeId = null;
+  renderMarkers();
+  renderList();
+}
+
+document.getElementById("popup-close").addEventListener("click", closePopup);
+
+// 지도 빈 곳 클릭 시 팝업 닫기
+document.getElementById("map-container").addEventListener("click", e => {
+  if (!e.target.closest(".marker") && !e.target.closest("#popup")) closePopup();
+});
+
+// ════════════════════════════════════════
+//  사이드 목록 렌더링
+// ════════════════════════════════════════
+function renderList() {
+  const container = document.getElementById("lh-list");
+  const filtered  = getFilteredList();
+
+  if (!filtered.length) {
+    container.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--gray3);font-size:.82rem;">검색 결과가 없습니다</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((lh, i) => {
+    const isActive = lh.id === activeId;
+    const tagHtml = (lh.tags || []).map(t => {
+      const c = TAG_INFO[t];
+      if (!c) return "";
+      return `<span class="lh-tag" style="background:${c.color};color:${c.text};">${c.label}</span>`;
+    }).join("");
+    return `
+      <div class="lh-item ${isActive ? "active" : ""}" data-id="${lh.id}">
+        <div class="lh-rank">${i+1}</div>
+        <div class="lh-thumb">${lh.emoji}</div>
+        <div class="lh-info">
+          <div class="lh-name">${lh.name}</div>
+          <div class="lh-loc">${lh.region}</div>
+        </div>
+        <div class="lh-tags">${tagHtml}</div>
+      </div>
+    `;
+  }).join("");
+
+  // 클릭 이벤트
+  container.querySelectorAll(".lh-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const dataId = item.dataset.id;
+      // 샘플 데이터 + 해양조사원 데이터 둘 다에서 찾기
+      const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
+      const lh = allData.find(l => String(l.id) === String(dataId));
+      if (!lh) return;
+
+      // 카카오 지도 등대면 panTo로 이동 + 팝업 열기
+      if (window.kakaoMap && lh.lat && lh.lng) {
+        window.kakaoMap.panTo(new kakao.maps.LatLng(lh.lat, lh.lng));
+        window.kakaoMap.setLevel(5);
+      }
+      openPopup(lh, null);
+    });
+  });
+}
+
+// ════════════════════════════════════════
+//  필터 상태 — JS 객체가 유일한 진실
+// ════════════════════════════════════════
+
+// 각 그룹의 체크 상태를 JS Set으로 관리
+const filterState = {
+  stamp: new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]),
+  year:  new Set(["year-all","year-2025","year-2024","year-2023","year-2022","year-2021","year-2019"]),
+  month: new Set(["month-all"]),
+};
+
+// 그룹별 전체 키 목록 (모두 표시 제외)
+const GROUP_KEYS = {
+  stamp: ["stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"],
+  year:  ["year-2025","year-2024","year-2023","year-2022","year-2021","year-2019"],
+  month: [],
+};
+
+// ── UI를 상태에 맞게 동기화 ──
+function syncFilterUI() {
+  // 자식 항목 체크 표시
+  document.querySelectorAll(".filter-child").forEach(el => {
+    const group = el.dataset.group;
+    const key   = el.dataset.key;
+    el.classList.toggle("checked", filterState[group].has(key));
+  });
+
+  // 최상단 '모든 등대 표시': 모든 그룹의 -all이 체크되어 있으면 체크
+  const allChecked =
+    filterState.stamp.has("stamp-all") &&
+    filterState.year.has("year-all")   &&
+    filterState.month.has("month-all");
+  document.getElementById("check-all").parentElement.classList.toggle("checked", allChecked);
+}
+
+// ── 그룹의 -all 상태를 개별 항목에 맞게 자동 업데이트 ──
+function syncGroupAll(group) {
+  const keys = GROUP_KEYS[group];
+  if (!keys.length) return; // month 그룹은 개별 항목 없음
+  const allIndividualChecked = keys.every(k => filterState[group].has(k));
+  if (allIndividualChecked) {
+    filterState[group].add(group + "-all");
+  } else {
+    filterState[group].delete(group + "-all");
+  }
+}
+
+// ── 드롭다운 토글 ──
+["stamp","year","month"].forEach(group => {
+  document.getElementById("toggle-" + group).addEventListener("click", () => {
+    const children = document.getElementById(group + "-group");
+    const arrow    = document.getElementById("arrow-" + group);
+    const isOpen   = children.classList.contains("open");
+    children.classList.toggle("open", !isOpen);
+    arrow.style.transform = isOpen ? "" : "rotate(90deg)";
+  });
+});
+
+// ── 자식 항목 클릭 ──
+document.querySelectorAll(".filter-child").forEach(el => {
+  el.addEventListener("click", () => {
+    const group = el.dataset.group;
+    const key   = el.dataset.key;
+    const isAll = key.endsWith("-all");
+
+    if (isAll) {
+      // 모두 표시 클릭 → 그룹 전체 토글
+      if (filterState[group].has(key)) {
+        // 이미 체크 → 전체 해제
+        filterState[group].clear();
+      } else {
+        // 체크 → 전체 선택
+        filterState[group].add(key);
+        GROUP_KEYS[group].forEach(k => filterState[group].add(k));
+      }
+    } else {
+      // 개별 항목 토글
+      if (filterState[group].has(key)) {
+        filterState[group].delete(key);
+      } else {
+        filterState[group].add(key);
+      }
+      syncGroupAll(group); // -all 자동 연동
+    }
+
+    syncFilterUI();
+    renderMarkers();
+    renderList();
+    if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
+  });
+});
+
+// ── 최상단 '모든 등대 표시' 클릭 ──
+document.getElementById("btn-all").addEventListener("click", () => {
+  const isCurrentlyAll =
+    filterState.stamp.has("stamp-all") &&
+    filterState.year.has("year-all")   &&
+    filterState.month.has("month-all");
+
+  if (isCurrentlyAll) {
+    // 전체 해제
+    filterState.stamp.clear();
+    filterState.year.clear();
+    filterState.month.clear();
+  } else {
+    // 전체 선택
+    filterState.stamp = new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]);
+    filterState.year  = new Set(["year-all","year-2025","year-2024","year-2023","year-2022","year-2021","year-2020","year-2019"]);
+    filterState.month = new Set(["month-all"]);
+  }
+
+  syncFilterUI();
+  closePopup();
+  renderMarkers();
+  renderList();
+   if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
+});
+
+// ── 이달의 등대 년도/월 선택 ──
+document.getElementById("month-year-select").addEventListener("change", () => {
+  renderMarkers(); renderList();
+});
+document.getElementById("month-month-select").addEventListener("change", () => {
+  renderMarkers(); renderList();
+});
+
+// 초기 UI 동기화
+syncFilterUI();
+
+// ════════════════════════════════════════
+//  검색
+// ════════════════════════════════════════
+// 검색 드롭다운 렌더 함수 (신규 추가)
+function renderSearchDropdown() {
+  const dropdown = document.getElementById("search-dropdown");
+  const query = searchQuery.trim();
+
+  // 검색어 없으면 드롭다운 숨김
+  if (!query) {
+    dropdown.classList.remove("visible");
+    dropdown.innerHTML = "";
+    return;
+  }
+
+  const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
+  const results = allData.filter(lh =>
+    lh.name.includes(query) || (lh.region || "").includes(query)
+  );
+
+  if (!results.length) {
+    dropdown.innerHTML = `<div class="search-no-result">검색 결과가 없습니다</div>`;
+  } else {
+    dropdown.innerHTML = results.map(lh => `
+      <div class="search-result-item" data-id="${lh.id}">
+        <span>${lh.emoji}</span>
+        <div>
+          <div class="sr-name">${lh.name}</div>
+          <div class="sr-region">${lh.region || ""}</div>
+        </div>
+      </div>
+    `).join("");
+
+    // 항목 클릭 시 지도 이동 + 팝업 오픈
+    dropdown.querySelectorAll(".search-result-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const lh = allData.find(l => String(l.id) === String(item.dataset.id));
+        if (!lh) return;
+        if (window.kakaoMap && lh.lat && lh.lng) {
+          window.kakaoMap.panTo(new kakao.maps.LatLng(lh.lat, lh.lng));
+          window.kakaoMap.setLevel(5);
+        }
+        openPopup(lh, null);
+        dropdown.classList.remove("visible"); // 선택 후 드롭다운 닫기
+        document.getElementById("search-input").value = lh.name;
+      });
+    });
+  }
+
+  dropdown.classList.add("visible");
+}
+
+// 기존 검색 이벤트 핸들러 교체
+document.getElementById("search-input").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  renderSearchDropdown(); // ← 드롭다운에 결과 표시
+  // renderList()는 호출하지 않음 (추천 목록과 분리)
+});
+
+// 검색창 바깥 클릭 시 드롭다운 닫기
+document.addEventListener("click", e => {
+  if (!e.target.closest(".header-search")) {
+    document.getElementById("search-dropdown").classList.remove("visible");
+  }
+});
+
+// 링크 모음 오버레이
+document.getElementById("btn-links").addEventListener("click", e => {
+  e.preventDefault();
+  document.getElementById("links-overlay").classList.add("visible");
+});
+document.getElementById("links-close").addEventListener("click", () => {
+  document.getElementById("links-overlay").classList.remove("visible");
+});
+document.getElementById("links-overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("links-overlay")) {
+    document.getElementById("links-overlay").classList.remove("visible");
+  }
+});
+
+// 온보딩 닫기
+document.getElementById("onboarding-close").addEventListener("click", () => {
+  document.getElementById("onboarding").style.display = "none";
+});
+// ── 패널 접기/펼치기 ──
+const panelToggleBtn = document.getElementById("panel-toggle");
+panelToggleBtn.addEventListener("click", () => {
+  const panel  = document.getElementById("panel");
+  const isOpen = !panel.classList.contains("collapsed");
+
+  if (isOpen) {
+    panel.classList.add("collapsed");
+    panelToggleBtn.textContent = "▶";
+    panelToggleBtn.style.left = "0";
+  } else {
+    panel.classList.remove("collapsed");
+    panelToggleBtn.textContent = "◀";
+    panelToggleBtn.style.left = "var(--panel-w)";
+  }
+
+  setTimeout(() => {
+    if (window.kakaoMap) kakao.maps.event.trigger(window.kakaoMap, "resize");
+  }, 310);
+});
+// ── 지도 확대/축소 버튼 ──
+document.querySelectorAll(".map-ctrl-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (!window.kakaoMap) return;
+    const title = btn.getAttribute("title");
+    if (title === "확대") window.kakaoMap.setLevel(window.kakaoMap.getLevel() - 1);
+    if (title === "축소") window.kakaoMap.setLevel(window.kakaoMap.getLevel() + 1);
+    if (title === "현위치") {
+      if (myLat && myLng) {
+        window.kakaoMap.panTo(new kakao.maps.LatLng(myLat, myLng));
+      }
+    }
+  });
+});
+// ════════════════════════════════════════
+//  초기 렌더
+// ════════════════════════════════════════
+renderMarkers();
+renderList();
+
+// ════════════════════════════════════════
+//  카카오 지도 초기화
+// ════════════════════════════════════════
+function loadKakaoMap() {
+  const script = document.createElement("script");
+  script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${CONFIG.KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer`;    + CONFIG.KAKAO_MAP_KEY
+    + "&libraries=services,clusterer&autoload=false";
+  script.onload = function () {
+    kakao.maps.load(function () {
+
+      // 가짜 지도 요소 숨기기
+      document.getElementById("markers-layer").style.display = "none";
+      document.querySelector(".map-coast").style.display    = "none";
+      document.querySelector(".map-scale").style.display    = "none";
+
+      // 카카오 지도 생성
+      const container = document.getElementById("map-container");
+      const options   = {
+        center: new kakao.maps.LatLng(36.5, 127.8),
+        level: 8
+      };
+      const map = new kakao.maps.Map(container, options);
+      window.kakaoMap = map;
+      
+      // 해양조사원 API로 실제 등대 데이터 불러오기
+      loadLighthouseData(map);
+      // 등대 마커 찍기
+      LIGHTHOUSES.forEach(lh => {
+        const position = new kakao.maps.LatLng(lh.lat, lh.lng);
+
+        // 커스텀 마커 이미지
+        const markerColor = lh.tags.includes("stamp") ? "#f59e0b"
+                          : lh.tags.includes("year")  ? "#10b981"
+                          : "#3b82f6";
+
+        const content = `
+          <div style="
+            display:flex; flex-direction:column; align-items:center;
+            cursor:pointer; filter:drop-shadow(0 2px 6px rgba(27,46,75,.3));
+          ">
+            <div style="
+              width:36px; height:36px;
+              background:${markerColor};
+              border-radius:50% 50% 50% 0;
+              transform:rotate(-45deg);
+              display:flex; align-items:center; justify-content:center;
+              border:2.5px solid white;
+            ">
+              <span style="transform:rotate(45deg);font-size:.95rem;">${lh.emoji}</span>
+            </div>
+            <div style="margin-top:4px;background:white;color:#1b2e4b;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.12);white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center;">${lh.name}</div>
+          </div>`;
+
+        const el = document.createElement("div");
+        el.innerHTML = content;
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function () {
+          map.panTo(position);
+          openPopup(lh, null);
+        });
+
+        const customOverlay = new kakao.maps.CustomOverlay({
+          position,
+          content: el,
+          yAnchor: 1.1
+        });
+        customOverlay.setMap(map);
+      });
+    });
+  };
+  document.head.appendChild(script);
+}
+// ════════════════════════════════════════
+//  해양조사원 등대표 API 호출 (XML 방식)
+// ════════════════════════════════════════
+async function loadLighthouseData(map) {
+  try {
+    const data = LIGHTHOUSE_DATA;
+    console.log(`✅ 등대 ${data.length}개 로드 완료`);
+
+    // 색상별 마커 이미지 생성 함수
+function makeMarkerImage(color) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z" fill="${color}" stroke="white" stroke-width="2"/>
+  </svg>`;
+  const url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+  return new kakao.maps.MarkerImage(url, new kakao.maps.Size(28, 36), { offset: new kakao.maps.Point(14, 36) });
+}
+const markerImages = {
+  stamp: makeMarkerImage("#f59e0b"),   // 노란색
+  year:  makeMarkerImage("#10b981"),   // 초록색
+  none:  makeMarkerImage("#6b7280"),   // 회색
+};
+
+    const clusterer = new kakao.maps.MarkerClusterer({
+      map,
+      averageCenter: true,
+      minLevel: 6,
+      styles: [{
+        width: "44px", height: "44px",
+        background: "rgba(245,158,11,.85)",
+        borderRadius: "50%",
+        color: "#fff",
+        textAlign: "center",
+        lineHeight: "44px",
+        fontSize: "13px",
+        fontWeight: "700",
+        border: "2px solid white",
+        boxShadow: "0 2px 8px rgba(0,0,0,.2)"
+      }]
+    });
+
+    window.REAL_LIGHTHOUSES = [];
+    const markers = [];
+
+    // 카테고리 매핑
+    const stampCatMap = {
+      "stamp-beautiful": "아름",
+      "stamp-history":   "역사",
+      "stamp-fun":       "재미",
+      "stamp-rich":      "풍요",
+      "stamp-healing":   "힐링",
+      "stamp-sunrise":   "일출",
+    };
+
+    // 필터 변경 시 마커 다시 그리기
+    window.redrawLighthouseMarkers = function() {
+      // 클러스터 색상 결정
+const clusterColor = filterState.year.size > 0 && filterState.stamp.size === 0
+  ? "rgba(16,185,129,.85)"   // 초록 (올해의 등대만)
+  : filterState.stamp.size > 0 && filterState.year.size === 0
+  ? "rgba(245,158,11,.85)"   // 노란 (스탬프만)
+  : "rgba(107,114,128,.85)"; // 회색 (모두 or 혼합)
+clusterer.setStyles([{
+  width: "44px", height: "44px",
+  background: clusterColor,
+  borderRadius: "50%",
+  color: "#fff", textAlign: "center",
+  lineHeight: "44px", fontSize: "13px", fontWeight: "700",
+  border: "2px solid white", boxShadow: "0 2px 8px rgba(0,0,0,.2)"
+}]);
+      const activeStampCats = Object.entries(stampCatMap)
+        .filter(([key]) => filterState.stamp.has(key))
+        .map(([, cat]) => cat);
+      const showAll = filterState.stamp.has("stamp-all");
+
+      clusterer.clear();
+      const newMarkers = [];
+
+      // 모든 등대 표시 상태 판단
+      const isShowAll =
+        filterState.stamp.has("stamp-all") &&
+        filterState.year.has("year-all");
+
+      // stamp 필터
+      const showStamp2 = filterState.stamp.size > 0 && activeStampCats.length > 0;
+      // year 필터
+      const activeYears = ["2025","2024","2023","2022","2021","2019"]
+        .filter(y => filterState.year.has("year-" + y))
+        .map(Number);
+      const showAllYear = filterState.year.has("year-all");
+      const showYear2 = filterState.year.size > 0 && (showAllYear || activeYears.length > 0);
+
+      // 아무것도 선택 안 했으면 아무것도 표시 안 함
+      if (!isShowAll && !showStamp2 && !showYear2) return;
+
+      window.REAL_LIGHTHOUSES.forEach(lh => {
+        const isStamp = lh.tags.includes("stamp");
+        const isYear  = lh.tags.includes("year");
+        const isNone  = !isStamp && !isYear;
+
+        let shouldShow = false;
+
+        if (isShowAll) {
+          // 모든 등대 표시: 전부 보임
+          shouldShow = true;
+        } else {
+          if (isStamp && showStamp2) {
+            if (showAll || (lh.stampCategory && activeStampCats.includes(lh.stampCategory))) {
+              shouldShow = true;
+            }
+          }
+          if (isYear && showYear2) {
+            if (showAllYear || (lh.yearData && activeYears.includes(lh.yearData.year))) {
+              shouldShow = true;
+            }
+          }
+          // isNone은 모든 등대 표시일 때만 보임 (개별 필터에서는 숨김)
+        }
+
+        if (!shouldShow) return;
+        if (!shouldShow) return;  // ← 이 한 줄 추가!
+
+      const position = new kakao.maps.LatLng(lh.lat, lh.lng);
+        const markerImage = isYear ? markerImages.year
+                 : isStamp ? markerImages.stamp
+                 : markerImages.none;
+        const marker = new kakao.maps.Marker({ position, image: markerImage });
+
+        kakao.maps.event.addListener(marker, "mouseover", () => {
+          const tooltip = document.getElementById("marker-tooltip");
+          tooltip.textContent = lh.name;
+          tooltip.style.display = "block";
+        });
+        marker._moveHandler = (e) => {
+          const tooltip = document.getElementById("marker-tooltip");
+          if (tooltip.style.display === "block") {
+            tooltip.style.left      = e.clientX + "px";
+            tooltip.style.top       = (e.clientY + 20) + "px";
+            tooltip.style.transform = "translateX(-50%)";
+        };
+      }
+        document.addEventListener("mousemove", marker._moveHandler);
+        kakao.maps.event.addListener(marker, "mouseout", () => {
+          document.getElementById("marker-tooltip").style.display = "none";
+          document.removeEventListener("mousemove", marker._moveHandler);
+        });
+        newMarkers.push(marker);
+      });
+
+      clusterer.addMarkers(newMarkers);
+    };
+    data.forEach(item => {
+      const lat = item.lat;
+      const lng = item.lng;
+      const name = item.name;
+      if (!lat || !lng || !name) return;
+
+      // 스탬프 데이터 매칭
+      const stamp = findStampData(name);
+      const yearInfo = findYearData(name, lat, lng);
+
+      window.REAL_LIGHTHOUSES.push({
+        id: item.id, name,
+        region: item.sea,
+        desc: stamp ? stamp.intro : (item.light || ""),
+        emoji: stamp ? "🏆" : yearInfo ? "🌟" : "🔦",
+        tags: [
+          ...(stamp ? ["stamp"] : []),
+          ...(yearInfo ? ["year"] : []),
+        ],
+        stampCategory: stamp ? stamp.category : null,
+        yearData: yearInfo || null,
+        ferry: [], reserveUrl: "#",
+        contact: stamp ? stamp.contact : "",
+        openTime: stamp ? stamp.openDate : "",
+        lat, lng
+      });
+
+      // 초기 마커는 REAL_LIGHTHOUSES만 채우고, 실제 표시는 redrawLighthouseMarkers가 담당
+    });
+
+    // 처음 로드 시 바로 필터 적용해서 표시
+    window.redrawLighthouseMarkers();
+    console.log(`✅ 등대 데이터 ${markers.length}개 로드 완료`);
+
+  } catch (err) {
+    console.error("❌ 등대 로드 실패:", err);
+  }
+}
+// 지도 로드 시작
+loadKakaoMap();
+</script>
+</body>
+</html>

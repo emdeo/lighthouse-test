@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>실시간 등대 식별 · 안녕, 등대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;900&display=swap" rel="stylesheet">
+<script src="lighthouses.js"></script>
+<script src="stamp_data.js"></script>
+<script src="year_data.js"></script>
+
+<style>
+  :root {
+    --navy:   #1b2e4b;
+    --accent: #f59e0b;
+    --green:  #10b981;
+    --gray:   #6b7280;
+    --glass:  rgba(15, 25, 45, 0.72);
+    --glass-border: rgba(255,255,255,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #0a0f1e;
+    color: #fff;
+    height: 100dvh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── HEADER ── */
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: rgba(10,15,30,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: -.3px;
+  }
+
+  .logo img {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  nav {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: rgba(255,255,255,0.55);
+    font-size: .82rem;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all .2s;
+  }
+
+  nav a.active,
+  nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* ── AR VIEWPORT ── */
+  #ar-viewport {
+    position: fixed;
+    inset: 52px 0 0 0;
+    overflow: hidden;
+    cursor: grab;
+  }
+
+  #ar-viewport.dragging { cursor: grabbing; }
+
+  /* 카메라 영상 (모바일) */
+  #camera-feed {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  /* 데스크탑 배경 - 밤바다 분위기 */
+  #desktop-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 110%, rgba(16,56,100,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 20% 80%, rgba(245,158,11,0.04) 0%, transparent 60%),
+      linear-gradient(180deg, #020510 0%, #071428 40%, #0d2040 70%, #142a4a 100%);
+  }
+
+  /* 별 배경 파티클 */
+  #stars-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* 수평선 라인 */
+  #horizon {
+    position: absolute;
+    left: 0; right: 0;
+    top: 62%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245,158,11,0.25), rgba(255,255,255,0.15), rgba(245,158,11,0.25), transparent);
+    pointer-events: none;
+  }
+
+  /* 수평선 아래 바다 */
+  #sea {
+    position: absolute;
+    left: 0; right: 0;
+    top: 62%; bottom: 0;
+    background: linear-gradient(180deg, rgba(10,30,60,0.5) 0%, rgba(5,15,35,0.8) 100%);
+    pointer-events: none;
+  }
+
+  /* 방위각 HUD 눈금자 */
+  #compass-ruler {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    pointer-events: none;
+    height: 44px;
+  }
+
+  .ruler-tick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 10px;
+    flex-shrink: 0;
+  }
+
+  .ruler-tick .tick-line {
+    width: 1px;
+    background: rgba(255,255,255,0.3);
+    height: 10px;
+  }
+
+  .ruler-tick.major .tick-line {
+    height: 18px;
+    background: rgba(255,255,255,0.6);
+  }
+
+  .ruler-tick .tick-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 3px;
+    letter-spacing: .5px;
+  }
+
+  .ruler-tick.major .tick-label {
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+    font-size: 10px;
+  }
+
+  /* 중앙 조준선 */
+  #crosshair {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 36px;
+    background: var(--accent);
+    pointer-events: none;
+  }
+
+  #crosshair::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--accent);
+  }
+
+  /* ── AR 오버레이 ── */
+  #ar-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .ar-marker {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: opacity .3s;
+  }
+
+  .ar-marker-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    transition: transform .15s, background .15s;
+  }
+
+  .ar-marker:hover .ar-marker-card {
+    background: rgba(15,25,45,0.92);
+    transform: scale(1.05);
+  }
+
+  .ar-marker-name {
+    font-size: .78rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.2px;
+  }
+
+  .ar-marker-dist {
+    font-size: .68rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .ar-marker-tag {
+    font-size: .6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 20px;
+    margin-top: 2px;
+  }
+
+  .tag-stamp { background: rgba(245,158,11,0.25); color: #f59e0b; }
+  .tag-year  { background: rgba(16,185,129,0.25); color: #10b981; }
+  .tag-none  { background: rgba(107,114,128,0.2); color: #9ca3af; }
+
+  /* 마커에서 아래로 이어지는 선 */
+  .ar-marker-line {
+    width: 1px;
+    height: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+  }
+
+  /* 마커 점 */
+  .ar-marker-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.3);
+    margin-bottom: -4px;
+  }
+
+  /* ── 하단 정보 패널 ── */
+  #info-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--glass);
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    padding: 16px 24px 24px;
+    transform: translateY(100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    z-index: 50;
+    max-height: 45dvh;
+    overflow-y: auto;
+  }
+
+  #info-panel.open { transform: translateY(0); }
+
+  #info-panel-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+
+  #info-panel-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  #info-panel-region {
+    font-size: .8rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+  }
+
+  #info-panel-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .panel-tag {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  #info-panel-desc {
+    font-size: .82rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+
+  #info-panel-dist {
+    font-size: .78rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  #btn-map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: #1b2e4b;
+    font-weight: 700;
+    font-size: .82rem;
+    padding: 9px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* ── 상태 UI ── */
+  #status-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .8rem;
+    color: rgba(255,255,255,0.7);
+    z-index: 50;
+    transition: opacity .3s;
+    white-space: nowrap;
+  }
+
+  #status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gray);
+    flex-shrink: 0;
+    transition: background .3s;
+  }
+
+  #status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  #status-dot.warn   { background: var(--accent); }
+
+  /* ── 시작 오버레이 ── */
+  #start-overlay {
+    position: fixed;
+    inset: 52px 0 0 0;
+    background: rgba(5, 10, 22, 0.92);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 80;
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  #start-overlay h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: -.5px;
+  }
+
+  #start-overlay p {
+    font-size: .85rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    max-width: 320px;
+  }
+
+  #start-btn {
+    background: var(--accent);
+    color: #1b2e4b;
+    border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    padding: 13px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    margin-top: 8px;
+  }
+
+  #start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(245,158,11,0.35);
+  }
+
+  .start-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(245,158,11,0.4));
+  }
+
+  .start-feature {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: .78rem;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .start-feature span:first-child { font-size: 1rem; }
+
+  /* ── 방위각 표시 ── */
+  #heading-display {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .72rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  /* ── 범위 슬라이더 ── */
+  #range-control {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 10px 14px;
+    z-index: 50;
+    display: none;
+  }
+
+  #range-control label {
+    font-size: .7rem;
+    color: rgba(255,255,255,0.5);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  #range-slider {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+
+  #range-value {
+    font-size: .72rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin-left: 6px;
+  }
+
+  /* ── 드래그 힌트 ── */
+  #drag-hint {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .72rem;
+    color: rgba(255,255,255,0.3);
+    pointer-events: none;
+    letter-spacing: .3px;
+    animation: fadeHint 3s ease-in-out 2s forwards;
+    opacity: 1;
+  }
+
+  @keyframes fadeHint {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* 스크롤바 */
+  #info-panel::-webkit-scrollbar { width: 3px; }
+  #info-panel::-webkit-scrollbar-track { background: transparent; }
+  #info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header id="header">
+  <a href="index.html" class="logo">
+    <img src="문어등대.png" style="width:28px;height:28px;border-radius:6px;object-fit:cover;">
+    <span>안녕, 등대</span>
+  </a>
+  <nav>
+    <a href="index.html">등대 지도</a>
+    <a href="news.html" class="active">실시간 등대 식별</a>
+    <a href="#" onclick="event.preventDefault(); document.getElementById('links-overlay').style.display='flex';">관련 사이트</a>
+  </nav>
+</header>
+
+<!-- ── 시작 오버레이 ── -->
+<div id="start-overlay">
+  <div class="start-icon">🔦</div>
+  <h2>실시간 등대 식별</h2>
+  <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별합니다.<br>화면을 드래그하거나 폰을 돌려 탐색하세요.</p>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+    <div class="start-feature"><span>📍</span><span>GPS 위치 권한이 필요합니다</span></div>
+    <div class="start-feature"><span>📷</span><span>모바일: 카메라 권한으로 AR 모드 활성화</span></div>
+    <div class="start-feature"><span>🖱️</span><span>데스크탑: 드래그로 방향 탐색</span></div>
+  </div>
+  <button id="start-btn">시작하기</button>
+</div>
+
+<!-- ── AR 뷰포트 ── -->
+<div id="ar-viewport">
+  <video id="camera-feed" autoplay playsinline muted></video>
+  <div id="desktop-bg"></div>
+  <canvas id="stars-canvas"></canvas>
+  <div id="sea"></div>
+  <div id="horizon"></div>
+
+  <!-- 방위각 눈금자 -->
+  <div id="compass-ruler"></div>
+  <div id="crosshair"></div>
+  <div id="heading-display">N 0°</div>
+
+  <!-- 등대 마커 오버레이 -->
+  <div id="ar-overlay"></div>
+
+  <!-- 드래그 힌트 -->
+  <div id="drag-hint">← 드래그하여 주변 탐색 →</div>
+</div>
+
+<!-- 범위 조절 -->
+<div id="range-control">
+  <label>표시 범위</label>
+  <input type="range" id="range-slider" min="5" max="100" value="30">
+  <span id="range-value">30km</span>
+</div>
+
+<!-- ── 하단 등대 정보 패널 ── -->
+<div id="info-panel">
+  <button id="info-panel-close">✕</button>
+  <div id="info-panel-name">–</div>
+  <div id="info-panel-region">–</div>
+  <div id="info-panel-dist">–</div>
+  <div id="info-panel-tags"></div>
+  <div id="info-panel-desc">–</div>
+  <button id="btn-map-link" onclick="window.location.href='index.html'">🗺 지도에서 보기</button>
+</div>
+
+<!-- ── 상태 표시 ── -->
+<div id="status-bar">
+  <div id="status-dot"></div>
+  <span id="status-text">위치 정보를 가져오는 중...</span>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  유틸리티
+// ════════════════════════════════════════
+function toRad(d) { return d * Math.PI / 180; }
+
+// 두 좌표 사이 거리 (km)
+function getDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// 두 좌표 사이 방위각 (0=북, 90=동, 180=남, 270=서)
+function getBearing(lat1, lng1, lat2, lng2) {
+  const dLng = toRad(lng2 - lng1);
+  const y = Math.sin(dLng) * Math.cos(toRad(lat2));
+  const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2))
+           - Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLng);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+// 방위각 → 방향 이름
+function headingLabel(h) {
+  const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+  return dirs[Math.round(h / 45) % 8];
+}
+
+// ════════════════════════════════════════
+//  별 파티클 (데스크탑 배경)
+// ════════════════════════════════════════
+function initStars() {
+  const canvas = document.getElementById("stars-canvas");
+  const ctx = canvas.getContext("2d");
+  let stars = [];
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({ length: 180 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.65,
+      r: Math.random() * 1.4 + 0.3,
+      a: Math.random() * 0.7 + 0.2,
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const alpha = s.a * (0.7 + 0.3 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+  requestAnimationFrame(draw);
+}
+
+// ════════════════════════════════════════
+//  방위각 눈금자
+// ════════════════════════════════════════
+function buildRuler() {
+  const ruler = document.getElementById("compass-ruler");
+  ruler.innerHTML = "";
+  // 총 72개 눈금 (360도 / 5도 간격)
+  const cardinals = { 0:"N", 45:"NE", 90:"E", 135:"SE", 180:"S", 225:"SW", 270:"W", 315:"NW" };
+  for (let i = 0; i < 360; i += 2) {
+    const tick = document.createElement("div");
+    tick.className = "ruler-tick" + (i % 45 === 0 ? " major" : (i % 10 === 0 ? " minor" : ""));
+    const line  = document.createElement("div");
+    line.className = "tick-line";
+    const label = document.createElement("div");
+    label.className = "tick-label";
+    label.textContent = i % 45 === 0 ? (cardinals[i] || "") : "";
+    tick.appendChild(line);
+    tick.appendChild(label);
+    ruler.appendChild(tick);
+  }
+}
+
+function updateRuler(heading) {
+  const ruler = document.getElementById("compass-ruler");
+  // 눈금자를 heading에 따라 이동 (중앙이 현재 방향)
+  const tickW = 10; // px per 2deg
+  const totalW = (360 / 2) * tickW; // 전체 눈금 너비
+  const offset = -(heading / 2) * tickW + window.innerWidth / 2;
+  ruler.style.transform = `translateX(calc(${offset}px - 50%))`;
+
+  document.getElementById("heading-display").textContent =
+    `${headingLabel(heading)} ${Math.round(heading)}°`;
+}
+
+// ════════════════════════════════════════
+//  메인 상태
+// ════════════════════════════════════════
+let myLat = null, myLng = null;
+let currentHeading = 0;  // 현재 보고 있는 방위각
+let smoothHeading  = 0;
+let maxRange = 30;        // km
+let lighthouses = [];     // 처리된 등대 배열
+let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+let arActive = false;
+
+// ════════════════════════════════════════
+//  등대 데이터 준비
+// ════════════════════════════════════════
+function prepareLighthouses() {
+  if (typeof LIGHTHOUSE_DATA === "undefined") return;
+  lighthouses = LIGHTHOUSE_DATA
+    .filter(d => d.lat && d.lng && d.name)
+    .map(d => {
+      const stamp = typeof findStampData === "function" ? findStampData(d.name) : null;
+      const year  = typeof findYearData  === "function" ? findYearData(d.name, d.lat, d.lng) : null;
+      return {
+        name: d.name,
+        region: d.sea || "",
+        lat: d.lat, lng: d.lng,
+        desc: stamp ? stamp.intro : (d.light || ""),
+        isStamp: !!stamp,
+        isYear:  !!year,
+        stampCat: stamp ? stamp.category : null,
+      };
+    });
+}
+
+// ════════════════════════════════════════
+//  AR 마커 렌더링
+// ════════════════════════════════════════
+const FOV = 70; // 화면에 보이는 시야각 (도)
+
+function renderMarkers() {
+  if (!myLat || !myLng) return;
+
+  const overlay  = document.getElementById("ar-overlay");
+  const vw = window.innerWidth;
+  const vh = window.innerHeight - 52;
+
+  overlay.innerHTML = "";
+
+  // 가까운 순으로 정렬해서 가까운 게 위에 렌더
+  const visible = lighthouses
+    .map(lh => {
+      const dist    = getDistance(myLat, myLng, lh.lat, lh.lng);
+      const bearing = getBearing(myLat, myLng, lh.lat, lh.lng);
+      return { ...lh, dist, bearing };
+    })
+    .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
+    .sort((a, b) => a.dist - b.dist);
+
+  // 마커 겹침 방지용 점유 영역
+  const occupied = [];
+
+  visible.forEach(lh => {
+    // 화면 X 위치 계산
+    let diff = lh.bearing - currentHeading;
+    if (diff > 180)  diff -= 360;
+    if (diff < -180) diff += 360;
+
+    if (Math.abs(diff) > FOV / 2 + 5) return; // 시야 밖
+
+    const screenX = (diff / FOV + 0.5) * vw;
+
+    // Y 위치: 거리에 따라 수평선 근처 (멀수록 위)
+    const horizonY = vh * 0.62;
+    const minY = vh * 0.08;
+    const t = Math.min(lh.dist / maxRange, 1);
+    const screenY = horizonY - (horizonY - minY) * (1 - t) * 0.85;
+
+    // 겹침 체크 (간단한 AABB)
+    const w = 130, h = 70;
+    const overlap = occupied.some(o =>
+      Math.abs(o.x - screenX) < w && Math.abs(o.y - screenY) < h
+    );
+    if (overlap) return;
+    occupied.push({ x: screenX, y: screenY });
+
+    // 거리 표시
+    const distStr = lh.dist < 1
+      ? `${Math.round(lh.dist * 1000)}m`
+      : `${lh.dist.toFixed(1)}km`;
+
+    // 태그
+    const tagClass = lh.isStamp ? "tag-stamp" : lh.isYear ? "tag-year" : "tag-none";
+    const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "등대";
+
+    // 투명도: 멀수록 흐리게
+    const opacity = Math.max(0.35, 1 - t * 0.6);
+
+    const el = document.createElement("div");
+    el.className = "ar-marker";
+    el.style.cssText = `left:${screenX}px; top:${screenY}px; opacity:${opacity};`;
+   const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
+    el.innerHTML = `
+      <div class="ar-marker-card">
+        <div class="ar-marker-name">${lh.name}</div>
+        <div class="ar-marker-dist">${distStr}</div>
+        <div class="ar-marker-tag ${tagClass}">${tagText}</div>
+      </div>
+      <div class="ar-marker-line"></div>
+      <svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+        <!-- 등대 몸체 -->
+        <rect x="11" y="10" width="6" height="20" fill="${dotColor}" opacity="0.9" rx="1"/>
+        <!-- 등대 상단 빛 -->
+        <rect x="9" y="7" width="10" height="5" fill="${dotColor}" rx="1"/>
+        <!-- 등대 꼭대기 -->
+        <rect x="12" y="4" width="4" height="4" fill="white" rx=".5"/>
+        <!-- 등대 하단 받침 -->
+        <rect x="8" y="30" width="12" height="3" fill="${dotColor}" opacity="0.7" rx="1"/>
+        <!-- 빛 줄기 왼쪽 -->
+        <line x1="14" y1="9" x2="2" y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
+        <!-- 빛 줄기 오른쪽 -->
+        <line x1="14" y1="9" x2="26" y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
+      </svg>
+    `;
+    el.addEventListener("click", () => openInfoPanel(lh, distStr));
+    overlay.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════
+//  정보 패널
+// ════════════════════════════════════════
+function openInfoPanel(lh, distStr) {
+  document.getElementById("info-panel-name").textContent   = lh.name;
+  document.getElementById("info-panel-region").textContent = lh.region;
+  document.getElementById("info-panel-dist").textContent   = `📍 ${distStr} 거리`;
+  document.getElementById("info-panel-desc").textContent   = lh.desc || "등록된 소개 정보가 없습니다.";
+
+  const tags = document.getElementById("info-panel-tags");
+  tags.innerHTML = "";
+  if (lh.isStamp) {
+    const t = document.createElement("span");
+    t.className = "panel-tag tag-stamp";
+    t.textContent = "🏆 스탬프 투어" + (lh.stampCat ? ` · ${lh.stampCat}` : "");
+    tags.appendChild(t);
+  }
+  if (lh.isYear) {
+    const t = document.createElement("span");
+    t.className = "panel-tag tag-year";
+    t.textContent = "🌟 올해의 등대";
+    tags.appendChild(t);
+  }
+
+  document.getElementById("info-panel").classList.add("open");
+  document.getElementById("status-bar").style.opacity = "0";
+}
+
+document.getElementById("info-panel-close").addEventListener("click", () => {
+  document.getElementById("info-panel").classList.remove("open");
+  document.getElementById("status-bar").style.opacity = "1";
+});
+
+// ════════════════════════════════════════
+//  상태바 업데이트
+// ════════════════════════════════════════
+function setStatus(text, state = "active") {
+  document.getElementById("status-text").textContent = text;
+  const dot = document.getElementById("status-dot");
+  dot.className = "";
+  dot.classList.add(state);
+}
+
+// ════════════════════════════════════════
+//  GPS
+// ════════════════════════════════════════
+function startGPS() {
+  if (!navigator.geolocation) {
+    setStatus("위치 정보를 지원하지 않는 브라우저입니다.", "warn");
+    return;
+  }
+
+  navigator.geolocation.watchPosition(
+    pos => {
+      myLat = pos.coords.latitude;
+      myLng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+      setStatus(`위치 확인됨 · 정확도 ±${acc}m · ${maxRange}km 이내 표시`, "active");
+      renderMarkers();
+    },
+    err => {
+      setStatus("위치 권한이 거부됐습니다. 브라우저 설정을 확인해주세요.", "warn");
+    },
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+  );
+}
+
+// ════════════════════════════════════════
+//  센서 (모바일 나침반)
+// ════════════════════════════════════════
+function startSensor() {
+  const handler = (e) => {
+    if (e.alpha === null) return;
+    const raw = (360 - e.alpha) % 360;
+    // 스무딩
+    let diff = raw - smoothHeading;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    smoothHeading += diff * 0.15;
+    smoothHeading = (smoothHeading + 360) % 360;
+    currentHeading = smoothHeading;
+    updateRuler(currentHeading);
+    renderMarkers();
+  };
+
+  // iOS 13+ 권한 요청
+  if (typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function") {
+    DeviceOrientationEvent.requestPermission()
+      .then(res => {
+        if (res === "granted") {
+          window.addEventListener("deviceorientationabsolute", handler, true);
+          window.addEventListener("deviceorientation", handler, true);
+        }
+      })
+      .catch(() => startDesktopDrag());
+  } else {
+    window.addEventListener("deviceorientationabsolute", handler, true);
+    window.addEventListener("deviceorientation", handler, true);
+  }
+}
+
+// ════════════════════════════════════════
+//  데스크탑 드래그
+// ════════════════════════════════════════
+function startDesktopDrag() {
+  const vp = document.getElementById("ar-viewport");
+  let dragging = false;
+  let lastX = 0;
+  let velocity = 0;
+  let lastTime = 0;
+
+  vp.addEventListener("mousedown", e => {
+    dragging = true;
+    lastX = e.clientX;
+    lastTime = Date.now();
+    velocity = 0;
+    vp.classList.add("dragging");
+  });
+
+  window.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX;
+    const dt = Date.now() - lastTime || 1;
+    velocity = dx / dt;
+    currentHeading = (currentHeading - dx * 0.25 + 360) % 360;
+    smoothHeading = currentHeading;
+    lastX = e.clientX;
+    lastTime = Date.now();
+    updateRuler(currentHeading);
+    renderMarkers();
+  });
+
+  window.addEventListener("mouseup", () => {
+    dragging = false;
+    vp.classList.remove("dragging");
+    // 관성 스크롤
+    let raf;
+    function inertia() {
+      velocity *= 0.92;
+      if (Math.abs(velocity) < 0.05) { cancelAnimationFrame(raf); return; }
+      currentHeading = (currentHeading - velocity * 8 + 360) % 360;
+      smoothHeading = currentHeading;
+      updateRuler(currentHeading);
+      renderMarkers();
+      raf = requestAnimationFrame(inertia);
+    }
+    raf = requestAnimationFrame(inertia);
+  });
+
+  // 터치 지원
+  vp.addEventListener("touchstart", e => {
+    lastX = e.touches[0].clientX;
+    velocity = 0;
+  }, { passive: true });
+
+  vp.addEventListener("touchmove", e => {
+    const dx = e.touches[0].clientX - lastX;
+    currentHeading = (currentHeading - dx * 0.35 + 360) % 360;
+    smoothHeading = currentHeading;
+    lastX = e.touches[0].clientX;
+    updateRuler(currentHeading);
+    renderMarkers();
+  }, { passive: true });
+}
+
+// ════════════════════════════════════════
+//  카메라 (모바일)
+// ════════════════════════════════════════
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment", width: { ideal: 1280 } }
+    });
+    const vid = document.getElementById("camera-feed");
+    vid.srcObject = stream;
+    vid.style.display = "block";
+    document.getElementById("desktop-bg").style.display  = "none";
+    document.getElementById("stars-canvas").style.display = "none";
+  } catch {
+    // 카메라 권한 없어도 AR은 계속 작동
+  }
+}
+
+// ════════════════════════════════════════
+//  범위 슬라이더
+// ════════════════════════════════════════
+document.getElementById("range-slider").addEventListener("input", e => {
+  maxRange = +e.target.value;
+  document.getElementById("range-value").textContent = maxRange + "km";
+  renderMarkers();
+});
+
+// ════════════════════════════════════════
+//  시작 버튼
+// ════════════════════════════════════════
+document.getElementById("start-btn").addEventListener("click", async () => {
+  document.getElementById("start-overlay").style.display = "none";
+  document.getElementById("range-control").style.display = "block";
+  arActive = true;
+
+  prepareLighthouses();
+  buildRuler();
+  initStars();
+  updateRuler(0);
+
+  startGPS();
+
+  if (isMobile) {
+    await startCamera();
+    startSensor();
+    startDesktopDrag(); // 터치도 지원
+  } else {
+    startDesktopDrag();
+  }
+
+  setStatus("주변 등대를 탐색 중...", "active");
+});
+</script>
+
+<!-- 링크 모음 오버레이 -->
+<div id="links-overlay" style="display:none; position:fixed; inset:0; background:rgba(5,10,22,0.85); backdrop-filter:blur(16px); z-index:200; align-items:center; justify-content:center;">
+  <div style="background:rgba(15,25,45,0.95); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:28px 32px; min-width:300px; position:relative;">
+    <button onclick="document.getElementById('links-overlay').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer;">✕</button>
+    <div style="font-weight:700;font-size:1rem;margin-bottom:20px;">🔗 바로가기 모음</div>
+    <a href="https://cafe.naver.com/lighthousetour" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:#fff;margin-bottom:10px;">
+      <span style="font-size:1.3rem;">☕</span>
+      <div>
+        <div style="font-size:.88rem;font-weight:700;">커뮤니티 바로가기</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,0.45);margin-top:2px;">네이버 카페에서 등대 여행자들과 소통해요</div>
+      </div>
+      <span style="margin-left:auto;color:rgba(255,255,255,0.3);">→</span>
+    </a>
+    <a href="https://www.lighthouse-museum.or.kr/sea/passport" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:#fff;">
+      <span style="font-size:1.3rem;">🏆</span>
+      <div>
+        <div style="font-size:.88rem;font-weight:700;">스탬프투어 신청하기</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,0.45);margin-top:2px;">전국 등대 스탬프 투어에 참여하세요</div>
+      </div>
+      <span style="margin-left:auto;color:rgba(255,255,255,0.3);">→</span>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>
