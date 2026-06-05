@@ -64,8 +64,8 @@
 <!-- 범위 조절 -->
 <div id="range-control">
   <label>표시 범위</label>
-  <input type="range" id="range-slider" min="5" max="30" value="15">
-  <span id="range-value">15km</span>
+  <input type="range" id="range-slider" min="5" max="10" value="10">
+  <span id="range-value">10km</span>
   <button id="compass-btn" style="
     display:none;
     background:rgba(255,255,255,0.1);
@@ -205,7 +205,7 @@ let myLat = null, myLng = null;
 let currentHeading = 0;
 let smoothHeading  = 0;
 let smoothTilt     = 0;
-let maxRange = 15;
+let maxRange = 10;
 let lighthouses = [];
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
