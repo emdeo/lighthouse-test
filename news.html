@@ -487,10 +487,18 @@ function attachSensorHandler() {
   };
 
   // Android는 absolute 이벤트 우선, iOS는 deviceorientation에서 webkitCompassHeading 사용
-  window.addEventListener("deviceorientationabsolute", handler, true);
-  window.addEventListener("deviceorientation", handler, true);
+ // absolute 이벤트가 오면 일반 이벤트는 무시
+    let hasAbsolute = false;
+    window.addEventListener("deviceorientationabsolute", e => {
+      hasAbsolute = true;
+      handler(e);
+    }, true);
+    window.addEventListener("deviceorientation", e => {
+      if (hasAbsolute) return; // absolute가 있으면 무시
+      handler(e);
+    }, true);
 
-  return handler;
+      return handler;
 }
 
 async function startSensor() {
