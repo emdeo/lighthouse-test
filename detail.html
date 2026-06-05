@@ -11,6 +11,40 @@
 </head>
 <body class="detail-page">
 
+<!-- 링크 모음 오버레이 -->
+<div id="links-overlay">
+  <div id="links-card">
+    <div id="links-title">🔗 관련사이트 바로가기</div>
+    <button id="links-close">✕</button>
+    <div id="links-body">
+      <a href="https://cafe.naver.com/lighthousetour" target="_blank" class="link-item">
+        <span class="link-icon">☕</span>
+        <div class="link-info">
+          <div class="link-name">커뮤니티 바로가기</div>
+          <div class="link-desc">네이버 카페에서 등대 여행자들과 소통해요</div>
+        </div>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="https://www.lighthouse-museum.or.kr/sea/passport" target="_blank" class="link-item">
+        <span class="link-icon">🏆</span>
+        <div class="link-info">
+          <div class="link-name">스탬프투어 신청하기</div>
+          <div class="link-desc">전국 등대 스탬프 투어에 참여하세요</div>
+        </div>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="https://island.theksa.co.kr/" target="_blank" class="link-item">
+        <span class="link-icon">🛳️</span>
+        <div class="link-info">
+          <div class="link-name">선박 예약하기</div>
+          <div class="link-desc">선박을 예약해보세요</div>
+        </div>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+  
 <!-- ── HEADER ── -->
 <header id="header">
   <a href="index.html" class="logo">
@@ -19,8 +53,8 @@
   </a>
   <nav>
     <a href="index.html">등대 지도</a>
-    <a href="news.html">등대 소식</a>
-    <a href="https://cafe.naver.com/lighthousetour">카페 바로가기</a>
+    <a href="news.html">실시간 등대 식별</a>
+    <a href="#" id="btn-links">관련 사이트 바로가기</a>
   </nav>
 </header>
 
@@ -159,6 +193,12 @@
 
 <script src="config.js"></script>
 <script>
+  document.getElementById("btn-links").addEventListener("click", () => {
+  document.getElementById("links-overlay").classList.add("visible");
+});
+document.getElementById("links-close").addEventListener("click", () => {
+  document.getElementById("links-overlay").classList.remove("visible");
+});
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name) || "";
 }
@@ -213,7 +253,7 @@ document.getElementById("detail-ferry").innerHTML =
   `<div class="data-empty">배편 정보 준비 중</div>`;
 
 document.getElementById("detail-reserve").onclick = () => {
-  window.open("https://island.haewoon.or.kr", "_blank");
+  window.open("https://island.theksa.co.kr/", "_blank");
 };
 
 document.getElementById("btn-naver").onclick = () => {
