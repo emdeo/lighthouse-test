@@ -589,7 +589,7 @@
 <!-- 범위 조절 -->
 <div id="range-control">
   <label>표시 범위</label>
-  <input type="range" id="range-slider" min="5" max="100" value="30">
+  <input type="range" id="range-slider" min="5" max="30" value="15">
   <span id="range-value">30km</span>
 </div>
 
@@ -719,7 +719,7 @@ function updateRuler(heading) {
 let myLat = null, myLng = null;
 let currentHeading = 0;  // 현재 보고 있는 방위각
 let smoothHeading  = 0;
-let maxRange = 30;        // km
+let maxRange = 15;        // km
 let lighthouses = [];     // 처리된 등대 배열
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
@@ -786,12 +786,12 @@ function renderMarkers() {
     // 거리 비율 (0=가깝다, 1=멀다)
     const t = Math.min(lh.dist / maxRange, 1);
 
-    // Y 위치: 모두 같은 수평선
+    // Y 위치: 수평선 위로 올리기
     const horizonY = vh * 0.62;
-    const screenY = horizonY;
+    const screenY = horizonY - 100; 
 
-    // 크기: 가까울수록 크게, 멀수록 작게
-    const scale = Math.max(0.4, 1.2 - t * 0.8);
+    // 크기: 4배 키우고, 가까울수록 크게
+    const scale = Math.max(1.6, 4.8 - t * 3.2);
 
     // 투명도: 멀수록 흐리게
     const opacity = Math.max(0.3, 1 - t * 0.65);
@@ -819,10 +819,9 @@ function renderMarkers() {
       left: ${screenX}px;
       top: ${screenY}px;
       opacity: ${opacity};
-      transform: translateX(-50%) scale(${scale});
-      transform-origin: bottom center;
+      transform: translateX(-50%);
     `;
-    
+
    const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
     el.innerHTML = `
       <div class="ar-marker-card">
@@ -831,7 +830,7 @@ function renderMarkers() {
         <div class="ar-marker-tag ${tagClass}">${tagText}</div>
       </div>
       <div class="ar-marker-line"></div>
-      <svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+      <svg width="${28*scale}" height="${38*scale}" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
         <!-- 등대 몸체 -->
         <rect x="11" y="10" width="6" height="20" fill="${dotColor}" opacity="0.9" rx="1"/>
         <!-- 등대 상단 빛 -->
