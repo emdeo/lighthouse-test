@@ -601,6 +601,13 @@ async function startCamera() {
     const vid = document.getElementById("camera-feed");
     vid.srcObject = stream;
     vid.style.display = "block";
+
+    // 카메라 스트림이 끊기면 (사용 중단 시) 모형 다시 보이게
+    stream.getVideoTracks()[0].addEventListener("ended", () => {
+      document.getElementById("ar-viewport").classList.remove("camera-on");
+      vid.style.display = "none";
+    });
+
     document.getElementById("desktop-bg").style.display  = "none";
     document.getElementById("stars-canvas").style.display = "none";
     // 카메라 켜면 수평선/바다 숨기기
