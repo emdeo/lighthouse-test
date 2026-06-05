@@ -552,7 +552,17 @@ function openPopup(lh, markerEl) {
 document.getElementById("popup-name").textContent = lh.name;
 document.getElementById("popup-desc").textContent = (lh.region ? lh.region + " · " : "") + (lh.desc || "");
 document.getElementById("popup-header-link").onclick = () => {
-  window.location.href = `detail.html?id=${lh.id}`;
+  const params = new URLSearchParams({
+  id:     lh.id   || "",
+  name:   lh.name || "",
+  lat:    lh.lat  || "",
+  lng:    lh.lng  || "",
+  region: lh.region || "",
+  desc:   lh.desc   || "",
+  tags:   (lh.tags  || []).join(","),
+  stampCategory: lh.stampCategory || "",
+});
+window.location.href = `detail.html?${params.toString()}`;
 };
 
   // 태그 배지
@@ -575,8 +585,18 @@ document.getElementById("popup-header-link").onclick = () => {
   metaEl.innerHTML = badges.join("");
 
   document.getElementById("btn-detail").onclick = () => {
-    window.open(`detail.html?id=${lh.id}&name=${encodeURIComponent(lh.name)}`, "_blank");
-  };
+  const params = new URLSearchParams({
+    id:     lh.id   || "",
+    name:   lh.name || "",
+    lat:    lh.lat  || "",
+    lng:    lh.lng  || "",
+    region: lh.region || "",
+    desc:   lh.desc   || "",
+    tags:   (lh.tags  || []).join(","),
+    stampCategory: lh.stampCategory || "",
+  });
+  window.open(`detail.html?${params.toString()}`, "_blank");
+};
 
   // 길찾기 딥링크
   document.getElementById("btn-naver").onclick = () => {
