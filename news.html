@@ -54,8 +54,8 @@
   <div id="crosshair"></div>
   <div id="heading-display">N 0°</div>
 
-  <!-- 등대 마커 오버레이 -->
-  <div id="ar-overlay"></div>
+  <!-- 등대 마커 오버레이 (파노라마 컨테이너) -->
+  <div id="ar-overlay" style="overflow:visible; pointer-events:none;"></div>
 
   <!-- 드래그 힌트 -->
   <div id="drag-hint" id="drag-hint"></div>
@@ -234,20 +234,41 @@ function prepareLighthouses() {
 }
 
 // ════════════════════════════════════════
-//  AR 마커 렌더링
+//  AR 마커 — 파노라마 방식
+//  360도 전체를 한 번에 그려두고
+//  heading이 바뀌면 컨테이너만 이동
 // ════════════════════════════════════════
-const FOV = 70; // 화면에 보이는 시야각 (도)
 
-function renderMarkers() {
+// 1도당 픽셀 수 (FOV 70도 = 화면 너비)
+const DEG_PER_PX = () => window.innerWidth / 70;
+
+// 파노라마 컨테이너: 360도 * DEG_PER_PX px 너비
+let markerEls = []; // 마커 DOM 요소 캐시
+
+// 마커를 처음 한 번만 생성 (GPS 업데이트 시 재생성)
+function buildMarkers() {
+  const overlay = document.getElementById("ar-overlay");
+  overlay.innerHTML = "";
+  markerEls = [];
+
   if (!myLat || !myLng) return;
 
-  const overlay = document.getElementById("ar-overlay");
   const vw = window.innerWidth;
   const vh = window.innerHeight - 52;
+  const pxPerDeg = DEG_PER_PX();
+  const totalW = 360 * pxPerDeg; // 파노라마 전체 너비
 
-  overlay.innerHTML = "";
+  // 파노라마 컨테이너 크기 설정
+  overlay.style.width  = totalW + "px";
+  overlay.style.height = "100%";
+  overlay.style.position = "absolute";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
 
-  const visible = lighthouses
+  const horizonY = vh * 0.62;
+
+  // 거리순 정렬 + 겹침 방지
+  const candidates = lighthouses
     .map(lh => {
       const dist    = getDistance(myLat, myLng, lh.lat, lh.lng);
       const bearing = getBearing(myLat, myLng, lh.lat, lh.lng);
@@ -258,44 +279,26 @@ function renderMarkers() {
 
   const occupied = [];
 
-  visible.forEach(lh => {
-    // ── X 위치: 방위각 기반 ──
-    let diff = lh.bearing - currentHeading;
-    if (diff > 180)  diff -= 360;
-    if (diff < -180) diff += 360;
-    if (Math.abs(diff) > FOV / 2 - 2) return;
-    const screenX = (diff / FOV + 0.5) * vw;
-    // 화면 끝쪽으로 갈수록 자연스럽게 투명해짐
-    const edgeFade = Math.max(0, 1 - Math.abs(diff / (FOV / 2)) * 3);
-
-    // ── 거리 비율 ──
+  candidates.forEach(lh => {
     const t = Math.min(lh.dist / maxRange, 1);
+    const scale   = Math.max(1.6, 4.8 - t * 3.2);
+    const opacity = Math.max(0.3, 1 - t * 0.65);
 
-    // ── Y 위치: 수평선 기준 + 상하 기울기 반영 ──
-    const horizonY = vh * 0.62;
-    // 기울기: 폰을 위로 들면 마커가 위로, 아래로 내리면 마커가 내려감
-    const tiltOffset = smoothTilt * 3; // 기울기 민감도
-    const screenY = horizonY - 120 + tiltOffset;
+    // 파노라마 상의 X 위치 (0~360도를 0~totalW px로)
+    const panX = lh.bearing * pxPerDeg;
+    const panY = horizonY - 120;
 
-    // ── 크기: 가까울수록 크게 ──
-    const scale = Math.max(1.6, 4.8 - t * 3.2);
-
-    // ── 투명도 ──
-    const opacity = Math.max(0, (1 - t * 0.65) * edgeFade);
-    if (opacity < 0.05) return;
-
-    // ── 겹침 방지 ──
-    const w = 140, h = 80;
+    // 겹침 방지 (파노라마 좌표 기준)
+    const w = 160, h = 90;
     const overlap = occupied.some(o =>
-    Math.abs(o.x - screenX) < w + 20 && Math.abs(o.y - screenY) < h + 20
+      Math.abs(o.x - panX) < w && Math.abs(o.y - panY) < h
     );
     if (overlap) return;
-    occupied.push({ x: screenX, y: screenY });
+    occupied.push({ x: panX, y: panY });
 
-    const distStr = lh.dist < 1
+    const distStr  = lh.dist < 1
       ? `${Math.round(lh.dist * 1000)}m`
       : `${lh.dist.toFixed(1)}km`;
-
     const tagClass = lh.isStamp ? "tag-stamp" : lh.isYear ? "tag-year" : "tag-none";
     const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "등대";
     const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
@@ -303,10 +306,11 @@ function renderMarkers() {
     const el = document.createElement("div");
     el.className = "ar-marker";
     el.style.cssText = `
-      left: ${screenX}px;
-      top: ${screenY}px;
+      left: ${panX}px;
+      top: ${panY}px;
       opacity: ${opacity};
       transform: translateX(-50%);
+      position: absolute;
     `;
     el.innerHTML = `
       <div class="ar-marker-card">
@@ -326,7 +330,47 @@ function renderMarkers() {
     `;
     el.addEventListener("click", () => openInfoPanel(lh, distStr));
     overlay.appendChild(el);
+    markerEls.push(el);
   });
+
+  // 처음 빌드 후 뷰포트 위치 맞추기
+  moveOverlay(currentHeading);
+}
+
+// heading이 바뀔 때마다 오버레이만 이동 (마커 재생성 없음)
+function moveOverlay(heading) {
+  const overlay  = document.getElementById("ar-overlay");
+  const pxPerDeg = DEG_PER_PX();
+  const totalW   = 360 * pxPerDeg;
+  const vw       = window.innerWidth;
+
+  // heading도 기준 중앙이 화면 중앙에 오도록 이동
+  // translateX(-heading * pxPerDeg + vw/2) 이지만
+  // 360도 경계 처리를 위해 모듈로 적용
+  let offsetX = -(heading * pxPerDeg) + vw / 2;
+
+  // 360도 랩어라운드: 0도↔360도 경계가 부드럽게 이어지도록
+  // 오버레이를 3배 복제 대신, 경계에서 위치를 보정
+  offsetX = ((offsetX % totalW) + totalW) % totalW;
+  // 화면 왼쪽으로 충분히 보이도록 보정
+  if (offsetX > totalW - vw) offsetX -= totalW;
+
+  overlay.style.transform = `translateX(${offsetX}px)`;
+
+  // 틸트에 따라 Y축도 이동
+  const vh = window.innerHeight - 52;
+  const tiltOffset = smoothTilt * 3;
+  markerEls.forEach(el => {
+    const baseY = parseFloat(el.style.top);
+    el.style.top = (parseFloat(el.dataset.baseY || baseY) + tiltOffset) + "px";
+    if (!el.dataset.baseY) el.dataset.baseY = baseY;
+  });
+}
+
+// GPS 업데이트 or 범위 변경 시 마커 재빌드
+// 센서/드래그는 moveOverlay만 호출
+function renderMarkers() {
+  buildMarkers();
 }
 
 // ════════════════════════════════════════
@@ -387,7 +431,7 @@ function startGPS() {
       myLng = pos.coords.longitude;
       const acc = Math.round(pos.coords.accuracy);
       setStatus(`위치 확인됨 · 정확도 ±${acc}m · ${maxRange}km 이내 표시`, "active");
-      renderMarkers();
+      buildMarkers(); // GPS 업데이트 시 마커 재빌드
     },
     err => {
       setStatus("위치 권한이 거부됐습니다. 브라우저 설정을 확인해주세요.", "warn");
@@ -435,7 +479,7 @@ function attachSensorHandler() {
     }
 
     updateRuler(currentHeading);
-    renderMarkers();
+    moveOverlay(currentHeading);
   };
 
   // Android는 absolute 이벤트 우선, iOS는 deviceorientation에서 webkitCompassHeading 사용
@@ -497,7 +541,7 @@ function startDesktopDrag() {
     lastX = e.clientX;
     lastTime = Date.now();
     updateRuler(currentHeading);
-    renderMarkers();
+    moveOverlay(currentHeading);
   });
 
   window.addEventListener("mouseup", () => {
@@ -510,7 +554,7 @@ function startDesktopDrag() {
       currentHeading = (currentHeading - velocity * 8 + 360) % 360;
       smoothHeading = currentHeading;
       updateRuler(currentHeading);
-      renderMarkers();
+      moveOverlay(currentHeading);
       raf = requestAnimationFrame(inertia);
     }
     raf = requestAnimationFrame(inertia);
@@ -529,7 +573,7 @@ function startDesktopDrag() {
     smoothHeading = currentHeading;
     lastX = e.touches[0].clientX;
     updateRuler(currentHeading);
-    renderMarkers();
+    moveOverlay(currentHeading);
   }, { passive: true });
 }
 
@@ -560,7 +604,7 @@ async function startCamera() {
 document.getElementById("range-slider").addEventListener("input", e => {
   maxRange = +e.target.value;
   document.getElementById("range-value").textContent = maxRange + "km";
-  renderMarkers();
+  buildMarkers();
 });
 
 // ════════════════════════════════════════
