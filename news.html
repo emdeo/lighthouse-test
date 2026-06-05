@@ -472,7 +472,8 @@ function attachSensorHandler() {
     let diff = heading - smoothHeading;
     if (diff > 180)  diff -= 360;
     if (diff < -180) diff += 360;
-    smoothHeading += diff * 0.15;
+    const smoothFactor = e.webkitCompassHeading !== undefined ? 0.15 : 0.06;
+    smoothHeading += diff * smoothFactor;
     smoothHeading = (smoothHeading + 360) % 360;
     currentHeading = smoothHeading;
 
