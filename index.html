@@ -107,8 +107,7 @@
             <span class="filter-arrow" id="arrow-stamp">▶</span>
           </div>
           <div class="filter-children" id="stamp-group">
-            <div class="filter-item filter-child" data-group="stamp" data
-            -key="stamp-all">
+            <div class="filter-item filter-child" data-group="stamp" data-key="stamp-all">
               <div class="filter-check">✓</div>모두 표시
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-beautiful">
@@ -480,9 +479,13 @@ function getFilteredList() {
             })
           : null;
         if (stampInfo) {
-          matchStamp = activeStampCats.includes(stampInfo.category);
+          if (filterState.stamp.has("stamp-all")) {
+            matchStamp = true;
+          } else {
+            matchStamp = activeStampCats.includes(stampInfo.category);
+          }
         } else {
-          matchStamp = filterState.stamp.size > 0;
+          matchStamp = filterState.stamp.has("stamp-all") || filterState.stamp.size > 0;
         }
       }
       const matchFilter =
@@ -700,9 +703,9 @@ function renderList() {
 
 // 각 그룹의 체크 상태를 JS Set으로 관리
 const filterState = {
-  stamp: new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]),
-  year:  new Set(["year-all","year-2025","year-2024","year-2023","year-2022","year-2021","year-2019"]),
-  month: new Set(["month-all"]),
+  stamp: new Set(),
+  year:  new Set(),
+  month: new Set(),
 };
 
 // 그룹별 전체 키 목록 (모두 표시 제외)
@@ -965,8 +968,8 @@ function loadKakaoMap() {
       // 카카오 지도 생성
       const container = document.getElementById("map-container");
       const options   = {
-        center: new kakao.maps.LatLng(36.5, 127.8),
-        level: 8
+        center: new kakao.maps.LatLng(36.0, 127.8),
+        level: 13
       };
       const map = new kakao.maps.Map(container, options);
       window.kakaoMap = map;
@@ -1102,7 +1105,7 @@ clusterer.setStyles([{
         filterState.year.has("year-all");
 
       // stamp 필터
-      const showStamp2 = filterState.stamp.size > 0 && activeStampCats.length > 0;
+      const showStamp2 = filterState.stamp.size > 0 && (showAll || activeStampCats.length > 0);
       // year 필터
       const activeYears = ["2025","2024","2023","2022","2021","2019"]
         .filter(y => filterState.year.has("year-" + y))
