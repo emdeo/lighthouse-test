@@ -88,7 +88,7 @@
   /* ── AR VIEWPORT ── */
   #ar-viewport {
     position: fixed;
-    inset: 52px 0 0 0;
+    inset: 96px 0 0 0;   /* 헤더52 + 범위바44 */
     overflow: hidden;
     cursor: grab;
   }
@@ -480,37 +480,39 @@
     pointer-events: none;
   }
 
-  /* ── 범위 슬라이더 ── */
+  /* ── 범위 슬라이더: 왼쪽 상단 고정 ── */
   #range-control {
     position: fixed;
-    top: 70px;
-    right: 16px;
+    top: 60px;       /* 헤더(52px) 바로 아래 */
+    left: 0;
+    right: 0;
     background: var(--glass);
-    border: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
     backdrop-filter: blur(12px);
-    border-radius: 12px;
-    padding: 10px 14px;
+    padding: 8px 20px;
     z-index: 50;
     display: none;
+    align-items: center;
+    gap: 10px;
   }
 
   #range-control label {
-    font-size: .7rem;
+    font-size: .72rem;
     color: rgba(255,255,255,0.5);
-    display: block;
-    margin-bottom: 6px;
+    white-space: nowrap;
+    margin-bottom: 0;
   }
 
   #range-slider {
-    width: 100px;
+    width: 130px;
     accent-color: var(--accent);
   }
 
   #range-value {
-    font-size: .72rem;
+    font-size: .75rem;
     color: var(--accent);
     font-weight: 700;
-    margin-left: 6px;
+    min-width: 32px;
   }
 
   /* ── 드래그 힌트 ── */
@@ -539,7 +541,6 @@
 
   /* ── 모바일 반응형 ── */
   @media (max-width: 768px) {
-    /* 헤더: 로고만 보이고 nav 축소 */
     #header {
       padding: 0 14px;
       gap: 10px;
@@ -549,23 +550,6 @@
       padding: 5px 8px;
     }
 
-    /* 범위 슬라이더: 왼쪽 하단으로 이동 */
-    #range-control {
-      top: auto;
-      bottom: 80px;
-      right: auto;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex !important;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 24px;
-    }
-    #range-control label { margin-bottom: 0; }
-    #range-slider { width: 120px; }
-
-    /* 말풍선: 모바일에서 글씨 조금 크게, 탭하기 쉽게 */
     .ar-marker-card {
       padding: 10px 14px;
       border-radius: 12px;
@@ -574,29 +558,22 @@
     .ar-marker-dist { font-size: .75rem; }
     .ar-marker-tag  { font-size: .65rem; }
 
-    /* 상태바: 모바일에서 위로 올리기 (슬라이더와 안 겹치게) */
     #status-bar {
-      bottom: 140px;
+      bottom: 24px;
       font-size: .72rem;
       padding: 8px 16px;
     }
 
-    /* 정보 패널: 모바일에서 더 높게 */
     #info-panel {
       max-height: 55dvh;
       padding: 20px 20px 32px;
     }
     #info-panel-name { font-size: 1.05rem; }
 
-    /* 시작 오버레이 */
     #start-overlay h2 { font-size: 1.35rem; }
     #start-overlay p  { font-size: .82rem; }
     #start-btn { padding: 14px 36px; font-size: .88rem; }
 
-    /* 드래그 힌트: 모바일에선 "폰을 돌려 탐색" */
-    #drag-hint { bottom: 160px; }
-
-    /* 눈금자 글씨 약간 크게 */
     .ruler-tick .tick-label { font-size: 10px; }
     .ruler-tick.major .tick-label { font-size: 11px; }
   }
@@ -621,13 +598,29 @@
 <div id="start-overlay">
   <div class="start-icon">🔦</div>
   <h2>실시간 등대 식별</h2>
-  <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별합니다.<br>화면을 드래그하거나 폰을 돌려 탐색하세요.</p>
+  <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별합니다.<br>폰을 돌리면 등대가 실제 방향으로 따라와요.</p>
   <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
     <div class="start-feature"><span>📍</span><span>GPS 위치 권한이 필요합니다</span></div>
+    <div class="start-feature"><span>🧭</span><span>모바일: 나침반 센서로 방향 자동 인식</span></div>
     <div class="start-feature"><span>📷</span><span>모바일: 카메라 권한으로 AR 모드 활성화</span></div>
     <div class="start-feature"><span>🖱️</span><span>데스크탑: 드래그로 방향 탐색</span></div>
   </div>
   <button id="start-btn">시작하기</button>
+  <!-- iOS 전용: 센서 권한 별도 버튼 -->
+  <button id="sensor-btn" style="display:none;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff;
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:.82rem;
+    font-weight:500;
+    padding:10px 24px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:-8px;">
+    🧭 나침반 센서 권한 허용
+  </button>
+  <p id="sensor-status" style="font-size:.72rem;color:rgba(255,255,255,0.35);margin-top:-8px;"></p>
 </div>
 
 <!-- ── AR 뷰포트 ── -->
@@ -654,7 +647,7 @@
 <div id="range-control">
   <label>표시 범위</label>
   <input type="range" id="range-slider" min="5" max="30" value="15">
-  <span id="range-value">30km</span>
+  <span id="range-value">15km</span>
 </div>
 
 <!-- ── 하단 등대 정보 패널 ── -->
@@ -974,11 +967,11 @@ function startGPS() {
 // ════════════════════════════════════════
 //  센서 (모바일 나침반)
 // ════════════════════════════════════════
-function startSensor() {
+function attachSensorHandler() {
   const handler = (e) => {
     if (e.alpha === null) return;
 
-    // ── 좌우 방위각 (alpha) ──
+    // 좌우 방위각
     const raw = (360 - e.alpha) % 360;
     let diff = raw - smoothHeading;
     if (diff > 180) diff -= 360;
@@ -987,11 +980,9 @@ function startSensor() {
     smoothHeading = (smoothHeading + 360) % 360;
     currentHeading = smoothHeading;
 
-    // ── 상하 기울기 (beta): 폰 세웠을 때 ~90도 ──
-    // beta: 0=평평, 90=수직(폰 세움), 180=뒤집기
-    // 90도 기준으로 편차를 계산: 위로 들면 양수, 아래로 내리면 음수
+    // 상하 기울기 (beta 기반)
     if (e.beta !== null) {
-      const rawTilt = e.beta - 90; // 수직 기준 편차
+      const rawTilt = e.beta - 90;
       smoothTilt += (rawTilt - smoothTilt) * 0.1;
     }
 
@@ -999,19 +990,32 @@ function startSensor() {
     renderMarkers();
   };
 
-  if (typeof DeviceOrientationEvent !== "undefined" &&
-      typeof DeviceOrientationEvent.requestPermission === "function") {
-    DeviceOrientationEvent.requestPermission()
-      .then(res => {
-        if (res === "granted") {
-          window.addEventListener("deviceorientationabsolute", handler, true);
-          window.addEventListener("deviceorientation", handler, true);
-        }
-      })
-      .catch(() => startDesktopDrag());
+  // absolute 우선, 없으면 일반 deviceorientation
+  window.addEventListener("deviceorientationabsolute", handler, true);
+  window.addEventListener("deviceorientation", handler, true);
+  return handler;
+}
+
+async function startSensor() {
+  const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
+                typeof DeviceOrientationEvent.requestPermission === "function";
+
+  if (isIOS) {
+    // iOS: 반드시 사용자 클릭 안에서 requestPermission 호출해야 함
+    try {
+      const res = await DeviceOrientationEvent.requestPermission();
+      if (res === "granted") {
+        attachSensorHandler();
+        document.getElementById("sensor-status").textContent = "🧭 나침반 센서 연결됨";
+      } else {
+        document.getElementById("sensor-status").textContent = "센서 권한 거부됨 · 드래그로 탐색하세요";
+      }
+    } catch {
+      document.getElementById("sensor-status").textContent = "센서 권한 요청 실패 · 드래그로 탐색하세요";
+    }
   } else {
-    window.addEventListener("deviceorientationabsolute", handler, true);
-    window.addEventListener("deviceorientation", handler, true);
+    // Android / 기타: 바로 연결
+    attachSensorHandler();
   }
 }
 
@@ -1049,7 +1053,6 @@ function startDesktopDrag() {
   window.addEventListener("mouseup", () => {
     dragging = false;
     vp.classList.remove("dragging");
-    // 관성 스크롤
     let raf;
     function inertia() {
       velocity *= 0.92;
@@ -1063,7 +1066,7 @@ function startDesktopDrag() {
     raf = requestAnimationFrame(inertia);
   });
 
-  // 터치 지원
+  // 터치 드래그 (센서 없을 때 fallback)
   vp.addEventListener("touchstart", e => {
     lastX = e.touches[0].clientX;
     velocity = 0;
@@ -1092,8 +1095,11 @@ async function startCamera() {
     vid.style.display = "block";
     document.getElementById("desktop-bg").style.display  = "none";
     document.getElementById("stars-canvas").style.display = "none";
+    // 카메라 켜면 수평선/바다 숨기기
+    document.getElementById("sea").style.display = "none";
+    document.getElementById("horizon").style.display = "none";
   } catch {
-    // 카메라 권한 없어도 AR은 계속 작동
+    // 카메라 권한 없어도 AR 계속 작동
   }
 }
 
@@ -1110,11 +1116,13 @@ document.getElementById("range-slider").addEventListener("input", e => {
 //  시작 버튼
 // ════════════════════════════════════════
 document.getElementById("start-btn").addEventListener("click", async () => {
+  const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
+                typeof DeviceOrientationEvent.requestPermission === "function";
+
   document.getElementById("start-overlay").style.display = "none";
-  document.getElementById("range-control").style.display = "block";
+  document.getElementById("range-control").style.display = "flex";
   arActive = true;
 
-  // 힌트 텍스트: 모바일/데스크탑 구분
   document.getElementById("drag-hint").textContent =
     isMobile ? "폰을 좌우로 돌려 주변 탐색" : "← 드래그하여 주변 탐색 →";
 
@@ -1122,18 +1130,31 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   buildRuler();
   initStars();
   updateRuler(0);
-
   startGPS();
+  startDesktopDrag(); // 드래그는 항상 활성화 (fallback)
 
   if (isMobile) {
     await startCamera();
-    startSensor();
-    startDesktopDrag();
-  } else {
-    startDesktopDrag();
+    if (isIOS) {
+      // iOS: 센서 권한 버튼을 오버레이 위에 다시 띄우기
+      document.getElementById("start-overlay").style.display = "flex";
+      document.getElementById("start-btn").style.display = "none";
+      document.getElementById("sensor-btn").style.display = "block";
+      document.getElementById("sensor-status").textContent =
+        "나침반 사용을 위해 아래 버튼을 눌러주세요";
+    } else {
+      // Android: 바로 센서 연결
+      attachSensorHandler();
+    }
   }
 
   setStatus("주변 등대를 탐색 중...", "active");
+});
+
+// iOS 센서 권한 버튼
+document.getElementById("sensor-btn").addEventListener("click", async () => {
+  await startSensor();
+  document.getElementById("start-overlay").style.display = "none";
 });
 </script>
 
