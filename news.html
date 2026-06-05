@@ -336,6 +336,8 @@ const panX_right = (lh.bearing + 360) * pxPerDeg;  // 오른쪽 복사본
       markerEls.push(el);
     });
 
+  }); // candidates.forEach 닫기
+
   // 처음 빌드 후 뷰포트 위치 맞추기
   moveOverlay(currentHeading);
 }
