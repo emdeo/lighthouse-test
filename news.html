@@ -475,7 +475,7 @@ function attachSensorHandler() {
     const smoothFactor = e.webkitCompassHeading !== undefined ? 0.15 : 0.06;
     smoothHeading += diff * smoothFactor;
     smoothHeading = (smoothHeading + 360) % 360;
-    const OFFSET = 5; // 왼쪽으로 치우쳐 있으면 양수, 오른쪽이면 음수
+    const OFFSET = 8; // 왼쪽으로 치우쳐 있으면 양수, 오른쪽이면 음수
     currentHeading = (smoothHeading + OFFSET + 360) % 360;
 
     if (e.beta !== null) {
@@ -606,6 +606,7 @@ async function startCamera() {
     // 카메라 켜면 수평선/바다 숨기기
     document.getElementById("sea").style.display = "none";
     document.getElementById("horizon").style.display = "none";
+    document.getElementById("ar-viewport").classList.add("camera-on");
   } catch {
     // 카메라 권한 없어도 AR 계속 작동
   }
