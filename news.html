@@ -347,13 +347,9 @@ function moveOverlay(heading) {
   // heading도 기준 중앙이 화면 중앙에 오도록 이동
   // translateX(-heading * pxPerDeg + vw/2) 이지만
   // 360도 경계 처리를 위해 모듈로 적용
+  // heading 기준 중앙이 화면 중앙에 오도록 단순 계산
+// 360도 랩어라운드 없이, heading을 직접 사용
   let offsetX = -(heading * pxPerDeg) + vw / 2;
-
-  // 360도 랩어라운드: 0도↔360도 경계가 부드럽게 이어지도록
-  // 오버레이를 3배 복제 대신, 경계에서 위치를 보정
-  offsetX = ((offsetX % totalW) + totalW) % totalW;
-  // 화면 왼쪽으로 충분히 보이도록 보정
-  if (offsetX > totalW - vw) offsetX -= totalW;
 
   overlay.style.transform = `translateX(${offsetX}px)`;
 
