@@ -1312,3 +1312,11 @@ body.ar-page nav a:hover {
 .camera-on .ar-marker-line {
   display: none;
 }
+/* 모든 등대 표시 체크박스 오른쪽 정렬 */
+#btn-all {
+  justify-content: space-between;
+}
+#btn-all .filter-check {
+  order: 1;
+  margin-left: auto;
+}
