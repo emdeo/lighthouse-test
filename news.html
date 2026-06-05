@@ -475,7 +475,8 @@ function attachSensorHandler() {
     const smoothFactor = e.webkitCompassHeading !== undefined ? 0.15 : 0.06;
     smoothHeading += diff * smoothFactor;
     smoothHeading = (smoothHeading + 360) % 360;
-    currentHeading = smoothHeading;
+    const OFFSET = 5; // 왼쪽으로 치우쳐 있으면 양수, 오른쪽이면 음수
+    currentHeading = (smoothHeading + OFFSET + 360) % 360;
 
     if (e.beta !== null) {
       const rawTilt = e.beta - 90;
