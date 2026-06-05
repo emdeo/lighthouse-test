@@ -793,6 +793,8 @@ let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
 let sensorActive = false;
 let sensorHandler = null;
+const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
+              typeof DeviceOrientationEvent.requestPermission === "function";
 
 // ════════════════════════════════════════
 //  등대 데이터 준비
@@ -1157,17 +1159,18 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   startDesktopDrag(); // 드래그는 항상 활성화 (fallback)
 
   if (isMobile) {
-    document.getElementById("compass-btn").style.display = "block"; // ← 추가
-    await startCamera();
+    document.getElementById("compass-btn").style.display = "block";
     if (isIOS) {
-      // iOS: 센서 권한 버튼을 오버레이 위에 다시 띄우기
+      // iOS: 카메라보다 센서 권한 먼저!
+      // 오버레이 다시 열고 센서 버튼만 보여줌
       document.getElementById("start-overlay").style.display = "flex";
       document.getElementById("start-btn").style.display = "none";
       document.getElementById("sensor-btn").style.display = "block";
       document.getElementById("sensor-status").textContent =
         "나침반 사용을 위해 아래 버튼을 눌러주세요";
+      // 카메라는 센서 버튼 누른 후에 켜짐 (sensor-btn 핸들러에서 처리)
     } else {
-      // Android: 바로 센서 연결
+      await startCamera();
       attachSensorHandler();
     }
   }
@@ -1177,17 +1180,18 @@ document.getElementById("start-btn").addEventListener("click", async () => {
 
 // iOS 센서 권한 버튼
 document.getElementById("sensor-btn").addEventListener("click", () => {
-  // async/await 없이 직접 requestPermission 호출
   DeviceOrientationEvent.requestPermission()
     .then(res => {
       if (res === "granted") {
         attachSensorHandler();
       }
-      // 성공/실패 상관없이 오버레이 닫기
+      // 센서 권한 후 카메라 켜기
+      startCamera();
       document.getElementById("start-overlay").style.display = "none";
       setStatus("주변 등대를 탐색 중...", "active");
     })
     .catch(() => {
+      startCamera();
       document.getElementById("start-overlay").style.display = "none";
       setStatus("센서 권한 없음 · 드래그로 탐색하세요", "warn");
     });
