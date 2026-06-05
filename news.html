@@ -648,6 +648,16 @@
   <label>표시 범위</label>
   <input type="range" id="range-slider" min="5" max="30" value="15">
   <span id="range-value">15km</span>
+  <button id="compass-btn" style="
+    display:none;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:8px;
+    color:#fff;
+    font-size:1.1rem;
+    padding:4px 10px;
+    cursor:pointer;
+    margin-left:8px;">🧭</button>
 </div>
 
 <!-- ── 하단 등대 정보 패널 ── -->
@@ -781,6 +791,8 @@ let maxRange = 15;
 let lighthouses = [];
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
+let sensorActive = false;
+let sensorHandler = null;
 
 // ════════════════════════════════════════
 //  등대 데이터 준비
@@ -968,7 +980,9 @@ function startGPS() {
 //  센서 (모바일 나침반)
 // ════════════════════════════════════════
 function attachSensorHandler() {
+  sensorActive = true;
   const handler = (e) => {
+    if (!sensorActive) return;   // ← 센서 꺼지면 무시
     if (e.alpha === null) return;
 
     // 좌우 방위각
@@ -994,13 +1008,15 @@ function attachSensorHandler() {
   // absolute 우선, 없으면 일반 deviceorientation
   window.addEventListener("deviceorientationabsolute", handler, true);
   window.addEventListener("deviceorientation", handler, true);
+  window.addEventListener("deviceorientationabsolute", handler, true);
+  window.addEventListener("deviceorientation", handler, true);
   return handler;
+}
 
-  // 렌더링을 센서와 분리 → 60fps로 부드럽게
+// renderLoop은 여기 (attachSensorHandler 밖)
 function renderLoop() {
   renderMarkers();
   requestAnimationFrame(renderLoop);
-}
 }
 
 async function startSensor() {
@@ -1075,6 +1091,7 @@ function startDesktopDrag() {
 
   // 터치 드래그 (센서 없을 때 fallback)
   vp.addEventListener("touchstart", e => {
+    sensorActive = false;        // ← 드래그 시작하면 센서 끔
     lastX = e.touches[0].clientX;
     velocity = 0;
   }, { passive: true });
@@ -1142,6 +1159,7 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   startDesktopDrag(); // 드래그는 항상 활성화 (fallback)
 
   if (isMobile) {
+    document.getElementById("compass-btn").style.display = "block"; // ← 추가
     await startCamera();
     if (isIOS) {
       // iOS: 센서 권한 버튼을 오버레이 위에 다시 띄우기
@@ -1164,6 +1182,12 @@ document.getElementById("sensor-btn").addEventListener("click", async () => {
   await startSensor();
   document.getElementById("start-overlay").style.display = "none";
 });
+
+// 나침반 버튼: 센서 다시 켜기
+document.getElementById("compass-btn").addEventListener("click", () => {
+  sensorActive = true;
+});
+
 </script>
 
 <!-- 링크 모음 오버레이 -->
