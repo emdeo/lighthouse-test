@@ -536,6 +536,70 @@
   #info-panel::-webkit-scrollbar { width: 3px; }
   #info-panel::-webkit-scrollbar-track { background: transparent; }
   #info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  /* ── 모바일 반응형 ── */
+  @media (max-width: 768px) {
+    /* 헤더: 로고만 보이고 nav 축소 */
+    #header {
+      padding: 0 14px;
+      gap: 10px;
+    }
+    nav a {
+      font-size: .72rem;
+      padding: 5px 8px;
+    }
+
+    /* 범위 슬라이더: 왼쪽 하단으로 이동 */
+    #range-control {
+      top: auto;
+      bottom: 80px;
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 24px;
+    }
+    #range-control label { margin-bottom: 0; }
+    #range-slider { width: 120px; }
+
+    /* 말풍선: 모바일에서 글씨 조금 크게, 탭하기 쉽게 */
+    .ar-marker-card {
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+    .ar-marker-name { font-size: .85rem; }
+    .ar-marker-dist { font-size: .75rem; }
+    .ar-marker-tag  { font-size: .65rem; }
+
+    /* 상태바: 모바일에서 위로 올리기 (슬라이더와 안 겹치게) */
+    #status-bar {
+      bottom: 140px;
+      font-size: .72rem;
+      padding: 8px 16px;
+    }
+
+    /* 정보 패널: 모바일에서 더 높게 */
+    #info-panel {
+      max-height: 55dvh;
+      padding: 20px 20px 32px;
+    }
+    #info-panel-name { font-size: 1.05rem; }
+
+    /* 시작 오버레이 */
+    #start-overlay h2 { font-size: 1.35rem; }
+    #start-overlay p  { font-size: .82rem; }
+    #start-btn { padding: 14px 36px; font-size: .88rem; }
+
+    /* 드래그 힌트: 모바일에선 "폰을 돌려 탐색" */
+    #drag-hint { bottom: 160px; }
+
+    /* 눈금자 글씨 약간 크게 */
+    .ruler-tick .tick-label { font-size: 10px; }
+    .ruler-tick.major .tick-label { font-size: 11px; }
+  }
 </style>
 </head>
 <body>
@@ -583,7 +647,7 @@
   <div id="ar-overlay"></div>
 
   <!-- 드래그 힌트 -->
-  <div id="drag-hint">← 드래그하여 주변 탐색 →</div>
+  <div id="drag-hint" id="drag-hint"></div>
 </div>
 
 <!-- 범위 조절 -->
@@ -717,10 +781,11 @@ function updateRuler(heading) {
 //  메인 상태
 // ════════════════════════════════════════
 let myLat = null, myLng = null;
-let currentHeading = 0;  // 현재 보고 있는 방위각
+let currentHeading = 0;
 let smoothHeading  = 0;
-let maxRange = 15;        // km
-let lighthouses = [];     // 처리된 등대 배열
+let smoothTilt     = 0;  // 상하 기울기: 0=수평 바라봄, 양수=위, 음수=아래
+let maxRange = 15;
+let lighthouses = [];
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
 
@@ -754,13 +819,12 @@ const FOV = 70; // 화면에 보이는 시야각 (도)
 function renderMarkers() {
   if (!myLat || !myLng) return;
 
-  const overlay  = document.getElementById("ar-overlay");
+  const overlay = document.getElementById("ar-overlay");
   const vw = window.innerWidth;
   const vh = window.innerHeight - 52;
 
   overlay.innerHTML = "";
 
-  // 가까운 순으로 정렬해서 가까운 게 위에 렌더
   const visible = lighthouses
     .map(lh => {
       const dist    = getDistance(myLat, myLng, lh.lat, lh.lng);
@@ -770,48 +834,46 @@ function renderMarkers() {
     .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
-  // 마커 겹침 방지용 점유 영역
   const occupied = [];
 
   visible.forEach(lh => {
-    // 화면 X 위치 계산
+    // ── X 위치: 방위각 기반 ──
     let diff = lh.bearing - currentHeading;
     if (diff > 180)  diff -= 360;
     if (diff < -180) diff += 360;
-
-    if (Math.abs(diff) > FOV / 2 + 5) return; // 시야 밖
-
+    if (Math.abs(diff) > FOV / 2 + 5) return;
     const screenX = (diff / FOV + 0.5) * vw;
 
-    // 거리 비율 (0=가깝다, 1=멀다)
+    // ── 거리 비율 ──
     const t = Math.min(lh.dist / maxRange, 1);
 
-    // Y 위치: 수평선 위로 올리기
+    // ── Y 위치: 수평선 기준 + 상하 기울기 반영 ──
     const horizonY = vh * 0.62;
-    const screenY = horizonY - 100; 
+    // 기울기: 폰을 위로 들면 마커가 위로, 아래로 내리면 마커가 내려감
+    const tiltOffset = smoothTilt * 3; // 기울기 민감도
+    const screenY = horizonY - 120 + tiltOffset;
 
-    // 크기: 4배 키우고, 가까울수록 크게
+    // ── 크기: 가까울수록 크게 ──
     const scale = Math.max(1.6, 4.8 - t * 3.2);
 
-    // 투명도: 멀수록 흐리게
+    // ── 투명도 ──
     const opacity = Math.max(0.3, 1 - t * 0.65);
 
-    // 겹침 체크
-    const w = 140 * scale, h = 80 * scale;
+    // ── 겹침 방지 ──
+    const w = 140, h = 80;
     const overlap = occupied.some(o =>
       Math.abs(o.x - screenX) < w && Math.abs(o.y - screenY) < h
     );
     if (overlap) return;
     occupied.push({ x: screenX, y: screenY });
 
-    // 거리 표시
     const distStr = lh.dist < 1
       ? `${Math.round(lh.dist * 1000)}m`
       : `${lh.dist.toFixed(1)}km`;
 
-    // 태그
     const tagClass = lh.isStamp ? "tag-stamp" : lh.isYear ? "tag-year" : "tag-none";
     const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "등대";
+    const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
 
     const el = document.createElement("div");
     el.className = "ar-marker";
@@ -821,8 +883,6 @@ function renderMarkers() {
       opacity: ${opacity};
       transform: translateX(-50%);
     `;
-
-   const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
     el.innerHTML = `
       <div class="ar-marker-card">
         <div class="ar-marker-name">${lh.name}</div>
@@ -831,17 +891,11 @@ function renderMarkers() {
       </div>
       <div class="ar-marker-line"></div>
       <svg width="${28*scale}" height="${38*scale}" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
-        <!-- 등대 몸체 -->
         <rect x="11" y="10" width="6" height="20" fill="${dotColor}" opacity="0.9" rx="1"/>
-        <!-- 등대 상단 빛 -->
-        <rect x="9" y="7" width="10" height="5" fill="${dotColor}" rx="1"/>
-        <!-- 등대 꼭대기 -->
-        <rect x="12" y="4" width="4" height="4" fill="white" rx=".5"/>
-        <!-- 등대 하단 받침 -->
-        <rect x="8" y="30" width="12" height="3" fill="${dotColor}" opacity="0.7" rx="1"/>
-        <!-- 빛 줄기 왼쪽 -->
-        <line x1="14" y1="9" x2="2" y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
-        <!-- 빛 줄기 오른쪽 -->
+        <rect x="9"  y="7"  width="10" height="5" fill="${dotColor}" rx="1"/>
+        <rect x="12" y="4"  width="4"  height="4" fill="white" rx=".5"/>
+        <rect x="8"  y="30" width="12" height="3" fill="${dotColor}" opacity="0.7" rx="1"/>
+        <line x1="14" y1="9" x2="2"  y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
         <line x1="14" y1="9" x2="26" y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
       </svg>
     `;
@@ -923,19 +977,28 @@ function startGPS() {
 function startSensor() {
   const handler = (e) => {
     if (e.alpha === null) return;
+
+    // ── 좌우 방위각 (alpha) ──
     const raw = (360 - e.alpha) % 360;
-    // 스무딩
     let diff = raw - smoothHeading;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
     smoothHeading += diff * 0.15;
     smoothHeading = (smoothHeading + 360) % 360;
     currentHeading = smoothHeading;
+
+    // ── 상하 기울기 (beta): 폰 세웠을 때 ~90도 ──
+    // beta: 0=평평, 90=수직(폰 세움), 180=뒤집기
+    // 90도 기준으로 편차를 계산: 위로 들면 양수, 아래로 내리면 음수
+    if (e.beta !== null) {
+      const rawTilt = e.beta - 90; // 수직 기준 편차
+      smoothTilt += (rawTilt - smoothTilt) * 0.1;
+    }
+
     updateRuler(currentHeading);
     renderMarkers();
   };
 
-  // iOS 13+ 권한 요청
   if (typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function") {
     DeviceOrientationEvent.requestPermission()
@@ -1051,6 +1114,10 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   document.getElementById("range-control").style.display = "block";
   arActive = true;
 
+  // 힌트 텍스트: 모바일/데스크탑 구분
+  document.getElementById("drag-hint").textContent =
+    isMobile ? "폰을 좌우로 돌려 주변 탐색" : "← 드래그하여 주변 탐색 →";
+
   prepareLighthouses();
   buildRuler();
   initStars();
@@ -1061,7 +1128,7 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   if (isMobile) {
     await startCamera();
     startSensor();
-    startDesktopDrag(); // 터치도 지원
+    startDesktopDrag();
   } else {
     startDesktopDrag();
   }
