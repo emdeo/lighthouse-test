@@ -64,7 +64,7 @@
 <!-- 범위 조절 -->
 <div id="range-control">
   <label>표시 범위</label>
-  <input type="range" id="range-slider" min="5" max="10" value="10">
+  <input type="range" id="range-slider" min="0" max="10" value="10">
   <span id="range-value">10km</span>
   <button id="compass-btn" style="
     display:none;
@@ -625,6 +625,7 @@ async function startCamera() {
 document.getElementById("range-slider").addEventListener("input", e => {
   maxRange = +e.target.value;
   document.getElementById("range-value").textContent = maxRange + "km";
+  setStatus(`위치 확인됨 · ${maxRange}km 이내 표시`, "active");
   buildMarkers();
 });
 
