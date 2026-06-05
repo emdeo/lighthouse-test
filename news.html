@@ -783,14 +783,21 @@ function renderMarkers() {
 
     const screenX = (diff / FOV + 0.5) * vw;
 
-    // Y 위치: 거리에 따라 수평선 근처 (멀수록 위)
-    const horizonY = vh * 0.62;
-    const minY = vh * 0.08;
+    // 거리 비율 (0=가깝다, 1=멀다)
     const t = Math.min(lh.dist / maxRange, 1);
-    const screenY = horizonY - (horizonY - minY) * (1 - t) * 0.85;
 
-    // 겹침 체크 (간단한 AABB)
-    const w = 130, h = 70;
+    // Y 위치: 모두 같은 수평선
+    const horizonY = vh * 0.62;
+    const screenY = horizonY;
+
+    // 크기: 가까울수록 크게, 멀수록 작게
+    const scale = Math.max(0.4, 1.2 - t * 0.8);
+
+    // 투명도: 멀수록 흐리게
+    const opacity = Math.max(0.3, 1 - t * 0.65);
+
+    // 겹침 체크
+    const w = 140 * scale, h = 80 * scale;
     const overlap = occupied.some(o =>
       Math.abs(o.x - screenX) < w && Math.abs(o.y - screenY) < h
     );
@@ -806,12 +813,16 @@ function renderMarkers() {
     const tagClass = lh.isStamp ? "tag-stamp" : lh.isYear ? "tag-year" : "tag-none";
     const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "등대";
 
-    // 투명도: 멀수록 흐리게
-    const opacity = Math.max(0.35, 1 - t * 0.6);
-
     const el = document.createElement("div");
     el.className = "ar-marker";
-    el.style.cssText = `left:${screenX}px; top:${screenY}px; opacity:${opacity};`;
+    el.style.cssText = `
+      left: ${screenX}px;
+      top: ${screenY}px;
+      opacity: ${opacity};
+      transform: translateX(-50%) scale(${scale});
+      transform-origin: bottom center;
+    `;
+    
    const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
     el.innerHTML = `
       <div class="ar-marker-card">
