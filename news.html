@@ -263,8 +263,10 @@ function renderMarkers() {
     let diff = lh.bearing - currentHeading;
     if (diff > 180)  diff -= 360;
     if (diff < -180) diff += 360;
-    if (Math.abs(diff) > FOV / 2 + 5) return;
+    if (Math.abs(diff) > FOV / 2 - 2) return;
     const screenX = (diff / FOV + 0.5) * vw;
+    // 화면 끝쪽으로 갈수록 자연스럽게 투명해짐
+    const edgeFade = Math.max(0, 1 - Math.abs(diff / (FOV / 2)) * 3);
 
     // ── 거리 비율 ──
     const t = Math.min(lh.dist / maxRange, 1);
@@ -279,12 +281,13 @@ function renderMarkers() {
     const scale = Math.max(1.6, 4.8 - t * 3.2);
 
     // ── 투명도 ──
-    const opacity = Math.max(0.3, 1 - t * 0.65);
+    const opacity = Math.max(0, (1 - t * 0.65) * edgeFade);
+    if (opacity < 0.05) return;
 
     // ── 겹침 방지 ──
     const w = 140, h = 80;
     const overlap = occupied.some(o =>
-      Math.abs(o.x - screenX) < w && Math.abs(o.y - screenY) < h
+    Math.abs(o.x - screenX) < w + 20 && Math.abs(o.y - screenY) < h + 20
     );
     if (overlap) return;
     occupied.push({ x: screenX, y: screenY });
