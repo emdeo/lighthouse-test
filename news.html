@@ -302,7 +302,7 @@ const panX_right = (lh.bearing + 360) * pxPerDeg;  // 오른쪽 복사본
       ? `${Math.round(lh.dist * 1000)}m`
       : `${lh.dist.toFixed(1)}km`;
     const tagClass = lh.isStamp ? "tag-stamp" : lh.isYear ? "tag-year" : "tag-none";
-    const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "등대";
+    const tagText  = lh.isStamp ? "스탬프 투어" : lh.isYear ? "올해의 등대" : "";
     const dotColor = lh.isStamp ? "#f59e0b" : lh.isYear ? "#10b981" : "#6b7280";
 
     [panX, panX_left, panX_right].forEach(px => {
@@ -319,7 +319,7 @@ const panX_right = (lh.bearing + 360) * pxPerDeg;  // 오른쪽 복사본
         <div class="ar-marker-card">
           <div class="ar-marker-name">${lh.name}</div>
           <div class="ar-marker-dist">${distStr}</div>
-          <div class="ar-marker-tag ${tagClass}">${tagText}</div>
+          <div class="ar-marker-tag ${tagClass}" style="display:${lh.isStamp || lh.isYear ? 'block' : 'none'}">${tagText}</div>
         </div>
         <div class="ar-marker-line"></div>
         <svg width="${28*scale}" height="${38*scale}" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
