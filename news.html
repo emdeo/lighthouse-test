@@ -976,24 +976,31 @@ function attachSensorHandler() {
     let diff = raw - smoothHeading;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
-    smoothHeading += diff * 0.15;
+    if (Math.abs(diff) < 1.5) return; // 데드존: 1.5도 미만 변화 무시
+    smoothHeading += diff * 0.06;     // 0.15 → 0.06 (더 부드럽게)
     smoothHeading = (smoothHeading + 360) % 360;
     currentHeading = smoothHeading;
 
-    // 상하 기울기 (beta 기반)
+    // 상하 기울기
     if (e.beta !== null) {
       const rawTilt = e.beta - 90;
-      smoothTilt += (rawTilt - smoothTilt) * 0.1;
+      smoothTilt += (rawTilt - smoothTilt) * 0.05; // 0.1 → 0.05
     }
 
     updateRuler(currentHeading);
-    renderMarkers();
+    // renderMarkers 제거! 아래 renderLoop이 담당
   };
 
   // absolute 우선, 없으면 일반 deviceorientation
   window.addEventListener("deviceorientationabsolute", handler, true);
   window.addEventListener("deviceorientation", handler, true);
   return handler;
+
+  // 렌더링을 센서와 분리 → 60fps로 부드럽게
+function renderLoop() {
+  renderMarkers();
+  requestAnimationFrame(renderLoop);
+}
 }
 
 async function startSensor() {
@@ -1131,6 +1138,7 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   initStars();
   updateRuler(0);
   startGPS();
+  requestAnimationFrame(renderLoop);
   startDesktopDrag(); // 드래그는 항상 활성화 (fallback)
 
   if (isMobile) {
