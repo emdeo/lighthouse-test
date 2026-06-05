@@ -606,21 +606,6 @@
     <div class="start-feature"><span>🖱️</span><span>데스크탑: 드래그로 방향 탐색</span></div>
   </div>
   <button id="start-btn">시작하기</button>
-  <!-- iOS 전용: 센서 권한 별도 버튼 -->
-  <button id="sensor-btn" style="display:none;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.2);
-    color:#fff;
-    font-family:'Noto Sans KR',sans-serif;
-    font-size:.82rem;
-    font-weight:500;
-    padding:10px 24px;
-    border-radius:10px;
-    cursor:pointer;
-    margin-top:-8px;">
-    🧭 나침반 센서 권한 허용
-  </button>
-  <p id="sensor-status" style="font-size:.72rem;color:rgba(255,255,255,0.35);margin-top:-8px;"></p>
 </div>
 
 <!-- ── AR 뷰포트 ── -->
@@ -657,7 +642,7 @@
     font-size:1.1rem;
     padding:4px 10px;
     cursor:pointer;
-    margin-left:8px;">🧭</button>
+    margin-left:6px;">🧭</button>
 </div>
 
 <!-- ── 하단 등대 정보 패널 ── -->
@@ -786,15 +771,12 @@ function updateRuler(heading) {
 let myLat = null, myLng = null;
 let currentHeading = 0;
 let smoothHeading  = 0;
-let smoothTilt     = 0;  // 상하 기울기: 0=수평 바라봄, 양수=위, 음수=아래
+let smoothTilt     = 0;
 let maxRange = 15;
 let lighthouses = [];
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
-let sensorActive = false;
-let sensorHandler = null;
-const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
-              typeof DeviceOrientationEvent.requestPermission === "function";
+let sensorActive = false; // 센서 켜짐 여부
 
 // ════════════════════════════════════════
 //  등대 데이터 준비
@@ -983,40 +965,48 @@ function startGPS() {
 // ════════════════════════════════════════
 function attachSensorHandler() {
   sensorActive = true;
-  const handler = (e) => {
-    if (!sensorActive) return;   // ← 센서 꺼지면 무시
-    if (e.alpha === null) return;
 
-    // 좌우 방위각
-    const raw = (360 - e.alpha) % 360;
-    let diff = raw - smoothHeading;
-    if (diff > 180) diff -= 360;
+  const handler = (e) => {
+    if (!sensorActive) return;
+
+    let heading = null;
+
+    // iOS 사파리: webkitCompassHeading이 진짜 나침반 값
+    if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
+      heading = e.webkitCompassHeading;
+
+    // Android absolute: 360 - alpha가 자북 기준
+    } else if (e.absolute === true && e.alpha !== null) {
+      heading = (360 - e.alpha) % 360;
+
+    // 그 외 (일반 deviceorientation): alpha는 상대값이라 신뢰도 낮음
+    } else if (e.alpha !== null) {
+      heading = (360 - e.alpha) % 360;
+    }
+
+    if (heading === null) return;
+
+    let diff = heading - smoothHeading;
+    if (diff > 180)  diff -= 360;
     if (diff < -180) diff += 360;
-    if (Math.abs(diff) < 1.5) return; // 데드존: 1.5도 미만 변화 무시
-    smoothHeading += diff * 0.06;     // 0.15 → 0.06 (더 부드럽게)
+    smoothHeading += diff * 0.15;
     smoothHeading = (smoothHeading + 360) % 360;
     currentHeading = smoothHeading;
 
-    // 상하 기울기
     if (e.beta !== null) {
       const rawTilt = e.beta - 90;
-      smoothTilt += (rawTilt - smoothTilt) * 0.05; // 0.1 → 0.05
+      smoothTilt += (rawTilt - smoothTilt) * 0.1;
     }
 
     updateRuler(currentHeading);
-    // renderMarkers 제거! 아래 renderLoop이 담당
+    renderMarkers();
   };
 
-  // absolute 우선, 없으면 일반 deviceorientation
+  // Android는 absolute 이벤트 우선, iOS는 deviceorientation에서 webkitCompassHeading 사용
   window.addEventListener("deviceorientationabsolute", handler, true);
   window.addEventListener("deviceorientation", handler, true);
-  return handler;
-}
 
-// renderLoop은 여기 (attachSensorHandler 밖)
-function renderLoop() {
-  renderMarkers();
-  requestAnimationFrame(renderLoop);
+  return handler;
 }
 
 async function startSensor() {
@@ -1052,6 +1042,7 @@ function startDesktopDrag() {
   let velocity = 0;
   let lastTime = 0;
 
+  // 마우스 드래그 (데스크탑)
   vp.addEventListener("mousedown", e => {
     dragging = true;
     lastX = e.clientX;
@@ -1089,9 +1080,9 @@ function startDesktopDrag() {
     raf = requestAnimationFrame(inertia);
   });
 
-  // 터치 드래그 (센서 없을 때 fallback)
+  // 터치 드래그 (모바일) - 드래그 시작하면 센서 끔
   vp.addEventListener("touchstart", e => {
-    sensorActive = false;        // ← 드래그 시작하면 센서 끔
+    sensorActive = false; // 드래그 시작 → 센서 끄기
     lastX = e.touches[0].clientX;
     velocity = 0;
   }, { passive: true });
@@ -1139,38 +1130,47 @@ document.getElementById("range-slider").addEventListener("input", e => {
 // ════════════════════════════════════════
 //  시작 버튼
 // ════════════════════════════════════════
-document.getElementById("start-btn").addEventListener("click", async () => {
-  const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
-                typeof DeviceOrientationEvent.requestPermission === "function";
-
+document.getElementById("start-btn").addEventListener("click", () => {
   document.getElementById("start-overlay").style.display = "none";
   document.getElementById("range-control").style.display = "flex";
   arActive = true;
 
   document.getElementById("drag-hint").textContent =
-    isMobile ? "폰을 좌우로 돌려 주변 탐색" : "← 드래그하여 주변 탐색 →";
+    isMobile ? "드래그하면 센서 꺼짐 · 🧭 버튼으로 다시 켜기" : "← 드래그하여 주변 탐색 →";
 
   prepareLighthouses();
   buildRuler();
   initStars();
   updateRuler(0);
   startGPS();
-  requestAnimationFrame(renderLoop);
-  startDesktopDrag(); // 드래그는 항상 활성화 (fallback)
+  startDesktopDrag(); // 항상 드래그 활성화
 
   if (isMobile) {
+    // 모바일: 나침반 버튼 표시
     document.getElementById("compass-btn").style.display = "block";
+
+    const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
+                  typeof DeviceOrientationEvent.requestPermission === "function";
+
     if (isIOS) {
-      // iOS: 카메라보다 센서 권한 먼저!
-      // 오버레이 다시 열고 센서 버튼만 보여줌
-      document.getElementById("start-overlay").style.display = "flex";
-      document.getElementById("start-btn").style.display = "none";
-      document.getElementById("sensor-btn").style.display = "block";
-      document.getElementById("sensor-status").textContent =
-        "나침반 사용을 위해 아래 버튼을 눌러주세요";
-      // 카메라는 센서 버튼 누른 후에 켜짐 (sensor-btn 핸들러에서 처리)
+      // iOS: 센서 권한을 지금 바로 요청 (클릭 컨텍스트 안에서!)
+      DeviceOrientationEvent.requestPermission()
+        .then(res => {
+          if (res === "granted") {
+            startCamera();
+            attachSensorHandler();
+          } else {
+            startCamera();
+            setStatus("센서 권한 거부 · 드래그로 탐색하세요", "warn");
+          }
+        })
+        .catch(() => {
+          startCamera();
+          setStatus("센서 권한 요청 실패 · 드래그로 탐색하세요", "warn");
+        });
     } else {
-      await startCamera();
+      // Android: 바로 카메라 + 센서 시작
+      startCamera();
       attachSensorHandler();
     }
   }
@@ -1178,30 +1178,11 @@ document.getElementById("start-btn").addEventListener("click", async () => {
   setStatus("주변 등대를 탐색 중...", "active");
 });
 
-// iOS 센서 권한 버튼
-document.getElementById("sensor-btn").addEventListener("click", () => {
-  DeviceOrientationEvent.requestPermission()
-    .then(res => {
-      if (res === "granted") {
-        attachSensorHandler();
-      }
-      // 센서 권한 후 카메라 켜기
-      startCamera();
-      document.getElementById("start-overlay").style.display = "none";
-      setStatus("주변 등대를 탐색 중...", "active");
-    })
-    .catch(() => {
-      startCamera();
-      document.getElementById("start-overlay").style.display = "none";
-      setStatus("센서 권한 없음 · 드래그로 탐색하세요", "warn");
-    });
-});
-
-// 나침반 버튼: 센서 다시 켜기
+// 🧭 나침반 버튼: 센서 다시 켜기
 document.getElementById("compass-btn").addEventListener("click", () => {
   sensorActive = true;
+  setStatus("나침반 센서 켜짐 · 폰을 돌려 탐색하세요", "active");
 });
-
 </script>
 
 <!-- 링크 모음 오버레이 -->
