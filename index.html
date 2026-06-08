@@ -84,7 +84,11 @@
     <a href="news.html">실시간 등대 식별</a>
     <a href="#" id="btn-links">관련 사이트 바로가기</a>
   </nav>
+  <!-- 모바일 햄버거 버튼 -->
+  <button id="mobile-menu-btn">☰</button>
 </header>
+
+<div id="mobile-overlay"></div>
 
 <!-- ── APP LAYOUT ── -->
 <div id="app">
@@ -556,19 +560,24 @@ function selectLighthouse(lh) {
     const pos = new kakao.maps.LatLng(lh.lat, lh.lng);
 window.kakaoMap.setLevel(5);
 
-// 팝업 열릴 예정이므로 팝업 너비만큼 왼쪽으로 오프셋
-const mapContainer = document.getElementById("map-container");
-const mapWidth = mapContainer.offsetWidth;
-const panelW = 320;   // 왼쪽 패널 너비
-const popupW = 300;   // 오른쪽 팝업 너비
-const visibleCenterX = panelW + (mapWidth - panelW - popupW) / 2;
-const fullCenterX = panelW + (mapWidth - panelW) / 2;
-const offsetPx = visibleCenterX - fullCenterX;
-const proj = window.kakaoMap.getProjection();
-const centerPoint = proj.pointFromCoords(pos);
-centerPoint.x -= offsetPx;
-const adjustedCenter = proj.coordsFromPoint(centerPoint);
-window.kakaoMap.setCenter(adjustedCenter);
+/// 팝업 열릴 예정이므로 오프셋 보정 (데스크탑만)
+const isMobile = window.innerWidth <= 768;
+if (!isMobile) {
+  const mapContainer = document.getElementById("map-container");
+  const mapWidth = mapContainer.offsetWidth;
+  const panelW = 320;
+  const popupW = 300;
+  const visibleCenterX = panelW + (mapWidth - panelW - popupW) / 2;
+  const fullCenterX = panelW + (mapWidth - panelW) / 2;
+  const offsetPx = visibleCenterX - fullCenterX;
+  const proj = window.kakaoMap.getProjection();
+  const centerPoint = proj.pointFromCoords(pos);
+  centerPoint.x -= offsetPx;
+  const adjustedCenter = proj.coordsFromPoint(centerPoint);
+  window.kakaoMap.setCenter(adjustedCenter);
+} else {
+  window.kakaoMap.setCenter(pos);
+}
 
     const markerImg = new kakao.maps.MarkerImage(
       "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
@@ -1307,6 +1316,34 @@ clusterer.setStyles([{
 }
 // 지도 로드 시작
 loadKakaoMap();
+
+// ── 모바일 패널 열기/닫기 ──
+const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+const mobileOverlay = document.getElementById("mobile-overlay");
+const panel = document.getElementById("panel");
+
+function openMobilePanel() {
+  panel.classList.add("mobile-open");
+  mobileOverlay.classList.add("visible");
+}
+function closeMobilePanel() {
+  panel.classList.remove("mobile-open");
+  mobileOverlay.classList.remove("visible");
+}
+
+mobileMenuBtn.addEventListener("click", () => {
+  if (panel.classList.contains("mobile-open")) {
+    closeMobilePanel();
+  } else {
+    openMobilePanel();
+  }
+});
+mobileOverlay.addEventListener("click", closeMobilePanel);
+
+// ── 모바일에서 마커 오프셋 0으로 ──
+// selectLighthouse 함수 안의 오프셋 계산을 모바일에서 무시
+const _origSelectLighthouse = selectLighthouse;
+
 </script>
 </body>
 </html>
