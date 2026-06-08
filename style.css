@@ -1702,20 +1702,22 @@ html:has(body.detail-page) {
 
   /* 하단 시트 (필터/목록) */
   #mobile-sheet {
-    display: block;
-    position: fixed;
-    bottom: 60px; left: 0; right: 0;
-    height: 70vh;
-    background: var(--white);
-    border-radius: 16px 16px 0 0;
-    border-top: 1.5px solid var(--gray2);
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
-    z-index: 200;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow: hidden;
-  }
-  #mobile-sheet.open { transform: translateY(0); }
+  display: block;
+  position: fixed;
+  bottom: 60px; left: 0; right: 0;
+  height: 100px;
+  background: var(--white);
+  border-radius: 16px 16px 0 0;
+  border-top: 1.5px solid var(--gray2);
+  box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
+  z-index: 200;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+#mobile-sheet.open {
+  transform: translateY(0);
+}
   #mobile-sheet-handle {
     width: 40px; height: 4px;
     background: var(--gray2);
