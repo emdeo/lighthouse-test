@@ -545,6 +545,40 @@ function renderMarkers() {
   });
 }
 
+function selectLighthouse(lh) {
+  // 이전 검색 마커 제거
+  if (window.searchMarker) {
+    window.searchMarker.setMap(null);
+    window.searchMarker = null;
+  }
+
+  if (window.kakaoMap && lh.lat && lh.lng) {
+    const pos = new kakao.maps.LatLng(lh.lat, lh.lng);
+    window.kakaoMap.setCenter(pos);  // panTo 대신 setCenter로 즉시 이동
+    window.kakaoMap.setLevel(5);
+
+    const markerImg = new kakao.maps.MarkerImage(
+      "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+      new kakao.maps.Size(24, 35)
+    );
+    window.searchMarker = new kakao.maps.Marker({
+      position: pos,
+      image: markerImg,
+      map: window.kakaoMap,
+      zIndex: 10,
+    });
+
+    kakao.maps.event.addListener(window.kakaoMap, "click", () => {
+      if (window.searchMarker) {
+        window.searchMarker.setMap(null);
+        window.searchMarker = null;
+      }
+    });
+  }
+
+  openPopup(lh, null);
+}
+
 // ════════════════════════════════════════
 //  팝업
 // ════════════════════════════════════════
@@ -738,11 +772,7 @@ function renderList() {
       if (!lh) return;
 
       // 카카오 지도 등대면 panTo로 이동 + 팝업 열기
-      if (window.kakaoMap && lh.lat && lh.lng) {
-        window.kakaoMap.panTo(new kakao.maps.LatLng(lh.lat, lh.lng));
-        window.kakaoMap.setLevel(5);
-      }
-      openPopup(lh, null);
+      selectLighthouse(lh);
     });
   });
 }
@@ -914,12 +944,8 @@ function renderSearchDropdown() {
       item.addEventListener("click", () => {
         const lh = allData.find(l => String(l.id) === String(item.dataset.id));
         if (!lh) return;
-        if (window.kakaoMap && lh.lat && lh.lng) {
-          window.kakaoMap.panTo(new kakao.maps.LatLng(lh.lat, lh.lng));
-          window.kakaoMap.setLevel(5);
-        }
-        openPopup(lh, null);
-        dropdown.classList.remove("visible"); // 선택 후 드롭다운 닫기
+        selectLighthouse(lh);
+        dropdown.classList.remove("visible");
         document.getElementById("search-input").value = lh.name;
       });
     });
