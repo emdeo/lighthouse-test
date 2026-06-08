@@ -357,9 +357,11 @@
   </button>
 </nav>
 
-<!-- 모바일 하단 시트 -->
+<!-- 모바일 하단 시트 (필터/팝업 공용) -->
 <div id="mobile-sheet">
-  <div id="mobile-sheet-handle"></div>
+  <div id="mobile-sheet-handle">
+    <div id="mobile-sheet-handle-bar"></div>
+  </div>
   <div id="mobile-sheet-content"></div>
 </div>
 <div id="mobile-overlay"></div>
@@ -1100,6 +1102,8 @@ function loadKakaoMap() {
       const map = new kakao.maps.Map(container, options);
       window.kakaoMap = map;
 
+      
+
       // 내 위치 마커 (지도 로드 후)
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(pos => {
@@ -1351,55 +1355,102 @@ clusterer.setStyles([{
 // 지도 로드 시작
 loadKakaoMap();
 
-
 // ── 모바일 전용 기능 ──
 const isMobileDevice = () => window.innerWidth <= 768;
 
-// 내 위치 마커
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(pos => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
-    if (window.kakaoMap) {
-      const locOverlay = new kakao.maps.CustomOverlay({
-        position: new kakao.maps.LatLng(lat, lng),
-        content: '<div class="my-location-marker"></div>',
-        zIndex: 5,
-      });
-      locOverlay.setMap(window.kakaoMap);
-    }
-  });
-}
-
-// 하단 시트 열기/닫기
-const mobileSheet = document.getElementById("mobile-sheet");
-const mobileOverlay = document.getElementById("mobile-overlay");
+// ── 하단 시트 공용 시스템 ──
+const mobileSheet     = document.getElementById("mobile-sheet");
+const mobileOverlay   = document.getElementById("mobile-overlay");
 const mobileSheetContent = document.getElementById("mobile-sheet-content");
+const handle          = document.getElementById("mobile-sheet-handle");
 
-function openMobileSheet() {
-  // 패널 내용을 시트에 복사
-  mobileSheetContent.innerHTML = document.getElementById("panel").innerHTML;
+let sheetMode = null;
+
+const SNAP_HALF = window.innerHeight * 0.4;
+const SNAP_FULL = window.innerHeight * 0.85;
+
+function openSheet(mode, contentHtml) {
+  sheetMode = mode;
+  mobileSheetContent.innerHTML = contentHtml;
+  mobileSheet.style.height = SNAP_HALF + "px";
   mobileSheet.classList.add("open");
   mobileOverlay.classList.add("visible");
-}
-function closeMobileSheet() {
-  mobileSheet.classList.remove("open");
-  mobileOverlay.classList.remove("visible");
+  adjustMapCenter(SNAP_HALF);
 }
 
-document.getElementById("mobile-sheet-btn").addEventListener("click", openMobileSheet);
+function closeSheet() {
+  mobileSheet.classList.remove("open");
+  mobileOverlay.classList.remove("visible");
+  sheetMode = null;
+  adjustMapCenter(0);
+}
+
+function adjustMapCenter(sheetHeight) {
+  if (!window.kakaoMap || !window.searchMarker) return;
+  const pos = window.searchMarker.getPosition();
+  if (sheetHeight === 0) {
+    window.kakaoMap.setCenter(pos);
+    return;
+  }
+  const offsetPy = sheetHeight / 2;
+  const proj = window.kakaoMap.getProjection();
+  const cp = proj.pointFromCoords(pos);
+  cp.y -= offsetPy;
+  window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
+}
+
+let dragStartY = 0;
+let dragStartH = 0;
+
+handle.addEventListener("touchstart", e => {
+  dragStartY = e.touches[0].clientY;
+  dragStartH = mobileSheet.offsetHeight;
+});
+
+handle.addEventListener("touchmove", e => {
+  const dy = dragStartY - e.touches[0].clientY;
+  const newH = Math.max(100, Math.min(SNAP_FULL, dragStartH + dy));
+  mobileSheet.style.height = newH + "px";
+  adjustMapCenter(newH);
+});
+
+handle.addEventListener("touchend", e => {
+  const currentH = mobileSheet.offsetHeight;
+  if (currentH < window.innerHeight * 0.2) {
+    closeSheet();
+  } else if (currentH < window.innerHeight * 0.6) {
+    mobileSheet.style.height = SNAP_HALF + "px";
+    adjustMapCenter(SNAP_HALF);
+  } else {
+    mobileSheet.style.height = SNAP_FULL + "px";
+    adjustMapCenter(SNAP_FULL);
+  }
+});
+
+mobileOverlay.addEventListener("click", closeSheet);
+
+document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
+  openSheet("filter", document.getElementById("panel").innerHTML);
+});
+
 document.getElementById("mobile-links-btn").addEventListener("click", () => {
   document.getElementById("links-overlay").classList.add("visible");
 });
-mobileOverlay.addEventListener("click", closeMobileSheet);
 
-// 드래그로 시트 닫기
-let startY = 0;
-const handle = document.getElementById("mobile-sheet-handle");
-handle.addEventListener("touchstart", e => { startY = e.touches[0].clientY; });
-handle.addEventListener("touchend", e => {
-  if (e.changedTouches[0].clientY - startY > 60) closeMobileSheet();
-});
+const _origOpenPopup = openPopup;
+function openPopupMobile(lh, markerEl) {
+  if (!isMobileDevice()) {
+    _origOpenPopup(lh, markerEl);
+    return;
+  }
+  _origOpenPopup(lh, markerEl);
+  const popupEl = document.getElementById("popup");
+  setTimeout(() => {
+    openSheet("popup", popupEl.innerHTML);
+    popupEl.classList.remove("visible");
+  }, 50);
+}
+window.openPopup = openPopupMobile;
 
 </script>
 </body>
