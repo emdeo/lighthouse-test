@@ -338,6 +338,7 @@
   cursor: pointer;
   transition: color .15s;
 }
+
 .popup-desc:hover {
   text-decoration: underline;
   text-decoration-color: #cbd5e1;
@@ -1631,87 +1632,36 @@ html:has(body.detail-page) {
   overflow: auto;
   height: auto;
 }
-
 /* ════════════════════════════════════════
    모바일 반응형 (768px 이하)
 ════════════════════════════════════════ */
+#mobile-nav { display: none; }
+#mobile-sheet { display: none; }
+#mobile-menu-btn { display: none; }
+
 @media (max-width: 768px) {
 
-  /* 헤더 */
-  #header {
-    padding: 0 1rem;
-    gap: .75rem;
-  }
-  .header-search {
-    flex: 1;
-    max-width: none;
-  }
-  nav { display: none; }
+  /* 헤더: 로고 + 검색만 */
+  #header { padding: 0 .75rem; gap: .6rem; }
+  #header nav { display: none; }
+  #mobile-menu-btn { display: none; }
+  .header-search { flex: 1; max-width: none; }
 
-  /* 햄버거 버튼 */
-  #mobile-menu-btn {
-    display: flex;
-    align-items: center; justify-content: center;
-    width: 36px; height: 36px;
-    background: none; border: none;
-    font-size: 1.4rem; cursor: pointer;
-    color: var(--navy); flex-shrink: 0;
-  }
-
-  /* 앱 레이아웃 */
+  /* 앱: 전체화면 지도 */
   #app { flex-direction: column; }
-
-  /* 패널: 하단 시트로 */
-  #panel {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    width: 100%;
-    height: 70vh;
-    border-right: none;
-    border-top: 1.5px solid var(--gray2);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
-    z-index: 150;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow-y: auto;
-  }
-  #panel.mobile-open {
-    transform: translateY(0);
-  }
-
-  /* 패널 핸들 */
-  #panel::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .5rem;
-  }
-
-  /* 패널 토글 버튼 숨김 */
+  #panel { display: none; }
   #panel-toggle { display: none; }
+  #map-wrap { flex: 1; width: 100%; height: 100%; }
 
-  /* 지도: 전체 화면 */
-  #map-wrap {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 팝업: 하단 시트로 */
+  /* 팝업: 하단 시트 */
   #popup {
     position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    top: auto !important; bottom: 60px !important;
+    left: 0 !important; right: 0 !important;
     width: 100% !important;
-    max-height: 70vh !important;
+    max-height: 65vh !important;
     border-radius: 16px 16px 0 0 !important;
     box-shadow: 0 -4px 24px rgba(27,46,75,0.15) !important;
-    overflow-y: auto;
   }
   #popup::before {
     content: '';
@@ -1721,339 +1671,81 @@ html:has(body.detail-page) {
     border-radius: 2px;
     margin: .75rem auto .25rem;
   }
+  .popup-close { top: .75rem !important; right: .75rem !important; }
 
-  /* 팝업 닫기 버튼 위치 조정 */
-  .popup-close {
-    top: .75rem !important;
-    right: .75rem !important;
-  }
-
-  /* 모바일 메뉴 오버레이 (패널 뒤 배경) */
-  #mobile-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 140;
-  }
-  #mobile-overlay.visible { display: block; }
-}
-
-/* ════════════════════════════════════════
-   모바일 반응형 (768px 이하)
-════════════════════════════════════════ */
-@media (max-width: 768px) {
-
-  /* 헤더 */
-  #header {
-    padding: 0 1rem;
-    gap: .75rem;
-  }
-  .header-search {
-    flex: 1;
-    max-width: none;
-  }
-  nav { display: none; }
-
-  /* 햄버거 버튼 */
-  #mobile-menu-btn {
+  /* 하단 내비게이션 바 */
+  #mobile-nav {
     display: flex;
-    align-items: center; justify-content: center;
-    width: 36px; height: 36px;
-    background: none; border: none;
-    font-size: 1.4rem; cursor: pointer;
-    color: var(--navy); flex-shrink: 0;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--white);
+    border-top: 1px solid var(--gray2);
+    z-index: 300;
+    box-shadow: 0 -2px 12px rgba(27,46,75,0.1);
   }
+  .mobile-nav-item {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px;
+    background: none; border: none;
+    text-decoration: none;
+    color: var(--gray3);
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: color .15s;
+  }
+  .mobile-nav-item.active { color: var(--navy); }
+  .mobile-nav-item:hover { color: var(--navy); }
+  .mobile-nav-icon { font-size: 1.3rem; }
+  .mobile-nav-label { font-size: .6rem; }
 
-  /* 앱 레이아웃 */
-  #app { flex-direction: column; }
-
-  /* 패널: 하단 시트로 */
-  #panel {
+  /* 하단 시트 (필터/목록) */
+  #mobile-sheet {
+    display: block;
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    width: 100%;
+    bottom: 60px; left: 0; right: 0;
     height: 70vh;
-    border-right: none;
-    border-top: 1.5px solid var(--gray2);
+    background: var(--white);
     border-radius: 16px 16px 0 0;
+    border-top: 1.5px solid var(--gray2);
     box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
-    z-index: 150;
+    z-index: 200;
     transform: translateY(100%);
     transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow-y: auto;
+    overflow: hidden;
   }
-  #panel.mobile-open {
-    transform: translateY(0);
-  }
-
-  /* 패널 핸들 */
-  #panel::before {
-    content: '';
-    display: block;
+  #mobile-sheet.open { transform: translateY(0); }
+  #mobile-sheet-handle {
     width: 40px; height: 4px;
     background: var(--gray2);
     border-radius: 2px;
     margin: .75rem auto .5rem;
+    cursor: grab;
   }
-
-  /* 패널 토글 버튼 숨김 */
-  #panel-toggle { display: none; }
-
-  /* 지도: 전체 화면 */
-  #map-wrap {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 팝업: 하단 시트로 */
-  #popup {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    border-radius: 16px 16px 0 0 !important;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15) !important;
+  #mobile-sheet-content {
     overflow-y: auto;
-  }
-  #popup::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .25rem;
+    height: calc(70vh - 32px);
+    padding: 0 1rem 1rem;
   }
 
-  /* 팝업 닫기 버튼 위치 조정 */
-  .popup-close {
-    top: .75rem !important;
-    right: .75rem !important;
-  }
-
-  /* 모바일 메뉴 오버레이 (패널 뒤 배경) */
+  /* 모바일 오버레이 */
   #mobile-overlay {
     display: none;
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.3);
-    z-index: 140;
+    z-index: 190;
   }
   #mobile-overlay.visible { display: block; }
+
+  /* 내 위치 마커 */
+  .my-location-marker {
+    width: 18px; height: 18px;
+    background: #2563eb;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.3);
+  }
 }
-
-/* ════════════════════════════════════════
-   모바일 반응형 (768px 이하)
-════════════════════════════════════════ */
-@media (max-width: 768px) {
-
-  /* 헤더 */
-  #header {
-    padding: 0 1rem;
-    gap: .75rem;
-  }
-  .header-search {
-    flex: 1;
-    max-width: none;
-  }
-  nav { display: none; }
-
-  /* 햄버거 버튼 */
-  #mobile-menu-btn {
-    display: flex;
-    align-items: center; justify-content: center;
-    width: 36px; height: 36px;
-    background: none; border: none;
-    font-size: 1.4rem; cursor: pointer;
-    color: var(--navy); flex-shrink: 0;
-  }
-
-  /* 앱 레이아웃 */
-  #app { flex-direction: column; }
-
-  /* 패널: 하단 시트로 */
-  #panel {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    width: 100%;
-    height: 70vh;
-    border-right: none;
-    border-top: 1.5px solid var(--gray2);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
-    z-index: 150;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow-y: auto;
-  }
-  #panel.mobile-open {
-    transform: translateY(0);
-  }
-
-  /* 패널 핸들 */
-  #panel::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .5rem;
-  }
-
-  /* 패널 토글 버튼 숨김 */
-  #panel-toggle { display: none; }
-
-  /* 지도: 전체 화면 */
-  #map-wrap {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 팝업: 하단 시트로 */
-  #popup {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    border-radius: 16px 16px 0 0 !important;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15) !important;
-    overflow-y: auto;
-  }
-  #popup::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .25rem;
-  }
-
-  /* 팝업 닫기 버튼 위치 조정 */
-  .popup-close {
-    top: .75rem !important;
-    right: .75rem !important;
-  }
-
-  /* 모바일 메뉴 오버레이 (패널 뒤 배경) */
-  #mobile-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 140;
-  }
-  #mobile-overlay.visible { display: block; }
-}
-/* ════════════════════════════════════════
-   모바일 반응형 (768px 이하)
-════════════════════════════════════════ */
-@media (max-width: 768px) {
-
-  /* 헤더 */
-  #header {
-    padding: 0 1rem;
-    gap: .75rem;
-  }
-  .header-search {
-    flex: 1;
-    max-width: none;
-  }
-  nav { display: none; }
-
-  /* 햄버거 버튼 */
-  #mobile-menu-btn {
-    display: flex;
-    align-items: center; justify-content: center;
-    width: 36px; height: 36px;
-    background: none; border: none;
-    font-size: 1.4rem; cursor: pointer;
-    color: var(--navy); flex-shrink: 0;
-  }
-
-  /* 앱 레이아웃 */
-  #app { flex-direction: column; }
-
-  /* 패널: 하단 시트로 */
-  #panel {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    width: 100%;
-    height: 70vh;
-    border-right: none;
-    border-top: 1.5px solid var(--gray2);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15);
-    z-index: 150;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow-y: auto;
-  }
-  #panel.mobile-open {
-    transform: translateY(0);
-  }
-
-  /* 패널 핸들 */
-  #panel::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .5rem;
-  }
-
-  /* 패널 토글 버튼 숨김 */
-  #panel-toggle { display: none; }
-
-  /* 지도: 전체 화면 */
-  #map-wrap {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 팝업: 하단 시트로 */
-  #popup {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    border-radius: 16px 16px 0 0 !important;
-    box-shadow: 0 -4px 24px rgba(27,46,75,0.15) !important;
-    overflow-y: auto;
-  }
-  #popup::before {
-    content: '';
-    display: block;
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .25rem;
-  }
-
-  /* 팝업 닫기 버튼 위치 조정 */
-  .popup-close {
-    top: .75rem !important;
-    right: .75rem !important;
-  }
-
-  /* 모바일 메뉴 오버레이 (패널 뒤 배경) */
-  #mobile-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 140;
-  }
-  #mobile-overlay.visible { display: block; }
-}
-
 /* 데스크탑에서 햄버거 버튼 숨김 */
 #mobile-menu-btn { display: none; }
