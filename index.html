@@ -1406,7 +1406,7 @@ function snapTo(snapH, animate = true) {
   adjustMapCenter(snapH);
 
   // 전체 확장 시 내부 스크롤 허용
-  mobileSheetContent.style.overflowY = snapH >= SNAP_FULL * 0.9 ? "auto" : "hidden";
+  mobileSheetContent.style.overflowY = snapH >= SNAP_HALF ? "auto" : "hidden";
 }
 
 // 가장 가까운 스냅 포인트 찾기
@@ -1529,10 +1529,31 @@ function openPopupMobile(lh, markerEl) {
   _origOpenPopup(lh, markerEl);
   const popupEl = document.getElementById("popup");
   setTimeout(() => {
-    openSheet("popup", popupEl.innerHTML);
+    // 모바일용: 이름 → 사진 → 기본정보 순으로 재조합
+    const imgPart  = popupEl.querySelector(".popup-img")?.outerHTML  || "";
+    const bodyPart = popupEl.querySelector(".popup-body")?.outerHTML || "";
+    const namePart = popupEl.querySelector(".popup-name")?.outerHTML || "";
+    const descPart = popupEl.querySelector(".popup-desc")?.outerHTML || "";
+
+    // popup-body에서 이름/설명 추출 후 나머지만 남기기
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = bodyPart;
+    const nameEl = tempDiv.querySelector(".popup-name");
+    const descEl = tempDiv.querySelector(".popup-desc");
+    if (nameEl) nameEl.remove();
+    if (descEl) descEl.remove();
+    const restBody = tempDiv.innerHTML;
+
+    openSheet("popup",
+      `<div class="popup-name" style="font-size:1.25rem;font-weight:700;padding:.8rem 1rem .2rem;">${popupEl.querySelector(".popup-name")?.textContent || ""}</div>` +
+      `<div class="popup-desc" style="padding:0 1rem .6rem;font-size:.85rem;color:var(--gray3);">${popupEl.querySelector(".popup-desc")?.textContent || ""}</div>` +
+      imgPart +
+      `<div class="popup-body">${restBody}</div>`
+    );
     popupEl.classList.remove("visible");
   }, 50);
 }
+window.openPopup = openPopupMobile;
 window.openPopup = openPopupMobile;
 
 </script>
