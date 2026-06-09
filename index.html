@@ -1480,6 +1480,17 @@ function closeSheet() {
     app.insertBefore(panel, document.getElementById("map-wrap"));
   }
   if (window._mobileNameOverlay) { window._mobileNameOverlay.setMap(null); window._mobileNameOverlay = null; }
+  if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
+  if (window.selectedMarker) {
+    if (window.selectedMarkerOriginalImage) {
+      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+    } else {
+      window.selectedMarker.setMap(null);
+    }
+    window.selectedMarker = null;
+    window.selectedMarkerOriginalImage = null;
+    window.selectedLhId = null;
+  }
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
   mobileSheet.style.height = SNAP_PEEK + "px";
