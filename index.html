@@ -1425,8 +1425,15 @@ function openSheet(mode, contentHtml) {
 }
 
 function closeSheet() {
+  // 필터 모드였으면 패널을 원래 자리로 되돌리기
+  if (sheetMode === "filter") {
+    const panel = document.getElementById("panel");
+    const app = document.getElementById("app");
+    app.insertBefore(panel, document.getElementById("map-wrap"));
+  }
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
+  mobileSheet.style.height = SNAP_PEEK + "px";
   sheetMode = null;
   currentSnap = SNAP_PEEK;
   adjustMapCenter(0);
@@ -1509,7 +1516,14 @@ mobileOverlay.addEventListener("click", closeSheet);
 
 // 필터/목록 버튼
 document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
-  openSheet("filter", document.getElementById("panel").innerHTML);
+  const panel = document.getElementById("panel");
+  const sheetContent = document.getElementById("mobile-sheet-content");
+  sheetContent.innerHTML = "";
+  sheetContent.appendChild(panel);
+  mobileSheet.classList.add("open");
+  mobileOverlay.classList.add("visible");
+  snapTo(SNAP_HALF);
+  sheetMode = "filter";
 });
 
 // 관련사이트 버튼
