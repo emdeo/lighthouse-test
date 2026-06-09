@@ -1429,6 +1429,7 @@ function closeSheet() {
   if (sheetMode === "filter") {
     const panel = document.getElementById("panel");
     panel.style.display = "";
+    panel.style.width = "";
     panel.style.height = "";
     panel.style.overflow = "";
     const app = document.getElementById("app");
@@ -1524,6 +1525,8 @@ document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
   sheetContent.innerHTML = "";
   sheetContent.appendChild(panel);
   panel.style.display = "flex";
+  panel.style.width = "100%";
+  panel.style.height = "100%";
   mobileSheet.classList.add("open");
   mobileOverlay.classList.add("visible");
   snapTo(SNAP_HALF);
