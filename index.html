@@ -1128,7 +1128,8 @@ function loadKakaoMap() {
       window.kakaoMap = map;
 
       kakao.maps.event.addListener(map, "click", () => {
-  closePopup();
+      if (isMobileDevice()) return;
+      closePopup();
 });
 
       markerImages = {
