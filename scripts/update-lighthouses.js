@@ -6,7 +6,7 @@ const NUM_OF_ROWS = 500;
 
 function fetchPage(pageNo) {
   return new Promise((resolve, reject) => {
-    const url = 'https://apis.data.go.kr/1192136/buoyInfo/getBuoyInfo'
+    const url = 'https://apis.data.go.kr/1192136/Buoy/getBuoyInfo'
       + '?serviceKey=' + API_KEY
       + '&pageNo=' + pageNo
       + '&numOfRows=' + NUM_OF_ROWS
