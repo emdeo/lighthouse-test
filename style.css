@@ -1636,7 +1636,7 @@ html:has(body.detail-page) {
 /* ════════════════════════════════════════
    모바일 반응형 (768px 이하)
 ════════════════════════════════════════ */
-#mobile-nav { display: none; }
+
 #mobile-sheet { display: none; }
 #mobile-menu-btn { display: none; }
 
