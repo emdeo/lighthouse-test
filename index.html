@@ -1470,6 +1470,18 @@ function findNearestSnap(h) {
 }
 
 function openSheet(mode, contentHtml) {
+  // 이전 시트가 열려있으면 조용히 정리 (마커는 건드리지 않음)
+  if (sheetMode && sheetMode !== mode) {
+    if (sheetMode === "filter") {
+      const panel = document.getElementById("panel");
+      panel.style.display = "";
+      panel.style.width = "";
+      panel.style.height = "";
+      panel.style.overflow = "hidden";
+      const app = document.getElementById("app");
+      app.insertBefore(panel, document.getElementById("map-wrap"));
+    }
+  }
   sheetMode = mode;
   mobileSheetContent.innerHTML = contentHtml;
   mobileSheetContent.scrollTop = 0;
@@ -1491,6 +1503,17 @@ function closeSheet() {
   }
   if (window._mobileNameOverlay) { window._mobileNameOverlay.setMap(null); window._mobileNameOverlay = null; }
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
+  // popup 모드 닫을 때만 마커 복원 (필터 모드는 마커 건드리지 않음)
+  if (sheetMode === "popup" && window.selectedMarker) {
+    if (window.selectedMarkerOriginalImage) {
+      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+    } else {
+      window.selectedMarker.setMap(null);
+    }
+    window.selectedMarker = null;
+    window.selectedMarkerOriginalImage = null;
+    window.selectedLhId = null;
+  }
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
   mobileSheet.style.height = SNAP_PEEK + "px";
