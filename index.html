@@ -592,10 +592,11 @@ function selectLighthouse(lh) {
     : null;
 
   if (markerObj) {
-  window.selectedMarkerOriginalImage = markerObj.getImage();
-  markerObj.setImage(markerImages.selected);
-  markerObj.setMap(window.kakaoMap);
-  window.selectedMarker = markerObj;
+    window.selectedMarkerOriginalImage = markerObj.getImage();
+    markerObj.setImage(markerImages.selected);
+    markerObj.setMap(window.kakaoMap);
+    window.selectedMarker = markerObj;
+    window.selectedLhId = lh.id;
 } else if (window.kakaoMap && lh.lat && lh.lng) {
   const pos2 = new kakao.maps.LatLng(lh.lat, lh.lng);
   const newMarker = new kakao.maps.Marker({
@@ -1317,20 +1318,26 @@ kakao.maps.event.addListener(marker, "click", () => {
     window._nameOverlay.setMap(null);
     window._nameOverlay = null;
   }
-  // 이전 선택 마커 복원
-  if (window.selectedMarker && window.selectedMarker !== marker) {
-    if (window.selectedMarkerOriginalImage) {
-      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
-    } else {
-      window.selectedMarker.setMap(null);
+  // 이전 선택 마커 복원 (id 기준으로 현재 마커 배열에서 다시 찾기)
+  if (window.selectedLhId && window.selectedLhId !== lh.id) {
+    const prevMarker = (window.REAL_LIGHTHOUSE_MARKERS || [])
+      .find(m => String(m._lhId) === String(window.selectedLhId));
+    if (prevMarker) {
+      prevMarker.setImage(window.selectedMarkerOriginalImage || markerImages.none);
+    } else if (window.selectedMarker) {
+      window.selectedMarker.setMap(null); // 필터 비활성 상태로 임시 생성된 마커 제거
     }
     window.selectedMarker = null;
     window.selectedMarkerOriginalImage = null;
+    window.selectedLhId = null;
   }
+
   // 현재 마커 빨간색으로
   window.selectedMarkerOriginalImage = marker.getImage();
   marker.setImage(markerImages.selected);
   window.selectedMarker = marker;
+  window.selectedLhId = lh.id;
+
   // 이름 말풍선
   const nameOverlay = new kakao.maps.CustomOverlay({
     position,
