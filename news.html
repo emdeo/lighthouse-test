@@ -318,12 +318,28 @@ function buildMarkers() {
         position: absolute;
       `;
       el.innerHTML = `
-  <div class="ar-marker-card">
-    <div class="ar-marker-name">${lh.name}</div>
-    <div class="ar-marker-dist">${distStr}</div>
-    <div class="ar-marker-tag ${tagClass}" style="display:${lh.isStamp || lh.isYear ? 'block' : 'none'}">${tagText}</div>
-  </div>
-  <div class="ar-marker-line" style="height:${Math.max(20, horizonY - panY - 10)}px;"></div>
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="160"
+       height="${Math.max(20, horizonY - panY - 10) + 60}"
+       style="overflow:visible; display:block;">
+    <!-- 말풍선 배경 -->
+    <rect x="0" y="0" width="160" height="52" rx="10"
+      fill="rgba(15,25,45,0.75)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <!-- 등대 이름 -->
+    <text x="80" y="20" text-anchor="middle"
+      font-family="Noto Sans KR, sans-serif" font-size="12" font-weight="700" fill="white">
+      ${lh.name}
+    </text>
+    <!-- 거리 -->
+    <text x="80" y="38" text-anchor="middle"
+      font-family="Noto Sans KR, sans-serif" font-size="11" fill="rgba(255,255,255,0.55)">
+      ${distStr}
+    </text>
+    <!-- 수직선 -->
+    <line x1="80" y1="52"
+          x2="80" y2="${Math.max(20, horizonY - panY - 10) + 52}"
+      stroke="rgba(245,158,11,0.85)" stroke-width="2"/>
+  </svg>
 `;
       el.addEventListener("click", () => openInfoPanel(lh, distStr));
       overlay.appendChild(el);
