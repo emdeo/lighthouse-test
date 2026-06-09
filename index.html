@@ -574,18 +574,23 @@ function renderMarkers() {
 }
 
 function selectLighthouse(lh) {
-  // 이전 선택 마커 원래 색으로 복원
-  if (window.selectedMarker && window.selectedMarkerOriginalImage) {
-    window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+  // 이전 선택 마커 복원 (id 기준으로 현재 마커 배열에서 다시 찾기)
+  if (window.selectedLhId && window.selectedLhId !== lh.id) {
+    const prevMarker = (window.REAL_LIGHTHOUSE_MARKERS || [])
+      .find(m => String(m._lhId) === String(window.selectedLhId));
+    if (prevMarker) {
+      prevMarker.setImage(window.selectedMarkerOriginalImage || markerImages.none);
+    } else if (window.selectedMarker) {
+      window.selectedMarker.setMap(null); // 임시 생성된 마커 제거
+    }
     window.selectedMarker = null;
     window.selectedMarkerOriginalImage = null;
+    window.selectedLhId = null;
   }
-  // 이전 검색 마커 제거 (혹시 남아있으면)
   if (window.searchMarker) {
     window.searchMarker.setMap(null);
     window.searchMarker = null;
   }
-
   // lh에 해당하는 실제 마커 객체 찾기
   const markerObj = window.REAL_LIGHTHOUSE_MARKERS
     ? window.REAL_LIGHTHOUSE_MARKERS.find(m => String(m._lhId) === String(lh.id))
@@ -608,6 +613,7 @@ function selectLighthouse(lh) {
   newMarker._lhId = lh.id;
   window.selectedMarker = newMarker;
   window.selectedMarkerOriginalImage = null;
+  window.selectedLhId = lh.id;  // ← 추가
 }
 
   if (window.kakaoMap && lh.lat && lh.lng) {
@@ -778,6 +784,15 @@ if (markerEl && layer && mapWrap) {
 
 function closePopup() {
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
+  document.getElementById("popup").classList.remove("visible");
+  activeId = null;
+  renderMarkers();
+  renderList();
+}
+
+document.getElementById("popup-close").addEventListener("click", () => {
+  // 팝업 닫기 + 마커 정리
+  if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
   if (window.selectedMarker) {
     if (window.selectedMarkerOriginalImage) {
       window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
@@ -786,15 +801,10 @@ function closePopup() {
     }
     window.selectedMarker = null;
     window.selectedMarkerOriginalImage = null;
-    window.selectedLhId = null; 
+    window.selectedLhId = null;
   }
-  document.getElementById("popup").classList.remove("visible");
-  activeId = null;
-  renderMarkers();
-  renderList();
-}
-
-document.getElementById("popup-close").addEventListener("click", closePopup);
+  closePopup();
+});
 
 
 // ════════════════════════════════════════
@@ -1481,16 +1491,6 @@ function closeSheet() {
   }
   if (window._mobileNameOverlay) { window._mobileNameOverlay.setMap(null); window._mobileNameOverlay = null; }
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
-  if (window.selectedMarker) {
-    if (window.selectedMarkerOriginalImage) {
-      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
-    } else {
-      window.selectedMarker.setMap(null);
-    }
-    window.selectedMarker = null;
-    window.selectedMarkerOriginalImage = null;
-    window.selectedLhId = null;
-  }
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
   mobileSheet.style.height = SNAP_PEEK + "px";
