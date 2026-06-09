@@ -1431,7 +1431,7 @@ function closeSheet() {
     panel.style.display = "";
     panel.style.width = "";
     panel.style.height = "";
-    panel.style.overflow = "";
+    panel.style.overflow = "hidden";
     const app = document.getElementById("app");
     app.insertBefore(panel, document.getElementById("map-wrap"));
   }

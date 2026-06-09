@@ -1641,6 +1641,15 @@ html:has(body.detail-page) {
 
 @media (max-width: 768px) {
 
+  #mobile-sheet-content .panel-section {
+  max-height: none;
+  flex-shrink: 1;
+}
+
+#mobile-sheet-content #panel {
+  overflow-y: auto;
+}
+
   /* 헤더: 로고 + 검색만 */
   #header { padding: 0 .75rem; gap: .6rem; }
   #header nav { display: none; }
@@ -1719,12 +1728,19 @@ html:has(body.detail-page) {
   transform: translateY(0);
 }
   #mobile-sheet-handle {
-    width: 40px; height: 4px;
-    background: var(--gray2);
-    border-radius: 2px;
-    margin: .75rem auto .5rem;
-    cursor: grab;
-  }
+  flex-shrink: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+#mobile-sheet-handle-bar {
+  width: 40px; height: 4px;
+  background: var(--gray2);
+  border-radius: 2px;
+}
+  
   #mobile-sheet-content {
   overflow-y: auto;
   height: calc(100% - 32px);
