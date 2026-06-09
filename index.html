@@ -1428,7 +1428,9 @@ function closeSheet() {
   // 필터 모드였으면 패널을 원래 자리로 되돌리기
   if (sheetMode === "filter") {
     const panel = document.getElementById("panel");
-    panel.style.display = ""; 
+    panel.style.display = "";
+    panel.style.height = "";
+    panel.style.overflow = "";
     const app = document.getElementById("app");
     app.insertBefore(panel, document.getElementById("map-wrap"));
   }
