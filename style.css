@@ -1007,7 +1007,7 @@ body.ar-page nav a:hover {
 .ar-marker-line {
   width: 1px;
   height: 24px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.15) 70%, transparent);
 }
 
 .ar-marker-dot {
