@@ -1500,17 +1500,7 @@ function closeSheet() {
   }
   if (window._mobileNameOverlay) { window._mobileNameOverlay.setMap(null); window._mobileNameOverlay = null; }
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
-  // popup 모드 닫을 때만 마커 복원 (필터 모드는 마커 건드리지 않음)
-  if (sheetMode === "popup" && window.selectedMarker) {
-    if (window.selectedMarkerOriginalImage) {
-      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
-    } else {
-      window.selectedMarker.setMap(null);
-    }
-    window.selectedMarker = null;
-    window.selectedMarkerOriginalImage = null;
-    window.selectedLhId = null;
-  }
+  
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
   mobileSheet.style.height = SNAP_PEEK + "px";
