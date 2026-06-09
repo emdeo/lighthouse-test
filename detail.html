@@ -396,6 +396,16 @@ if (lh.lat && lh.lng) {
   document.querySelector(".weather-label").textContent = "좌표 정보가 없어 날씨를 불러올 수 없어요";
 }
 
+function wfToIcon(wf) {
+  if (!wf) return "🌤";
+  if (wf.includes("비")) return "🌧";
+  if (wf.includes("눈")) return "❄️";
+  if (wf.includes("흐림") || wf.includes("흐리고")) return "☁️";
+  if (wf.includes("구름많")) return "🌥";
+  if (wf.includes("맑")) return "☀️";
+  return "🌤";
+}
+
 function renderForecast(days) {
   const list = document.getElementById("forecast-list");
   if (!days || !days.length) {
@@ -410,28 +420,44 @@ function renderForecast(days) {
       border-radius:10px;
       font-size:.85rem;
     ">
-      <span style="font-weight:700; color:var(--navy); width:80px;">${d.date}</span>
-      <span style="flex:1; text-align:center; color:var(--gray4);">${d.desc}</span>
-      <span style="color:#e74c3c; font-weight:700; margin-right:.5rem;">${d.tempMax}°</span>
+      <span style="font-weight:700; color:var(--navy); width:90px; flex-shrink:0;">${d.date}</span>
+      <span style="font-size:1.2rem; margin-right:.5rem;">${wfToIcon(d.desc)}</span>
+      <span style="flex:1; color:var(--gray4);">${d.desc}</span>
+      <span style="color:#e74c3c; font-weight:700; margin-right:.4rem;">${d.tempMax}°</span>
       <span style="color:#3b82f6; font-weight:700;">${d.tempMin}°</span>
     </div>
   `).join("");
 }
 
-// 오늘 날짜 기준으로 7일치 임시 데이터 생성 (API 연결 전 테스트용)
-const dayNames = ["일","월","화","수","목","금","토"];
-const tempDays = Array.from({length: 7}, (_, i) => {
-  const d = new Date();
-  d.setDate(d.getDate() + i);
-  const label = i === 0 ? "오늘" : i === 1 ? "내일" : `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
-  return {
-    date: label,
-    desc: "정보 준비 중",
-    tempMax: "—",
-    tempMin: "—"
-  };
-});
-renderForecast(tempDays);
+if (lh.lat && lh.lng) {
+  fetch(`${CONFIG.WEATHER_API_URL}/forecast?lat=${lh.lat}&lng=${lh.lng}`)
+    .then(r => r.json())
+    .then(data => {
+      const landItem = data.land?.response?.body?.items?.item?.[0];
+      const taItem   = data.ta?.response?.body?.items?.item?.[0];
+      if (!landItem || !taItem) { renderForecast([]); return; }
+
+      const dayNames = ["일","월","화","수","목","금","토"];
+      const today = new Date();
+      const days = [];
+      for (let i = 4; i <= 10; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
+        const wf = i <= 7
+          ? (landItem[`wf${i}Pm`] || landItem[`wf${i}Am`] || "—")
+          : (landItem[`wf${i}`] || "—");
+        days.push({
+          date:    label,
+          desc:    wf,
+          tempMax: taItem[`taMax${i}`] ?? "—",
+          tempMin: taItem[`taMin${i}`] ?? "—",
+        });
+      }
+      renderForecast(days);
+    })
+    .catch(() => renderForecast([]));
+}
 
 </script>
 </body>
