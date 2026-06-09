@@ -1713,7 +1713,7 @@ html:has(body.detail-page) {
   z-index: 200;
   transform: translateY(100%);
   transition: transform .3s cubic-bezier(.4,0,.2,1);
-  overflow: hidden;
+  overflow: visible;
 }
 #mobile-sheet.open {
   transform: translateY(0);
@@ -1726,10 +1726,10 @@ html:has(body.detail-page) {
     cursor: grab;
   }
   #mobile-sheet-content {
-    overflow-y: auto;
-    height: calc(70vh - 32px);
-    padding: 0 1rem 1rem;
-  }
+  overflow-y: auto;
+  height: calc(100% - 32px);
+  padding: 0 1rem 2rem;
+}
 
   /* 모바일 오버레이 */
   #mobile-overlay {
