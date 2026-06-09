@@ -574,57 +574,65 @@ function renderMarkers() {
 }
 
 function selectLighthouse(lh) {
-  // 이전 검색 마커 제거
+  // 이전 선택 마커 원래 색으로 복원
+  if (window.selectedMarker && window.selectedMarkerOriginalImage) {
+    window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+    window.selectedMarker = null;
+    window.selectedMarkerOriginalImage = null;
+  }
+  // 이전 검색 마커 제거 (혹시 남아있으면)
   if (window.searchMarker) {
     window.searchMarker.setMap(null);
     window.searchMarker = null;
   }
 
-  if (window.kakaoMap && lh.lat && lh.lng) {
-    const pos = new kakao.maps.LatLng(lh.lat, lh.lng);
-window.kakaoMap.setLevel(5);
+  // lh에 해당하는 실제 마커 객체 찾기
+  const markerObj = window.REAL_LIGHTHOUSE_MARKERS
+    ? window.REAL_LIGHTHOUSE_MARKERS.find(m => String(m._lhId) === String(lh.id))
+    : null;
 
-/// 팝업 열릴 예정이므로 오프셋 보정 (데스크탑만)
-const isMobile = window.innerWidth <= 768;
-if (!isMobile) {
-  const mapContainer = document.getElementById("map-container");
-  const mapWidth = mapContainer.offsetWidth;
-  const panelW = 320;
-  const popupW = 300;
-  const visibleCenterX = panelW + (mapWidth - panelW - popupW) / 2;
-  const fullCenterX = panelW + (mapWidth - panelW) / 2;
-  const offsetPx = visibleCenterX - fullCenterX;
-  const proj = window.kakaoMap.getProjection();
-  const centerPoint = proj.pointFromCoords(pos);
-  centerPoint.x -= offsetPx;
-  const adjustedCenter = proj.coordsFromPoint(centerPoint);
-  window.kakaoMap.setCenter(adjustedCenter);
-} else {
-  // 모바일: 하단 시트 높이만큼 위로 보정
-  const sheetH = window.innerHeight * 0.4;
-  const proj = window.kakaoMap.getProjection();
-  const cp = proj.pointFromCoords(pos);
-  cp.y += sheetH / 2;
-  window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
+  if (markerObj) {
+  window.selectedMarkerOriginalImage = markerObj.getImage();
+  markerObj.setImage(markerImages.selected);
+  markerObj.setMap(window.kakaoMap);
+  window.selectedMarker = markerObj;
+} else if (window.kakaoMap && lh.lat && lh.lng) {
+  const pos2 = new kakao.maps.LatLng(lh.lat, lh.lng);
+  const newMarker = new kakao.maps.Marker({
+    position: pos2,
+    image: markerImages.selected,
+    map: window.kakaoMap,
+    zIndex: 10,
+  });
+  newMarker._lhId = lh.id;
+  window.selectedMarker = newMarker;
+  window.selectedMarkerOriginalImage = null;
 }
 
-    const markerImg = new kakao.maps.MarkerImage(
-      "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-      new kakao.maps.Size(24, 35)
-    );
-    window.searchMarker = new kakao.maps.Marker({
-      position: pos,
-      image: markerImg,
-      map: window.kakaoMap,
-      zIndex: 10,
-    });
+  if (window.kakaoMap && lh.lat && lh.lng) {
+    const pos = new kakao.maps.LatLng(lh.lat, lh.lng);
+    window.kakaoMap.setLevel(5);
 
-    kakao.maps.event.addListener(window.kakaoMap, "click", () => {
-      if (window.searchMarker) {
-        window.searchMarker.setMap(null);
-        window.searchMarker = null;
-      }
-    });
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+      const mapContainer = document.getElementById("map-container");
+      const mapWidth = mapContainer.offsetWidth;
+      const panelW = 320;
+      const popupW = 300;
+      const visibleCenterX = panelW + (mapWidth - panelW - popupW) / 2;
+      const fullCenterX = panelW + (mapWidth - panelW) / 2;
+      const offsetPx = visibleCenterX - fullCenterX;
+      const proj = window.kakaoMap.getProjection();
+      const centerPoint = proj.pointFromCoords(pos);
+      centerPoint.x -= offsetPx;
+      window.kakaoMap.setCenter(proj.coordsFromPoint(centerPoint));
+    } else {
+      const sheetH = window.innerHeight * 0.4;
+      const proj = window.kakaoMap.getProjection();
+      const cp = proj.pointFromCoords(pos);
+      cp.y += sheetH / 2;
+      window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
+    }
   }
 
   openPopup(lh, null);
@@ -768,24 +776,24 @@ if (markerEl && layer && mapWrap) {
 }
 
 function closePopup() {
+  if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
+  if (window.selectedMarker) {
+    if (window.selectedMarkerOriginalImage) {
+      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+    } else {
+      window.selectedMarker.setMap(null);
+    }
+    window.selectedMarker = null;
+    window.selectedMarkerOriginalImage = null;
+  }
   document.getElementById("popup").classList.remove("visible");
   activeId = null;
   renderMarkers();
   renderList();
-
-  // 마커가 있으면 팝업 닫힌 후 지도 중심을 원래대로 복원
-  if (window.searchMarker) {
-    const pos = window.searchMarker.getPosition();
-    window.kakaoMap.setCenter(pos);
-  }
 }
 
 document.getElementById("popup-close").addEventListener("click", closePopup);
 
-// 지도 빈 곳 클릭 시 팝업 닫기
-document.getElementById("map-container").addEventListener("click", e => {
-  if (!e.target.closest(".marker") && !e.target.closest("#popup")) closePopup();
-});
 
 // ════════════════════════════════════════
 //  사이드 목록 렌더링
@@ -1107,8 +1115,17 @@ function loadKakaoMap() {
       const map = new kakao.maps.Map(container, options);
       window.kakaoMap = map;
 
-      
+      kakao.maps.event.addListener(map, "click", () => {
+  closePopup();
+});
 
+      markerImages = {
+      stamp:    makeMarkerImage("#f59e0b"),
+      year:     makeMarkerImage("#10b981"),
+      none:     makeMarkerImage("#6b7280"),
+      selected: makeMarkerImage("#ef4444"),
+    };
+      
       // 내 위치 마커 (지도 로드 후)
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(pos => {
@@ -1169,15 +1186,8 @@ if (navigator.geolocation) {
   };
   document.head.appendChild(script);
 }
-// ════════════════════════════════════════
-//  해양조사원 등대표 API 호출 (XML 방식)
-// ════════════════════════════════════════
-async function loadLighthouseData(map) {
-  try {
-    const data = LIGHTHOUSE_DATA;
-    console.log(`✅ 등대 ${data.length}개 로드 완료`);
 
-    // 색상별 마커 이미지 생성 함수
+let markerImages = {};
 function makeMarkerImage(color) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
     <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z" fill="${color}" stroke="white" stroke-width="2"/>
@@ -1185,11 +1195,14 @@ function makeMarkerImage(color) {
   const url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
   return new kakao.maps.MarkerImage(url, new kakao.maps.Size(28, 36), { offset: new kakao.maps.Point(14, 36) });
 }
-const markerImages = {
-  stamp: makeMarkerImage("#f59e0b"),   // 노란색
-  year:  makeMarkerImage("#10b981"),   // 초록색
-  none:  makeMarkerImage("#6b7280"),   // 회색
-};
+
+// ════════════════════════════════════════
+//  해양조사원 등대표 API 호출 (XML 방식)
+// ════════════════════════════════════════
+async function loadLighthouseData(map) {
+  try {
+    const data = LIGHTHOUSE_DATA;
+    console.log(`✅ 등대 ${data.length}개 로드 완료`);
 
     const clusterer = new kakao.maps.MarkerClusterer({
       map,
@@ -1295,28 +1308,51 @@ clusterer.setStyles([{
                  : isStamp ? markerImages.stamp
                  : markerImages.none;
         const marker = new kakao.maps.Marker({ position, image: markerImage });
+        marker._lhId = lh.id;
 
-        kakao.maps.event.addListener(marker, "mouseover", () => {
-          const tooltip = document.getElementById("marker-tooltip");
-          tooltip.textContent = lh.name;
-          tooltip.style.display = "block";
-        });
-        marker._moveHandler = (e) => {
-          const tooltip = document.getElementById("marker-tooltip");
-          if (tooltip.style.display === "block") {
-            tooltip.style.left      = e.clientX + "px";
-            tooltip.style.top       = (e.clientY + 20) + "px";
-            tooltip.style.transform = "translateX(-50%)";
-        };
-      }
-        document.addEventListener("mousemove", marker._moveHandler);
-        kakao.maps.event.addListener(marker, "mouseout", () => {
-          document.getElementById("marker-tooltip").style.display = "none";
-          document.removeEventListener("mousemove", marker._moveHandler);
-        });
-        newMarkers.push(marker);
+// 클릭 시 이름 말풍선 + 팝업/시트
+kakao.maps.event.addListener(marker, "click", () => {
+  // 이전 말풍선 제거
+  if (window._nameOverlay) {
+    window._nameOverlay.setMap(null);
+    window._nameOverlay = null;
+  }
+  // 이전 선택 마커 복원
+  if (window.selectedMarker && window.selectedMarker !== marker) {
+    if (window.selectedMarkerOriginalImage) {
+      window.selectedMarker.setImage(window.selectedMarkerOriginalImage);
+    } else {
+      window.selectedMarker.setMap(null);
+    }
+    window.selectedMarker = null;
+    window.selectedMarkerOriginalImage = null;
+  }
+  // 현재 마커 빨간색으로
+  window.selectedMarkerOriginalImage = marker.getImage();
+  marker.setImage(markerImages.selected);
+  window.selectedMarker = marker;
+  // 이름 말풍선
+  const nameOverlay = new kakao.maps.CustomOverlay({
+    position,
+    content: `<div style="
+      background:white; color:#1b2e4b;
+      font-size:.72rem; font-weight:700;
+      padding:.3rem .7rem; border-radius:6px;
+      box-shadow:0 2px 8px rgba(0,0,0,.2);
+      white-space:nowrap; margin-top:4px;
+    ">${lh.name}</div>`,
+    yAnchor: -0.3,
+    zIndex: 10,
+  });
+  nameOverlay.setMap(map);
+  window._nameOverlay = nameOverlay;
+  openPopup(lh, null);
+});
+
+newMarkers.push(marker);
       });
 
+      window.REAL_LIGHTHOUSE_MARKERS = newMarkers;       
       clusterer.addMarkers(newMarkers);
     };
     data.forEach(item => {
@@ -1423,7 +1459,7 @@ function openSheet(mode, contentHtml) {
   mobileOverlay.classList.add("visible");
   snapTo(SNAP_PEEK);
 }
-
+if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
 function closeSheet() {
   // 필터 모드였으면 패널을 원래 자리로 되돌리기
   if (sheetMode === "filter") {
@@ -1435,6 +1471,7 @@ function closeSheet() {
     const app = document.getElementById("app");
     app.insertBefore(panel, document.getElementById("map-wrap"));
   }
+  if (window._mobileNameOverlay) { window._mobileNameOverlay.setMap(null); window._mobileNameOverlay = null; }
   mobileSheet.classList.remove("open");
   mobileOverlay.classList.remove("visible");
   mobileSheet.style.height = SNAP_PEEK + "px";
