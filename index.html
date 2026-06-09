@@ -1548,6 +1548,29 @@ function openPopupMobile(lh, markerEl) {
       imgPart +
       `<div class="popup-body">${restBody}</div>`
     );
+
+    // 시트: 이름/설명 클릭 → detail 이동
+    const sheetContent = document.getElementById("mobile-sheet-content");
+    const sheetNameEl = sheetContent.querySelector(".popup-name");
+    const sheetDescEl = sheetContent.querySelector(".popup-desc");
+    const sheetDetailBtn = sheetContent.querySelector("#btn-detail");
+    const goDetail = () => {
+      const params = new URLSearchParams({
+        id:     lh.id   || "",
+        name:   lh.name || "",
+        lat:    lh.lat  || "",
+        lng:    lh.lng  || "",
+        region: lh.region || "",
+        desc:   lh.desc   || "",
+        tags:   (lh.tags  || []).join(","),
+        stampCategory: lh.stampCategory || "",
+      });
+      window.location.href = `detail.html?${params.toString()}`;
+    };
+    if (sheetNameEl) { sheetNameEl.style.cursor = "pointer"; sheetNameEl.onclick = goDetail; }
+    if (sheetDescEl) { sheetDescEl.style.cursor = "pointer"; sheetDescEl.onclick = goDetail; }
+    if (sheetDetailBtn) sheetDetailBtn.onclick = goDetail;
+
     // 시트 날씨 별도 업데이트
 fetch(`${CONFIG.WEATHER_API_URL}/?lat=${lh.lat}&lng=${lh.lng}`)
   .then(r => r.json())
