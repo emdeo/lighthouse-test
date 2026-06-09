@@ -318,21 +318,13 @@ function buildMarkers() {
         position: absolute;
       `;
       el.innerHTML = `
-        <div class="ar-marker-card">
-          <div class="ar-marker-name">${lh.name}</div>
-          <div class="ar-marker-dist">${distStr}</div>
-          <div class="ar-marker-tag ${tagClass}" style="display:${lh.isStamp || lh.isYear ? 'block' : 'none'}">${tagText}</div>
-        </div>
-        <div class="ar-marker-line" style="height:${Math.max(20, horizonY - panY - 10)}px;"></div>
-        <svg width="${28*scale}" height="${38*scale}" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
-          <rect x="11" y="10" width="6" height="20" fill="${dotColor}" opacity="0.9" rx="1"/>
-          <rect x="9"  y="7"  width="10" height="5" fill="${dotColor}" rx="1"/>
-          <rect x="12" y="4"  width="4"  height="4" fill="white" rx=".5"/>
-          <rect x="8"  y="30" width="12" height="3" fill="${dotColor}" opacity="0.7" rx="1"/>
-          <line x1="14" y1="9" x2="2"  y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
-          <line x1="14" y1="9" x2="26" y2="2" stroke="${dotColor}" stroke-width="1" opacity="0.4"/>
-        </svg>
-      `;
+  <div class="ar-marker-card">
+    <div class="ar-marker-name">${lh.name}</div>
+    <div class="ar-marker-dist">${distStr}</div>
+    <div class="ar-marker-tag ${tagClass}" style="display:${lh.isStamp || lh.isYear ? 'block' : 'none'}">${tagText}</div>
+  </div>
+  <div class="ar-marker-line" style="height:${Math.max(20, horizonY - panY - 10)}px;"></div>
+`;
       el.addEventListener("click", () => openInfoPanel(lh, distStr));
       overlay.appendChild(el);
       markerEls.push(el);
