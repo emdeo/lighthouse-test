@@ -1576,6 +1576,9 @@ mobileOverlay.addEventListener("click", closeSheet);
 
 // 필터/목록 버튼
 document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
+  // 이전 시트 상태 정리 (popup 모드였으면 마커 복원도 포함)
+  if (sheetMode && sheetMode !== "filter") closeSheet();
+
   const panel = document.getElementById("panel");
   const sheetContent = document.getElementById("mobile-sheet-content");
   sheetContent.innerHTML = "";
