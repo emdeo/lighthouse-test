@@ -1005,9 +1005,10 @@ body.ar-page nav a:hover {
 .tag-none  { background: rgba(107,114,128,0.2); color: #9ca3af; }
 
 .ar-marker-line {
-  width: 1px;
+  width: 2px;
   height: 24px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.15) 70%, transparent);
+  background: linear-gradient(180deg, rgba(245,158,11,0.9), rgba(245,158,11,0.4) 70%, transparent);
+  box-shadow: 0 0 4px rgba(245,158,11,0.5);
 }
 
 .ar-marker-dot {
