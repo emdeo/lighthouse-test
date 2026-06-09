@@ -1,0 +1,37 @@
+name: Update Lighthouse Data
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and filter lighthouse data
+        env:
+          LIGHTHOUSE_API_KEY: ${{ secrets.LIGHTHOUSE_API_KEY }}
+        run: |
+          node -e "
+          const https = require('https');
+          const fs = require('fs');
+          const API_KEY = process.env.LIGHTHOUSE_API_KEY;
+          const NUM_OF_ROWS = 500;
+          function fetchPage(pageNo) {
+            return new Promise((resolve, reject) => {
+              const url = 'https://apis.data.go.kr/1192136/buoyInfo/getBuoyInfo'
+                + '?serviceKey=' + API_KEY
+                + '&pageNo=' + pageNo
+                + '&numOfRows=' + NUM_OF_ROWS
+                + '&type=xml';
+              https.get(url, (res) => {
