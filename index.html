@@ -1385,14 +1385,12 @@ function adjustMapCenter(sheetH) {
     window.kakaoMap.setCenter(pos);
     return;
   }
-  // 시트에 가려지지 않는 영역의 중심으로 보정
-  const headerH = 56;
-  const visibleH = window.innerHeight - headerH - sheetH;
-  const offsetPy = (sheetH / 2);
+  // 마커 원본 좌표 기준으로 보정 (누적 오류 방지)
+  const offsetPy = sheetH / 2;
   const proj = window.kakaoMap.getProjection();
-  const cp = proj.pointFromCoords(pos);
-  cp.y += offsetPy;
-  window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
+  const basePoint = proj.pointFromCoords(pos);
+  const adjustedPoint = new kakao.maps.Point(basePoint.x, basePoint.y + offsetPy);
+  window.kakaoMap.setCenter(proj.coordsFromPoint(adjustedPoint));
 }
 
 // 스냅 포인트로 이동
