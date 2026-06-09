@@ -1543,19 +1543,20 @@ mobileSheetContent.addEventListener("touchstart", e => {
 });
 
 mobileSheetContent.addEventListener("touchmove", e => {
+  // 필터 모드일 때는 내부 스크롤만 허용, 시트 크기 조절 안 함
+  if (sheetMode === "filter") return;
+
   const dy = e.touches[0].clientY - contentDragStartY;
   const atTop = mobileSheetContent.scrollTop === 0;
   const isFullyExpanded = currentSnap >= SNAP_FULL * 0.9;
 
   if (atTop && dy > 8) {
-    // 맨 위에서 아래로 → 시트 축소
     e.preventDefault();
     const newH = Math.max(SNAP_PEEK, mobileSheet.offsetHeight - dy * 0.6);
     mobileSheet.style.height = newH + "px";
     mobileSheet.style.transition = "none";
     adjustMapCenter(newH);
   } else if (!isFullyExpanded) {
-    // 확장 안 된 상태에서 위로 → 확장
     e.preventDefault();
     const newH = Math.min(SNAP_FULL, mobileSheet.offsetHeight - dy * 0.6);
     mobileSheet.style.height = newH + "px";
