@@ -21,17 +21,16 @@ jobs:
       - name: Fetch and filter lighthouse data
         env:
           LIGHTHOUSE_API_KEY: ${{ secrets.LIGHTHOUSE_API_KEY }}
+        run: node scripts/update-lighthouses.js
+
+      - name: Commit and push if changed
         run: |
-          node -e "
-          const https = require('https');
-          const fs = require('fs');
-          const API_KEY = process.env.LIGHTHOUSE_API_KEY;
-          const NUM_OF_ROWS = 500;
-          function fetchPage(pageNo) {
-            return new Promise((resolve, reject) => {
-              const url = 'https://apis.data.go.kr/1192136/buoyInfo/getBuoyInfo'
-                + '?serviceKey=' + API_KEY
-                + '&pageNo=' + pageNo
-                + '&numOfRows=' + NUM_OF_ROWS
-                + '&type=xml';
-              https.get(url, (res) => {
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add lighthouses.js
+          if git diff --staged --quiet; then
+            echo "변경사항 없음 — 커밋 생략"
+          else
+            git commit -m "chore: 등대 데이터 월간 자동 업데이트 $(date +'%Y-%m')"
+            git push
+          fi
