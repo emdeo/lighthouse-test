@@ -1602,6 +1602,7 @@ function openPopupMobile(lh, markerEl) {
     return;
   }
   _origOpenPopup(lh, markerEl);
+  document.getElementById("popup").style.display = "none";
   const popupEl = document.getElementById("popup");
   setTimeout(() => {
     // 모바일용: 이름 → 사진 → 기본정보 순으로 재조합
