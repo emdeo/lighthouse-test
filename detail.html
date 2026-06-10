@@ -123,19 +123,14 @@
     <div class="section-title">🌤 현재 날씨</div>
     <div class="weather-box">
       <div class="weather-icon">☀️</div>
-      <div>
+      <div style="flex:1;">
         <div class="weather-temp">—°</div>
         <div class="weather-label">날씨 정보 준비 중 (API 연결 예정)</div>
       </div>
+      <div id="today-travel-badge" style="padding:0.4rem 0.8rem; border-radius:20px; font-size:0.82rem; font-weight:600; text-align:center; background:var(--gray2); color:var(--gray4); align-self:center; flex-shrink:0;">
+        확인 중...
+      </div>
     </div>
-
-    </div>
-    <div id="today-travel-badge" style="margin-top:0.6rem; padding:0.4rem 0.8rem; border-radius:20px; font-size:0.82rem; font-weight:600; text-align:center; background:var(--gray2); color:var(--gray4);">
-      여행 가능 여부 확인 중...
-    </div>
-
-  </div>
-
   </div>
 
   <!-- 주간 기상 예보 -->
@@ -415,12 +410,12 @@ document.getElementById("btn-kakao").onclick = () => {
 // 여행 가능 여부 판단 함수
 function getTravelBadge(windSpeed, weatherId, waveHeight) {
   // 🚫 위험
-  if (windSpeed > 14) return { label: '🚫 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (waveHeight !== null && waveHeight > 1.0) return { label: '🚫 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (weatherId >= 95) return { label: '🚫 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (windSpeed > 14) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (waveHeight !== null && waveHeight > 1.0) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (weatherId >= 95) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
   // ⚠️ 주의
-  if (windSpeed > 10) return { label: '⚠️ 주의', bg: '#fef9c3', color: '#ca8a04' };
-  if (waveHeight !== null && waveHeight > 0.5) return { label: '⚠️ 주의', bg: '#fef9c3', color: '#ca8a04' };
+  if (windSpeed > 10) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
+  if (waveHeight !== null && waveHeight > 0.5) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
   // ✅ 가능
   return { label: '✅ 여행 가능', bg: '#dcfce7', color: '#16a34a' };
 }
@@ -463,8 +458,8 @@ if (lh.lat && lh.lng) {
 function getTravelBadgeByForecast(d) {
   const isThunder = d.desc.includes('뇌우');
   const isRain = d.desc.includes('비') || d.desc.includes('눈');
-  if (isThunder || d.rnSt > 70) return { label: '🚫 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (isRain || d.rnSt > 50) return { label: '⚠️ 주의', bg: '#fef9c3', color: '#ca8a04' };
+  if (isThunder || d.rnSt > 70) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (isRain || d.rnSt > 50) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
   return { label: '✅ 가능', bg: '#dcfce7', color: '#16a34a' };
 }
 
@@ -499,7 +494,7 @@ function renderForecast(days) {
       <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; margin-right:.4rem; flex-shrink:0;
         background:${d.rnSt > 70 || d.desc.includes('비') || d.desc.includes('눈') ? '#fee2e2' : d.rnSt > 50 ? '#fef9c3' : '#dcfce7'};
         color:${d.rnSt > 70 || d.desc.includes('비') || d.desc.includes('눈') ? '#dc2626' : d.rnSt > 50 ? '#ca8a04' : '#16a34a'};">
-        ${d.rnSt > 70 || d.desc.includes('비') || d.desc.includes('눈') ? '🚫 위험' : d.rnSt > 50 ? '⚠️ 주의' : '✅ 가능'}
+        ${d.rnSt > 70 || d.desc.includes('비') || d.desc.includes('눈') ? '🚫 여행 위험' : d.rnSt > 50 ? '⚠️ 여행 주의' : '✅ 가능'}
       </span>
       <span style="color:#e74c3c; font-weight:700; margin-right:.4rem;">${d.tempMax}°</span>
       <span style="color:#3b82f6; font-weight:700;">${d.tempMin}°</span>
