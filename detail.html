@@ -152,23 +152,6 @@
     <button class="reserve-btn" id="detail-reserve">🎫 배편 예매하기</button>
   </div>
 
-  <!-- 갯벌/뱃멀미 지수 -->
-  <div class="section-card">
-    <div class="section-title">🌊 오늘의 바다 지수</div>
-    <div style="display:flex; gap:1rem;">
-      <div style="flex:1; background:var(--gray1); border-radius:8px; padding:1rem; text-align:center;">
-        <div style="font-size:1.5rem;">🦀</div>
-        <div style="font-weight:600; margin:.3rem 0 .2rem;">갯벌체험지수</div>
-        <div id="detail-tidal" style="color:var(--gray4); font-size:.88rem;">준비 중</div>
-      </div>
-      <div style="flex:1; background:var(--gray1); border-radius:8px; padding:1rem; text-align:center;">
-        <div style="font-size:1.5rem;">🌀</div>
-        <div style="font-weight:600; margin:.3rem 0 .2rem;">뱃멀미지수</div>
-        <div id="detail-seasick" style="color:var(--gray4); font-size:.88rem;">준비 중</div>
-      </div>
-    </div>
-  </div>
-
   <!-- 주차장 정보 -->
   <div class="section-card">
     <div class="section-title">🅿 근처 주차장 (1km 이내)</div>
@@ -481,17 +464,22 @@ function renderForecast(days) {
   }
   list.innerHTML = days.map(d => `
     <div style="
-      display:flex; align-items:center; justify-content:space-between;
+      display:flex; align-items:center;
       padding:.65rem .8rem;
       background:var(--gray1);
       border-radius:10px;
       font-size:.85rem;
+      gap:0.4rem;
     ">
-      <span style="font-weight:700; color:var(--navy); width:90px; flex-shrink:0;">${d.date}</span>
-      <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; margin-right:.4rem; flex-shrink:0; background:${getTravelBadgeByForecast(d).bg}; color:${getTravelBadgeByForecast(d).color};">${getTravelBadgeByForecast(d).label}</span>
-      <span style="flex:1; color:var(--gray4);">${d.desc}</span>
-      <span style="color:#e74c3c; font-weight:700; margin-right:.4rem;">${d.tempMax}°</span>
-      <span style="color:#3b82f6; font-weight:700;">${d.tempMin}°</span>
+      <span style="font-weight:700; color:var(--navy); width:70px; flex-shrink:0;">${d.date}</span>
+      <span style="color:#e74c3c; font-weight:700; flex-shrink:0; width:32px; text-align:right;">${d.tempMax}°</span>
+      <span style="color:#3b82f6; font-weight:700; flex-shrink:0; width:32px; text-align:right;">${d.tempMin}°</span>
+      <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
+      <span style="flex:1; color:var(--gray4); font-size:0.82rem;">${d.desc}</span>
+      <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
+      <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; flex-shrink:0; background:${getTravelBadgeByForecast(d).bg}; color:${getTravelBadgeByForecast(d).color};">${getTravelBadgeByForecast(d).label}</span>
+      <span style="font-size:0.82rem; flex-shrink:0; width:50px; text-align:center; color:var(--gray4);" id="seasick-${d.dateKey}">—</span>
+      <span style="font-size:0.82rem; flex-shrink:0; width:50px; text-align:center; color:var(--gray4);" id="tidal-${d.dateKey}">—</span>
     </div>
   `).join("");
 }
@@ -516,7 +504,9 @@ if (lh.lat && lh.lng) {
           : (landItem[`wf${i}`] || "—");
         days.push({
           date:    label,
+          dateKey: `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`,
           desc:    wf,
+          rnSt:    rnSt,
           tempMax: taItem[`taMax${i}`] ?? "—",
           tempMin: taItem[`taMin${i}`] ?? "—",
         });
