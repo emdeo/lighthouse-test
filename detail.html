@@ -109,6 +109,15 @@
     </div>
   </div>
 
+  <!-- 길찾기 -->
+  <div class="section-card">
+    <div class="section-title">🗺 길찾기</div>
+    <div class="dir-buttons">
+      <button class="dir-btn dir-naver" id="btn-naver">🗺 네이버지도 길찾기</button>
+      <button class="dir-btn dir-kakao" id="btn-kakao">🗺 카카오맵 길찾기</button>
+    </div>
+  </div>
+
   <!-- 날씨 -->
   <div class="section-card">
     <div class="section-title">🌤 현재 날씨</div>
@@ -140,13 +149,10 @@
     <button class="reserve-btn" id="detail-reserve">🎫 배편 예매하기</button>
   </div>
 
-  <!-- 길찾기 -->
+  <!-- 주차장 정보 -->
   <div class="section-card">
-    <div class="section-title">🗺 길찾기</div>
-    <div class="dir-buttons">
-      <button class="dir-btn dir-naver" id="btn-naver">🗺 네이버지도 길찾기</button>
-      <button class="dir-btn dir-kakao" id="btn-kakao">🗺 카카오맵 길찾기</button>
-    </div>
+    <div class="section-title">🅿 근처 주차장 (1km 이내)</div>
+    <div id="detail-parking"><div class="data-empty">주차장 정보를 불러오는 중...</div></div>
   </div>
 
   <!-- 기본 정보 카드 -->
@@ -462,6 +468,28 @@ if (lh.lat && lh.lng) {
     })
     .catch(() => renderForecast([]));
 }
+// 주차장 정보 로드
+fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${lh.lng}&y=${lh.lat}&radius=1000&sort=distance`, {
+  headers: { 'Authorization': `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
+})
+.then(r => r.json())
+.then(data => {
+  const parkingEl = document.getElementById('detail-parking');
+  if (!data.documents || data.documents.length === 0) {
+    parkingEl.innerHTML = '<div class="data-empty">근처 주차장 정보가 없습니다</div>';
+    return;
+  }
+  parkingEl.innerHTML = data.documents.map(p => `
+    <div style="padding: 0.7rem 0; border-bottom: 1px solid var(--gray2);">
+      <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
+      <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
+      <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍 ${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
+    </div>
+  `).join('');
+})
+.catch(() => {
+  document.getElementById('detail-parking').innerHTML = '<div class="data-empty">주차장 정보를 불러올 수 없습니다</div>';
+});
 
 </script>
 </body>
