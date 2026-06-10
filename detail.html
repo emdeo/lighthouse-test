@@ -112,7 +112,6 @@
 
   <!-- 길찾기 -->
   <div class="section-card">
-    <div class="section-title">🗺 길찾기</div>
     <div class="dir-buttons">
       <button class="dir-btn dir-naver" id="btn-naver">네이버지도 길찾기</button>
       <button class="dir-btn dir-kakao" id="btn-kakao">카카오맵 길찾기</button>
@@ -512,6 +511,14 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
       <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
       <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
       <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터 ${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
+      <div style="margin-top:0.5rem; display:flex; gap:0.4rem;">
+        <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}" 
+           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.naver.com/v5/directions/-/-/-/walk?c=${p.x},${p.y},15,0,0,0,dh&destination=${p.y},${p.x},${encodeURIComponent(p.place_name)}')}"
+           style="flex:1; text-align:center; padding:0.35rem 0; border-radius:6px; font-size:0.78rem; font-weight:600; background:#03C75A; color:white; text-decoration:none;">네이버지도</a>
+        <a href="kakaomap://route?ep=${p.y},${p.x}&by=FOOT"
+           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.kakao.com/link/to/${encodeURIComponent(p.place_name)},${p.y},${p.x}')}"
+           style="flex:1; text-align:center; padding:0.35rem 0; border-radius:6px; font-size:0.78rem; font-weight:600; background:#FAE300; color:#3A1D1D; text-decoration:none;">카카오맵</a>
+      </div>
     </div>
   `).join('');
 })
@@ -535,6 +542,14 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=화장실&x=${l
       <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
       <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
       <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터 ${Math.round(p.distance)}m</div>
+      <div style="margin-top:0.5rem; display:flex; gap:0.4rem;">
+        <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}"
+           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.naver.com/v5/directions/-/-/-/walk?c=${p.x},${p.y},15,0,0,0,dh&destination=${p.y},${p.x},${encodeURIComponent(p.place_name)}')}"
+           style="flex:1; text-align:center; padding:0.35rem 0; border-radius:6px; font-size:0.78rem; font-weight:600; background:#03C75A; color:white; text-decoration:none;">네이버지도</a>
+        <a href="kakaomap://route?ep=${p.y},${p.x}&by=FOOT"
+           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.kakao.com/link/to/${encodeURIComponent(p.place_name)},${p.y},${p.x}')}"
+           style="flex:1; text-align:center; padding:0.35rem 0; border-radius:6px; font-size:0.78rem; font-weight:600; background:#FAE300; color:#3A1D1D; text-decoration:none;">카카오맵</a>
+      </div>
     </div>
   `).join('');
 })
