@@ -11,7 +11,8 @@
 
 <!-- config.js 먼저 불러오기 (API 키) -->
 <script src="config.js"></script>
-<script src="lighthouses.js"></script>  
+<script src="lighthouses.js"></script>
+<script src="lighthouses_custom.js"></script>  
 <script src="stamp_data.js"></script>
 <script src="year_data.js"></script> 
 </head>
@@ -1210,7 +1211,7 @@ function makeMarkerImage(color) {
 // ════════════════════════════════════════
 async function loadLighthouseData(map) {
   try {
-    const data = LIGHTHOUSE_DATA;
+    const data = [...LIGHTHOUSE_DATA, ...LIGHTHOUSE_CUSTOM_DATA];
     console.log(`✅ 등대 ${data.length}개 로드 완료`);
 
     const clusterer = new kakao.maps.MarkerClusterer({
