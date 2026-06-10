@@ -502,6 +502,10 @@ if (lh.lat && lh.lng) {
         const wf = i <= 7
           ? (landItem[`wf${i}Pm`] || landItem[`wf${i}Am`] || "—")
           : (landItem[`wf${i}`] || "—");
+          
+          const rnSt = i <= 7
+          ? Math.max(landItem[`rnSt${i}Pm`] ?? 0, landItem[`rnSt${i}Am`] ?? 0)
+          : (landItem[`rnSt${i}`] ?? 0);
         days.push({
           date:    label,
           dateKey: `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`,
