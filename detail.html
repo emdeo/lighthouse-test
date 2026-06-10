@@ -128,6 +128,14 @@
         <div class="weather-label">날씨 정보 준비 중 (API 연결 예정)</div>
       </div>
     </div>
+
+    </div>
+    <div id="today-travel-badge" style="margin-top:0.6rem; padding:0.4rem 0.8rem; border-radius:20px; font-size:0.82rem; font-weight:600; text-align:center; background:var(--gray2); color:var(--gray4);">
+      여행 가능 여부 확인 중...
+    </div>
+
+  </div>
+
   </div>
 
   <!-- 주간 기상 예보 -->
@@ -459,6 +467,7 @@ function renderForecast(days) {
       <span style="font-weight:700; color:var(--navy); width:90px; flex-shrink:0;">${d.date}</span>
       <span style="font-size:1.2rem; margin-right:.5rem;">${wfToIcon(d.desc)}</span>
       <span style="flex:1; color:var(--gray4);">${d.desc}</span>
+      <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; background:var(--gray2); color:var(--gray4); margin-right:.4rem; flex-shrink:0;">—</span>
       <span style="color:#e74c3c; font-weight:700; margin-right:.4rem;">${d.tempMax}°</span>
       <span style="color:#3b82f6; font-weight:700;">${d.tempMin}°</span>
     </div>
