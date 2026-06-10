@@ -519,6 +519,25 @@ if (lh.lat && lh.lng) {
     })
     .catch(() => renderForecast([]));
 }
+
+// 뱃멀미지수 로드
+if (lh.lat && lh.lng) {
+  fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
+    .then(r => r.json())
+    .then(data => {
+      const items = data.data?.response?.body?.items?.item;
+      if (!items || !items.length) return;
+      items.forEach(item => {
+        const dateKey = item.baseDate;
+        const timeLabel = item.baseTime === '0600' ? '오전' : '오후';
+        const label = item.sicknessValue || '—';
+        const el = document.getElementById(`seasick-${dateKey}`);
+        if (el) el.textContent = `${label}`;
+      });
+    })
+    .catch(() => {});
+}
+
 // 주차장 정보 로드
 fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${lh.lng}&y=${lh.lat}&radius=1000&sort=distance`, {
   headers: { 'Authorization': `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
