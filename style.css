@@ -1636,7 +1636,6 @@ html:has(body.detail-page) {
 /* ════════════════════════════════════════
    모바일 반응형 (768px 이하)
 ════════════════════════════════════════ */
-
 #mobile-sheet { display: none; }
 #mobile-menu-btn { display: none; }
 
@@ -1656,6 +1655,7 @@ html:has(body.detail-page) {
   #header nav { display: none; }
   #mobile-menu-btn { display: none; }
   .header-search { flex: 1; max-width: none; }
+  .header-search input { font-size: 1rem; }
 
   /* 앱: 전체화면 지도 */
   #app { flex-direction: column; }
