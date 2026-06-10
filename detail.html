@@ -475,11 +475,12 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
 .then(r => r.json())
 .then(data => {
   const parkingEl = document.getElementById('detail-parking');
-  if (!data.documents || data.documents.length === 0) {
-    parkingEl.innerHTML = '<div class="data-empty">근처 주차장 정보가 없습니다</div>';
+  const filtered = (data.documents || []).filter(p => p.place_name.includes('공영'));
+  if (filtered.length === 0) {
+    parkingEl.innerHTML = '<div class="data-empty">근처 공영주차장 정보가 없습니다</div>';
     return;
   }
-  parkingEl.innerHTML = data.documents.map(p => `
+  parkingEl.innerHTML = filtered.map(p => `
     <div style="padding: 0.7rem 0; border-bottom: 1px solid var(--gray2);">
       <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
       <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
