@@ -484,7 +484,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
     <div style="padding: 0.7rem 0; border-bottom: 1px solid var(--gray2);">
       <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
       <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
-      <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍 ${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
+      <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터 ${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
     </div>
   `).join('');
 })
