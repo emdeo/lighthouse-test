@@ -525,14 +525,18 @@ if (lh.lat && lh.lng) {
   fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
     .then(r => r.json())
     .then(data => {
-      const items = data.data?.response?.body?.items?.item;
+      const items = data.data;
       if (!items || !items.length) return;
+      // 날짜별로 오전/오후 합쳐서 표시
+      const byDate = {};
       items.forEach(item => {
-        const dateKey = item.baseDate;
-        const timeLabel = item.baseTime === '0600' ? '오전' : '오후';
-        const label = item.sicknessValue || '—';
+        const dateKey = item.predcYmd; // "20260615" 형태
+        if (!byDate[dateKey]) byDate[dateKey] = [];
+        byDate[dateKey].push(item.predcNoonSeCd + ' ' + (item.totalIndex || '—'));
+      });
+      Object.entries(byDate).forEach(([dateKey, labels]) => {
         const el = document.getElementById(`seasick-${dateKey}`);
-        if (el) el.textContent = `${label}`;
+        if (el) el.textContent = labels.join(' / ');
       });
     })
     .catch(() => {});
