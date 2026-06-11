@@ -540,17 +540,13 @@ if (lh.lat && lh.lng) {
 
     // 4일후~10일후: 중기예보
     if (landItem && taItem) {
-      for (let i = 4; i <= 10; i++) {
+      for (let i = 4; i <= 7; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() + i);
         const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
         const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
-        const wf = i <= 7
-          ? (landItem[`wf${i}Pm`] || landItem[`wf${i}Am`] || "—")
-          : (landItem[`wf${i}`] || "—");
-        const rnSt = i <= 7
-          ? Math.max(landItem[`rnSt${i}Pm`] ?? 0, landItem[`rnSt${i}Am`] ?? 0)
-          : (landItem[`rnSt${i}`] ?? 0);
+        const wf = landItem[`wf${i}Pm`] || landItem[`wf${i}Am`] || "—";
+        const rnSt = Math.max(landItem[`rnSt${i}Pm`] ?? 0, landItem[`rnSt${i}Am`] ?? 0);
         days.push({
           date: label, dateKey,
           desc: wf, rnSt,
