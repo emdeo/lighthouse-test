@@ -516,75 +516,52 @@ if (lh.lat && lh.lng) {
     return "—";
   }
 
-  Promise.all([
-    fetch(`${CONFIG.WEATHER_API_URL}/short?lat=${lh.lat}&lng=${lh.lng}`).then(r => r.json()),
-    fetch(`${CONFIG.WEATHER_API_URL}/forecast?lat=${lh.lat}&lng=${lh.lng}`).then(r => r.json())
-  ]).then(([shortData, midData]) => {
-    const shortByDate = parseShort(shortData);
-    const landItem = midData.land?.response?.body?.items?.item?.[0];
-    const taItem   = midData.ta?.response?.body?.items?.item?.[0];
+  fetch(`${CONFIG.WEATHER_API_URL}/short?lat=${lh.lat}&lng=${lh.lng}`)
+    .then(r => r.json())
+    .then(shortData => {
+      const shortByDate = parseShort(shortData);
+      const days = [];
 
-    const days = [];
-
-    // 내일~3일후: 단기예보
-    for (let i = 1; i <= 3; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-      const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
-      const sd = shortByDate[dateKey] || {};
-      const desc = ptyToDesc(sd.PTY, sd.SKY);
-      const pop = parseInt(sd.POP || "0");
-      days.push({
-        date: label, dateKey,
-        desc, rnSt: pop,
-        tempMax: sd.TMX ? Math.round(sd.TMX) : "—",
-        tempMin: sd.TMN ? Math.round(sd.TMN) : "—",
-      });
-    }
-
-    // 4일후~10일후: 중기예보
-    if (landItem && taItem) {
-      for (let i = 4; i <= 7; i++) {
+      for (let i = 1; i <= 4; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() + i);
         const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
         const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
-        const wf = landItem[`wf${i}Pm`] || landItem[`wf${i}Am`] || "—";
-        const rnSt = Math.max(landItem[`rnSt${i}Pm`] ?? 0, landItem[`rnSt${i}Am`] ?? 0);
+        const sd = shortByDate[dateKey] || {};
+        const desc = ptyToDesc(sd.PTY, sd.SKY);
+        const pop = parseInt(sd.POP || "0");
         days.push({
           date: label, dateKey,
-          desc: wf, rnSt,
-          tempMax: taItem[`taMax${i}`] ?? "—",
-          tempMin: taItem[`taMin${i}`] ?? "—",
+          desc, rnSt: pop,
+          tempMax: sd.TMX ? Math.round(sd.TMX) : "—",
+          tempMin: sd.TMN ? Math.round(sd.TMN) : "—",
         });
       }
-    }
 
-    renderForecast(days);
+      renderForecast(days);
 
-    // 뱃멀미지수 로드 (renderForecast 이후 실행)
-    fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
-      .then(r => r.json())
-      .then(data => {
-        const items = data.data;
-        if (!items || !items.length) return;
-        const byDate = {};
-        items.forEach(item => {
-          const dateKey = item.predcYmd.replace(/-/g, '');
-          if (!byDate[dateKey]) byDate[dateKey] = [];
-          const label = item.predcNoonSeCd === '일'
-            ? (item.totalIndex || '—')
-            : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
-          byDate[dateKey].push(label);
-        });
-        Object.entries(byDate).forEach(([dateKey, labels]) => {
-          const el = document.getElementById(`seasick-${dateKey}`);
-          if (el) el.innerHTML = labels.join('<br>');
-        });
-      })
-      .catch(() => {});
-  }).catch(() => renderForecast([]));
+      fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
+        .then(r => r.json())
+        .then(data => {
+          const items = data.data;
+          if (!items || !items.length) return;
+          const byDate = {};
+          items.forEach(item => {
+            const dateKey = item.predcYmd.replace(/-/g, '');
+            if (!byDate[dateKey]) byDate[dateKey] = [];
+            const label = item.predcNoonSeCd === '일'
+              ? (item.totalIndex || '—')
+              : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
+            byDate[dateKey].push(label);
+          });
+          Object.entries(byDate).forEach(([dateKey, labels]) => {
+            const el = document.getElementById(`seasick-${dateKey}`);
+            if (el) el.innerHTML = labels.join('<br>');
+          });
+        })
+        .catch(() => {});
+    })
+    .catch(() => renderForecast([]));
 }
 
 // 주차장 정보 로드
