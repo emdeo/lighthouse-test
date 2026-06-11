@@ -392,15 +392,12 @@ document.getElementById("btn-kakao").onclick = () => {
 
 // 여행 가능 여부 판단 함수
 function getTravelBadge(windSpeed, weatherId, waveHeight) {
-  // 🚫 위험
-  if (windSpeed > 14) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (waveHeight !== null && waveHeight > 1.0) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (weatherId >= 95) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  // ⚠️ 주의
-  if (windSpeed > 10) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  if (waveHeight !== null && waveHeight > 0.5) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  // ✅ 가능
-  return { label: '✅ 여행 가능', bg: '#dcfce7', color: '#16a34a' };
+  if (windSpeed > 14) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (waveHeight !== null && waveHeight > 1.0) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (weatherId >= 95) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (windSpeed > 10) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
+  if (waveHeight !== null && waveHeight > 0.5) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
+  return { label: '여행 가능', bg: '#dcfce7', color: '#16a34a' };
 }
 
 if (lh.lat && lh.lng) {
@@ -441,9 +438,9 @@ if (lh.lat && lh.lng) {
 function getTravelBadgeByForecast(d) {
   const isThunder = d.desc.includes('뇌우');
   const isRain = d.desc.includes('비') || d.desc.includes('눈');
-  if (isThunder || d.rnSt > 70) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (isRain || d.rnSt > 50) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  return { label: '✅ 여행 가능', bg: '#dcfce7', color: '#16a34a' };
+  if (isThunder || d.rnSt > 70) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
+  if (isRain || d.rnSt > 50) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
+  return { label: '여행 가능', bg: '#dcfce7', color: '#16a34a' };
 }
 
 function wfToIcon(wf) {
@@ -464,8 +461,8 @@ function renderForecast(days) {
   }
   list.innerHTML = `
     <div style="display:flex; justify-content:flex-end; gap:0.4rem; margin-bottom:0.2rem; padding-right:0.2rem;">
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">🚢 뱃멀미</span>
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">🦀 갯벌</span>
+      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">뱃멀미지수</span>
+      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">갯벌체험지수</span>
     </div>
   ` + days.map(d => `
     <div style="
@@ -516,52 +513,72 @@ if (lh.lat && lh.lng) {
     return "—";
   }
 
-  fetch(`${CONFIG.WEATHER_API_URL}/short?lat=${lh.lat}&lng=${lh.lng}`)
-    .then(r => r.json())
-    .then(shortData => {
-      const shortByDate = parseShort(shortData);
-      const days = [];
+  Promise.all([
+    fetch(`${CONFIG.WEATHER_API_URL}/short?lat=${lh.lat}&lng=${lh.lng}`).then(r => r.json()),
+    fetch(`${CONFIG.WEATHER_API_URL}/forecast?lat=${lh.lat}&lng=${lh.lng}`).then(r => r.json())
+  ]).then(([shortData, midData]) => {
+    const shortByDate = parseShort(shortData);
+    const landItem = midData.land?.response?.body?.items?.item?.[0];
+    const taItem   = midData.ta?.response?.body?.items?.item?.[0];
+    const days = [];
 
-      for (let i = 1; i <= 4; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
-        const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-        const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
-        const sd = shortByDate[dateKey] || {};
-        const desc = ptyToDesc(sd.PTY, sd.SKY);
-        const pop = parseInt(sd.POP || "0");
-        days.push({
-          date: label, dateKey,
-          desc, rnSt: pop,
-          tempMax: sd.TMX ? Math.round(sd.TMX) : "—",
-          tempMin: sd.TMN ? Math.round(sd.TMN) : "—",
+    // 내일~3일후: 단기예보
+    for (let i = 1; i <= 3; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
+      const sd = shortByDate[dateKey] || {};
+      days.push({
+        date: label, dateKey,
+        desc: ptyToDesc(sd.PTY, sd.SKY),
+        rnSt: parseInt(sd.POP || "0"),
+        tempMax: sd.TMX ? Math.round(sd.TMX) : "—",
+        tempMin: sd.TMN ? Math.round(sd.TMN) : "—",
+      });
+    }
+
+    // 4일후: 중기예보
+    if (landItem && taItem) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + 4);
+      const dateKey = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
+      days.push({
+        date: label, dateKey,
+        desc: landItem[`wf4Pm`] || landItem[`wf4Am`] || "—",
+        rnSt: Math.max(landItem[`rnSt4Pm`] ?? 0, landItem[`rnSt4Am`] ?? 0),
+        tempMax: taItem[`taMax4`] ?? "—",
+        tempMin: taItem[`taMin4`] ?? "—",
+      });
+    }
+
+    renderForecast(days);
+
+    // 뱃멀미지수 로드
+    fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
+      .then(r => r.json())
+      .then(data => {
+        const items = data.data;
+        if (!items || !items.length) return;
+        const todayKey = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+        const byDate = {};
+        items.forEach(item => {
+          const dateKey = item.predcYmd.replace(/-/g, '');
+          if (dateKey === todayKey) return;
+          if (!byDate[dateKey]) byDate[dateKey] = [];
+          const label = item.predcNoonSeCd === '일'
+            ? (item.totalIndex || '—')
+            : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
+          byDate[dateKey].push(label);
         });
-      }
-
-      renderForecast(days);
-
-      fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
-        .then(r => r.json())
-        .then(data => {
-          const items = data.data;
-          if (!items || !items.length) return;
-          const byDate = {};
-          items.forEach(item => {
-            const dateKey = item.predcYmd.replace(/-/g, '');
-            if (!byDate[dateKey]) byDate[dateKey] = [];
-            const label = item.predcNoonSeCd === '일'
-              ? (item.totalIndex || '—')
-              : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
-            byDate[dateKey].push(label);
-          });
-          Object.entries(byDate).forEach(([dateKey, labels]) => {
-            const el = document.getElementById(`seasick-${dateKey}`);
-            if (el) el.innerHTML = labels.join('<br>');
-          });
-        })
-        .catch(() => {});
-    })
-    .catch(() => renderForecast([]));
+        Object.entries(byDate).forEach(([dateKey, labels]) => {
+          const el = document.getElementById(`seasick-${dateKey}`);
+          if (el) el.innerHTML = labels.join('<br>');
+        });
+      })
+      .catch(() => {});
+  }).catch(() => renderForecast([]));
 }
 
 // 주차장 정보 로드
