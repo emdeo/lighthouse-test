@@ -578,6 +578,28 @@ if (lh.lat && lh.lng) {
         });
       })
       .catch(() => {});
+      
+      // 갯벌체험지수 로드 (서해안만: 경도 127.5 이하)
+      if (lh.lng && lh.lng <= 127.5) {
+        fetch(`${CONFIG.WEATHER_API_URL}/tidal?lat=${lh.lat}&lng=${lh.lng}`)
+          .then(r => r.json())
+          .then(data => {
+            const items = data.data;
+            if (!items || !items.length) return;
+            const todayKey = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+            const byDate = {};
+            items.forEach(item => {
+              const dateKey = item.predcYmd.replace(/-/g, '');
+              if (!byDate[dateKey]) byDate[dateKey] = [];
+              byDate[dateKey].push(item.totalIndex || '—');
+            });
+            Object.entries(byDate).forEach(([dateKey, labels]) => {
+              const el = document.getElementById(`tidal-${dateKey}`);
+              if (el) el.innerHTML = labels.join('<br>');
+            });
+          })
+          .catch(() => {});
+      }
   }).catch(() => renderForecast([]));
 }
 
