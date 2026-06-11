@@ -557,6 +557,28 @@ if (lh.lat && lh.lng) {
     }
 
     renderForecast(days);
+
+    // 뱃멀미지수 로드 (renderForecast 이후 실행)
+    fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
+      .then(r => r.json())
+      .then(data => {
+        const items = data.data;
+        if (!items || !items.length) return;
+        const byDate = {};
+        items.forEach(item => {
+          const dateKey = item.predcYmd.replace(/-/g, '');
+          if (!byDate[dateKey]) byDate[dateKey] = [];
+          const label = item.predcNoonSeCd === '일'
+            ? (item.totalIndex || '—')
+            : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
+          byDate[dateKey].push(label);
+        });
+        Object.entries(byDate).forEach(([dateKey, labels]) => {
+          const el = document.getElementById(`seasick-${dateKey}`);
+          if (el) el.textContent = labels.join(' / ');
+        });
+      })
+      .catch(() => {});
   }).catch(() => renderForecast([]));
 }
 
