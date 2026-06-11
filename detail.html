@@ -138,8 +138,8 @@
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
     <div class="section-title" style="margin:0;">📅 주간 기상 예보</div>
     <div style="display:flex; gap:0.4rem;">
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">뱃멀미지수</span>
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">갯벌체험지수</span>
+      <span style="width:48px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">뱃멀미지수</span>
+      <span style="width:48px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">갯벌체험지수</span>
     </div>
   </div>
   <div id="forecast-list" style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
@@ -599,8 +599,8 @@ function renderForecast(days) {
       <span style="flex:1; color:var(--gray4); font-size:0.82rem;">${d.desc}</span>
       <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
       <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; flex-shrink:0; background:${getTravelBadgeByForecast(d).bg}; color:${getTravelBadgeByForecast(d).color};">${getTravelBadgeByForecast(d).label}</span>
-      <span style="font-size:0.75rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); line-height:1.5;" id="seasick-${d.dateKey}">—</span>
-      <span style="font-size:0.75rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="tidal-${d.dateKey}">—</span>
+      <span style="font-size:0.75rem; flex-shrink:0; width:48px; text-align:center; color:var(--gray4); line-height:1.5;" id="seasick-${d.dateKey}">—</span>
+      <span style="font-size:0.75rem; flex-shrink:0; width:48px; text-align:center; color:var(--gray4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="tidal-${d.dateKey}">—</span>
     </div>
   `).join("");
 }
