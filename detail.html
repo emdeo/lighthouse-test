@@ -317,6 +317,124 @@
 
 </main>
 
+<!-- AI 정보 섹션 -->
+<div class="section-card" id="section-ai">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="section-title" style="margin:0;">🤖 AI 등대 정보</div>
+    <button id="btn-ai-load" style="
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    ">✨ AI 정보 가져오기</button>
+  </div>
+
+  <!-- API 키 입력 영역 -->
+  <div id="ai-key-area" style="margin-top:1rem; display:none;">
+    <div style="font-size:0.82rem; color:var(--gray4); margin-bottom:0.5rem;">Gemini API 키를 입력해주세요 (<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ocean);">발급받기</a>)</div>
+    <div style="display:flex; gap:0.5rem;">
+      <input id="ai-key-input" type="password" placeholder="AIza..." style="
+        flex:1; padding:0.5rem 0.8rem;
+        border:1.5px solid var(--gray2);
+        border-radius:8px;
+        font-size:0.85rem;
+        outline:none;
+      ">
+      <button id="btn-ai-key-save" style="
+        background:var(--ocean);
+        color:white; border:none;
+        border-radius:8px;
+        padding:0.5rem 1rem;
+        font-size:0.85rem;
+        font-weight:600;
+        cursor:pointer;
+      ">저장 후 검색</button>
+    </div>
+  </div>
+
+  <!-- 로딩 상태 -->
+  <div id="ai-loading" style="display:none; text-align:center; padding:2rem; color:var(--gray3);">
+    <div style="font-size:1.5rem; margin-bottom:0.5rem;">🔍</div>
+    <div style="font-size:0.88rem;">AI가 웹을 검색하고 있어요...</div>
+    <div style="font-size:0.78rem; color:var(--gray3); margin-top:0.3rem;">잠시만 기다려주세요 (10~20초)</div>
+  </div>
+
+  <!-- 결과 영역 -->
+  <div id="ai-result" style="display:none; margin-top:1rem;">
+
+    <!-- 역사/설명 -->
+    <div class="ai-block">
+      <div class="ai-block-title">📖 역사 & 설명</div>
+      <div id="ai-story" class="ai-block-content">—</div>
+    </div>
+
+    <!-- 건립연도 + 출처 -->
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">🏗 건립 연도</div>
+        <div id="ai-era" class="ai-block-content">—</div>
+      </div>
+      <div class="ai-block" style="flex:2; min-width:180px;">
+        <div class="ai-block-title">🔗 참고 출처</div>
+        <div id="ai-sources" class="ai-block-content">—</div>
+      </div>
+    </div>
+
+    <!-- 시설/주의 -->
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">🅿 시설 안내</div>
+        <div id="ai-facilities" class="ai-block-content">—</div>
+      </div>
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">⚠️ 주의사항</div>
+        <div id="ai-notices" class="ai-block-content">—</div>
+      </div>
+    </div>
+
+    <!-- 주변 정보 -->
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">🍽 주변 맛집</div>
+        <div id="ai-food" class="ai-block-content">—</div>
+      </div>
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">🏨 숙소</div>
+        <div id="ai-stay" class="ai-block-content">—</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">🗺 주변 관광지</div>
+        <div id="ai-spot" class="ai-block-content">—</div>
+      </div>
+      <div class="ai-block" style="flex:1; min-width:140px;">
+        <div class="ai-block-title">💡 방문 팁</div>
+        <div id="ai-tips" class="ai-block-content">—</div>
+      </div>
+    </div>
+
+    <!-- 다시 검색 버튼 -->
+    <button id="btn-ai-reload" style="
+      margin-top:1rem; width:100%;
+      background:var(--gray1);
+      border:1.5px solid var(--gray2);
+      border-radius:10px;
+      padding:0.6rem;
+      font-size:0.82rem;
+      color:var(--gray4);
+      cursor:pointer;
+    ">🔄 다시 검색하기</button>
+  </div>
+
+  <!-- 에러 영역 -->
+  <div id="ai-error" style="display:none; margin-top:1rem; padding:1rem; background:#fee2e2; border-radius:10px; font-size:0.85rem; color:#dc2626;"></div>
+</div>
+
 <script src="config.js"></script>
 <script>
   document.getElementById("btn-links").addEventListener("click", () => {

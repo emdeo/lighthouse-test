@@ -1776,3 +1776,21 @@ html:has(body.detail-page) {
     bottom: 60px; /* 내비바 높이만큼 올리기 */
   }
 }
+/* ── AI 정보 섹션 ── */
+.ai-block {
+  background: var(--gray1);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+.ai-block-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray4);
+  margin-bottom: 0.4rem;
+}
+.ai-block-content {
+  font-size: 0.85rem;
+  color: var(--navy);
+  line-height: 1.7;
+  white-space: pre-line;
+}
