@@ -135,7 +135,13 @@
 
   <!-- 주간 기상 예보 -->
 <div class="section-card">
-  <div class="section-title">📅 주간 기상 예보</div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+    <div class="section-title" style="margin:0;">📅 주간 기상 예보</div>
+    <div style="display:flex; gap:0.4rem;">
+      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">🚢 뱃멀미</span>
+      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">🦀 갯벌</span>
+    </div>
+  </div>
   <div id="forecast-list" style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
     <!-- JS로 채워짐 -->
     <div style="color:var(--gray3); font-size:.85rem; text-align:center; padding:1rem;">
@@ -459,12 +465,7 @@ function renderForecast(days) {
     list.innerHTML = `<div style="color:var(--gray3);font-size:.85rem;text-align:center;padding:1rem;">예보 정보를 불러올 수 없어요</div>`;
     return;
   }
-  list.innerHTML = `
-    <div style="display:flex; justify-content:flex-end; gap:0.4rem; margin-bottom:0.2rem; padding-right:0.2rem;">
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316;">뱃멀미지수</span>
-      <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899;">갯벌체험지수</span>
-    </div>
-  ` + days.map(d => `
+  list.innerHTML = days.map(d => `
     <div style="
       display:flex; align-items:center;
       padding:.65rem .8rem;
@@ -481,7 +482,7 @@ function renderForecast(days) {
       <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
       <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; flex-shrink:0; background:${getTravelBadgeByForecast(d).bg}; color:${getTravelBadgeByForecast(d).color};">${getTravelBadgeByForecast(d).label}</span>
       <span style="font-size:0.75rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); line-height:1.5;" id="seasick-${d.dateKey}">—</span>
-      <span style="font-size:0.75rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); line-height:1.5;" id="tidal-${d.dateKey}">—</span>
+      <span style="font-size:0.75rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="tidal-${d.dateKey}">—</span>
     </div>
   `).join("");
 }
@@ -578,7 +579,7 @@ if (lh.lat && lh.lng) {
         });
       })
       .catch(() => {});
-      
+
       // 갯벌체험지수 로드 (서해안만: 경도 127.5 이하)
       if (lh.lng && lh.lng <= 127.5) {
         fetch(`${CONFIG.WEATHER_API_URL}/tidal?lat=${lh.lat}&lng=${lh.lng}`)
