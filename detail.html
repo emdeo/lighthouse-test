@@ -789,6 +789,49 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=화장실&x=${l
   document.getElementById('detail-toilet').innerHTML = '<div class="data-empty">화장실 정보를 불러올 수 없습니다</div>';
 });
 
+
+// ── AI 정보 로드 ──
+const AI_WORKER_URL = "https://lighthouse-ai.ehdgml5032.workers.dev";
+
+function showAiSection(state) {
+  document.getElementById('ai-key-area').style.display   = state === 'key'     ? 'block' : 'none';
+  document.getElementById('ai-loading').style.display    = state === 'loading' ? 'block' : 'none';
+  document.getElementById('ai-result').style.display     = state === 'result'  ? 'block' : 'none';
+  document.getElementById('ai-error').style.display      = state === 'error'   ? 'block' : 'none';
+}
+
+async function loadAiInfo() {
+  showAiSection('loading');
+  try {
+    const res = await fetch(`${AI_WORKER_URL}?name=${encodeURIComponent(lh.name)}&lat=${lh.lat}&lng=${lh.lng}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById('ai-era').textContent       = data.era       || '정보 없음';
+    document.getElementById('ai-story').textContent     = data.story     || '정보 없음';
+    document.getElementById('ai-facilities').textContent = data.facilities || '정보 없음';
+    document.getElementById('ai-notices').textContent   = data.notices   || '정보 없음';
+    document.getElementById('ai-food').textContent      = data.food      || '정보 없음';
+    document.getElementById('ai-stay').textContent      = data.stay      || '정보 없음';
+    document.getElementById('ai-spot').textContent      = data.spot      || '정보 없음';
+    document.getElementById('ai-tips').textContent      = data.tips      || '정보 없음';
+
+    // 출처 링크 처리
+    const sources = data.sources || [];
+    document.getElementById('ai-sources').innerHTML = sources.length
+      ? sources.map(s => `<a href="${s}" target="_blank" style="display:block; color:var(--ocean); font-size:0.8rem; word-break:break-all;">${s}</a>`).join('')
+      : '정보 없음';
+
+    showAiSection('result');
+  } catch (e) {
+    document.getElementById('ai-error').textContent = '정보를 불러오지 못했어요: ' + e.message;
+    showAiSection('error');
+  }
+}
+
+document.getElementById('btn-ai-load').addEventListener('click', loadAiInfo);
+document.getElementById('btn-ai-reload').addEventListener('click', loadAiInfo);
+
 </script>
 </body>
 </html>
