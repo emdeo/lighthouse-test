@@ -443,7 +443,7 @@ function getTravelBadgeByForecast(d) {
   const isRain = d.desc.includes('비') || d.desc.includes('눈');
   if (isThunder || d.rnSt > 70) return { label: '🚫 여행 위험', bg: '#fee2e2', color: '#dc2626' };
   if (isRain || d.rnSt > 50) return { label: '⚠️ 여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  return { label: '✅ 가능', bg: '#dcfce7', color: '#16a34a' };
+  return { label: '✅ 여행 가능', bg: '#dcfce7', color: '#16a34a' };
 }
 
 function wfToIcon(wf) {
