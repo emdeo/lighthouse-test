@@ -530,7 +530,7 @@ if (lh.lat && lh.lng) {
       // 날짜별로 오전/오후 합쳐서 표시
       const byDate = {};
       items.forEach(item => {
-        const dateKey = item.predcYmd; // "20260615" 형태
+        const dateKey = item.predcYmd.replace(/-/g, ''); 
         if (!byDate[dateKey]) byDate[dateKey] = [];
         byDate[dateKey].push(item.predcNoonSeCd + ' ' + (item.totalIndex || '—'));
       });
