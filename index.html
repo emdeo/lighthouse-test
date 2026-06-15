@@ -317,6 +317,15 @@
   </div>
 </div>
 
+<!-- 해무 CCTV -->
+<div id="popup-fog-cctv" style="display:none; margin-top:0.8rem;">
+  <div style="font-size:0.78rem; font-weight:700; color:var(--gray4); margin-bottom:0.4rem;">
+    📷 해무 CCTV <span id="popup-fog-station" style="font-weight:400;"></span>
+  </div>
+  <div id="popup-fog-content"></div>
+</div>
+
+
 <div class="popup-bottom-buttons">
   <button class="popup-cctv-btn" id="btn-cctv">📹 실시간 CCTV</button>
 </div>
@@ -752,6 +761,23 @@ fetch(`${CONFIG.WEATHER_API_URL}/?lat=${lh.lat}&lng=${lh.lng}`)
     document.getElementById("popup-weather-desc").textContent = "날씨 정보를 불러올 수 없어요";
   });
 
+// 해무 CCTV 불러오기
+document.getElementById("popup-fog-cctv").style.display = "none";
+document.getElementById("popup-fog-content").innerHTML = "";
+fetch(`${CONFIG.WEATHER_API_URL}/fog-cctv?lat=${lh.lat}&lng=${lh.lng}`)
+  .then(r => r.json())
+  .then(data => {
+    if (!data.station || !data.items || !data.items.length) return;
+    document.getElementById("popup-fog-station").textContent = `(${data.station} · ${data.distKm}km)`;
+    document.getElementById("popup-fog-content").innerHTML = data.items.map(item => `
+      <div style="margin-bottom:0.5rem;">
+        <div style="font-size:0.72rem; color:var(--gray4); margin-bottom:0.2rem;">${item.imgCrtDt}</div>
+        <img src="${item.uri}" alt="해무 CCTV" style="width:100%; border-radius:8px;" onerror="this.style.display='none'">
+      </div>
+    `).join('');
+    document.getElementById("popup-fog-cctv").style.display = "block";
+  })
+  .catch(() => {});
 
   // 팝업 표시 (오른쪽 고정)
   popup.classList.add("visible");
