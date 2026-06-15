@@ -471,11 +471,15 @@ fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name)}`)
   .then(data => {
     if (data.url) {
       const hero = document.getElementById('detail-hero');
-      hero.style.backgroundImage = `url(${data.url})`;
-      hero.style.backgroundSize = 'cover';
-      hero.style.backgroundPosition = 'center';
-      document.getElementById('detail-emoji').style.display = 'none';
-      hero.querySelector('.hero-placeholder-text').style.display = 'none';
+      hero.style.background = '#ffffff';
+      hero.style.height = 'auto';
+      hero.style.minHeight = '200px';
+      hero.style.padding = '0';
+      const img = document.createElement('img');
+      img.src = data.url;
+      img.style.cssText = 'width:100%; height:auto; display:block; border-radius:var(--radius);';
+      hero.innerHTML = '';
+      hero.appendChild(img);
     }
   })
   .catch(() => {});
