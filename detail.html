@@ -63,7 +63,7 @@
 <main id="page">
 
   <!-- 뒤로 가기 -->
-  <a class="back-btn" onclick="history.back()">← 지도로 돌아가기</a>
+  <a class="back-btn" onclick="history.length > 1 ? history.back() : window.location.href='index.html'">← 지도로 돌아가기</a>
 
   <!-- 빵 부스러기(breadcrumb) 탐색 -->
   <div class="breadcrumb">
