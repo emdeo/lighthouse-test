@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <script src="config.js"></script>
+  <script src="port_data.js"></script>
 <script src="stamp_data.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -145,7 +146,7 @@
 
 
   <!-- 배편 정보 -->
-  <div class="section-card">
+  <div class="section-card" id="ferry-section" style="display:none;">
     <div class="section-title">⛴ 배편/교통 정보</div>
     <div class="ferry-table" id="detail-ferry"></div>
     <button class="reserve-btn" id="detail-reserve">🎫 배편 예매하기</button>
@@ -490,12 +491,62 @@ document.getElementById("info-coords").textContent = lh.lat && lh.lng
   ? `${lh.lat}°N, ${lh.lng}°E` : "정보 준비 중";
 document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 준비 중";
 
-document.getElementById("detail-ferry").innerHTML =
-  `<div class="data-empty">배편 정보 준비 중</div>`;
+// 배편 정보 로드
+(async () => {
+  if (!lh.lat || !lh.lng) return;
+  const port = findNearestPort(lh.lat, lh.lng, 30);
+  if (!port) return; // 30km 이내 항구 없으면 섹션 숨김 유지
 
-document.getElementById("detail-reserve").onclick = () => {
-  window.open("https://island.theksa.co.kr/", "_blank");
-};
+  document.getElementById("ferry-section").style.display = "";
+
+  const TAGO_KEY = CONFIG.TAGO_KEY;
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}`;
+
+  try {
+    const res = await fetch(`https://apis.data.go.kr/1613000/DmstcShipNvgInfo/GetShipOpratInfoList?serviceKey=${TAGO_KEY}&numOfRows=20&pageNo=1&_type=json&depNodeId=${port.nodeId}&strtRecpDt=${dateStr}&endRecpDt=${dateStr}`);
+    const data = await res.json();
+    const items = data.response?.body?.items?.item || [];
+
+    if (!items.length) {
+      document.getElementById("detail-ferry").innerHTML =
+        `<div class="data-empty">오늘 운항 정보가 없습니다</div>`;
+    } else {
+      document.getElementById("detail-ferry").innerHTML = `
+        <div style="font-size:0.82rem; color:#666; margin-bottom:0.5rem;">📍 출발항: ${port.name} (${port.distKm}km)</div>
+        <table style="width:100%; border-collapse:collapse; font-size:0.83rem;">
+          <thead>
+            <tr style="background:#f5f5f5; text-align:left;">
+              <th style="padding:6px 8px;">도착지</th>
+              <th style="padding:6px 8px;">출발</th>
+              <th style="padding:6px 8px;">도착</th>
+              <th style="padding:6px 8px;">요금</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(it => {
+              const dep = String(it.depPlandTime).slice(8,12).replace(/(\d{2})(\d{2})/, "$1:$2");
+              const arr = String(it.arrPlandTime).slice(8,12).replace(/(\d{2})(\d{2})/, "$1:$2");
+              const charge = it.charge ? it.charge.toLocaleString() + "원" : "-";
+              return `<tr style="border-bottom:1px solid #eee;">
+                <td style="padding:6px 8px;">${it.arrPlaceNm}</td>
+                <td style="padding:6px 8px;">${dep}</td>
+                <td style="padding:6px 8px;">${arr}</td>
+                <td style="padding:6px 8px;">${charge}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>`;
+    }
+  } catch(e) {
+    document.getElementById("detail-ferry").innerHTML =
+      `<div class="data-empty">배편 정보를 불러오지 못했습니다</div>`;
+  }
+
+  document.getElementById("detail-reserve").onclick = () => {
+    window.open("https://island.theksa.co.kr/", "_blank");
+  };
+})();
 
 document.getElementById("btn-naver").onclick = () => {
   window.open(`https://map.naver.com/v5/search/${encodeURIComponent(lh.name)}`, "_blank");
