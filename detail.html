@@ -464,6 +464,21 @@ const TAG_INFO = {
 document.title = lh.name + " — 안녕, 등대";
 document.getElementById("bc-name").textContent       = lh.name;
 document.getElementById("detail-emoji").textContent  = "🔦";
+
+// 등대 이미지 로드
+fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name)}`)
+  .then(r => r.json())
+  .then(data => {
+    if (data.url) {
+      const hero = document.getElementById('detail-hero');
+      hero.style.backgroundImage = `url(${data.url})`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+      document.getElementById('detail-emoji').style.display = 'none';
+      hero.querySelector('.hero-placeholder-text').style.display = 'none';
+    }
+  })
+  .catch(() => {});
 document.getElementById("detail-name").textContent   = lh.name;
 const stampInfo = (typeof STAMP_DATA !== 'undefined')
   ? STAMP_DATA.find(s => s.name.replace(/\s/g, '') === lh.name.replace(/\s/g, '')) || null
