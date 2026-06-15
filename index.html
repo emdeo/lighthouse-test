@@ -407,7 +407,7 @@ function findYearData(name, lat, lng) {
 // 이달의 등대 데이터 매칭 (이름만 비교, 공백 제거)
 function findMonthlyData(name) {
   if (!window.MONTHLY_LIGHTHOUSE_DATA) return null;
-  const clean = n => n.replace(/\s/g, "");
+  const clean = n => n.replace(/\s+/g, "").replace(/\n/g, "").replace(/\r/g, "");
   return window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === clean(name)) || null;
 }
 
@@ -1469,7 +1469,7 @@ newMarkers.push(marker);
       if (!lat || !lng || !name) return;
 
       // 스탬프 데이터 매칭
-      const stamp = findStampData(name);
+      const stamp = findStampData(name, lat, lng);
       const yearInfo = findYearData(name, lat, lng);
       const monthlyInfo = findMonthlyData(name);
 
