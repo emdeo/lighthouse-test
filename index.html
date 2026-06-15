@@ -15,6 +15,7 @@
 <script src="lighthouses_custom.js"></script>  
 <script src="stamp_data.js"></script>
 <script src="year_data.js"></script> 
+<script src="monthly_lighthouse.js"></script>
 </head>
 <body>
 
@@ -189,7 +190,7 @@
             <div class="month-selects">
               <select id="month-year-select" class="month-select">
                 <option value="">년도 선택</option>
-                <option>2025</option><option>2024</option><option>2023</option>
+                <option>2026</option><option>2025</option><option>2024</option><option>2023</option>
                 <option>2022</option><option>2021</option><option>2020</option>
                 <option>2019</option>
               </select>
@@ -401,6 +402,13 @@ function findYearData(name, lat, lng) {
     if (!y.lat || !y.lng) return true;
     return Math.abs(y.lat - lat) <= 0.01 && Math.abs(y.lng - lng) <= 0.01;
   }) || null;
+}
+
+// 이달의 등대 데이터 매칭 (이름만 비교, 공백 제거)
+function findMonthlyData(name) {
+  if (!window.MONTHLY_LIGHTHOUSE_DATA) return null;
+  const clean = n => n.replace(/\s/g, "");
+  return window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === clean(name)) || null;
 }
 
 function findStampData(name, lat, lng) {
@@ -1024,12 +1032,24 @@ document.getElementById("btn-all").addEventListener("click", () => {
 
 // ── 이달의 등대 년도/월 선택 ──
 document.getElementById("month-year-select").addEventListener("change", () => {
+  // 년도 선택 시 month-all 해제, month 필터 활성화
+  const yearVal = document.getElementById("month-year-select").value;
+  if (yearVal) {
+    filterState.month.delete("month-all");
+    filterState.month.add("month-year");
+  } else {
+    filterState.month.delete("month-year");
+  }
+  // 월 선택 초기화
+  document.getElementById("month-month-select").value = "";
+  syncFilterUI();
   renderMarkers(); renderList();
+  if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
 });
 document.getElementById("month-month-select").addEventListener("change", () => {
   renderMarkers(); renderList();
+  if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
 });
-
 // 초기 UI 동기화
 syncFilterUI();
 
@@ -1185,6 +1205,7 @@ function loadKakaoMap() {
       markerImages = {
       stamp:    makeMarkerImage("#f59e0b"),
       year:     makeMarkerImage("#10b981"),
+      month:    makeMarkerImage("#3b82f6"),
       none:     makeMarkerImage("#6b7280"),
       selected: makeMarkerImage("#ef4444"),
     };
@@ -1301,9 +1322,11 @@ async function loadLighthouseData(map) {
     // 필터 변경 시 마커 다시 그리기
     window.redrawLighthouseMarkers = function() {
       // 클러스터 색상 결정
-const clusterColor = filterState.year.size > 0 && filterState.stamp.size === 0
+const clusterColor = filterState.month.size > 0 && filterState.year.size === 0 && filterState.stamp.size === 0
+  ? "rgba(59,130,246,.85)"   // 파란 (이달의 등대만)
+  : filterState.year.size > 0 && filterState.stamp.size === 0 && filterState.month.size === 0
   ? "rgba(16,185,129,.85)"   // 초록 (올해의 등대만)
-  : filterState.stamp.size > 0 && filterState.year.size === 0
+  : filterState.stamp.size > 0 && filterState.year.size === 0 && filterState.month.size === 0
   ? "rgba(245,158,11,.85)"   // 노란 (스탬프만)
   : "rgba(107,114,128,.85)"; // 회색 (모두 or 혼합)
 clusterer.setStyles([{
@@ -1335,10 +1358,14 @@ clusterer.setStyles([{
         .map(Number);
       const showAllYear = filterState.year.has("year-all");
       const showYear2 = filterState.year.size > 0 && (showAllYear || activeYears.length > 0);
+      // month 필터
+      const showAllMonth = filterState.month.has("month-all");
+      const selectedMonthYear = parseInt(document.getElementById("month-year-select").value) || null;
+      const selectedMonthMonth = parseInt(document.getElementById("month-month-select").value) || null;
+      const showMonth2 = filterState.month.size > 0;
 
       // 아무것도 선택 안 했으면 아무것도 표시 안 함
-      if (!isShowAll && !showStamp2 && !showYear2) return;
-
+      if (!isShowAll && !showStamp2 && !showYear2 && !showMonth2) return;
       window.REAL_LIGHTHOUSES.forEach(lh => {
         const isStamp = lh.tags.includes("stamp");
         const isYear  = lh.tags.includes("year");
@@ -1360,14 +1387,25 @@ clusterer.setStyles([{
               shouldShow = true;
             }
           }
+          if (lh.tags.includes("month") && showMonth2) {
+            if (showAllMonth) {
+              shouldShow = true;
+            } else if (selectedMonthYear && lh.monthlyData) {
+              if (lh.monthlyData.year === selectedMonthYear) {
+                if (!selectedMonthMonth || lh.monthlyData.month === selectedMonthMonth) {
+                  shouldShow = true;
+                }
+              }
+            }
+          }
           // isNone은 모든 등대 표시일 때만 보임 (개별 필터에서는 숨김)
         }
 
         if (!shouldShow) return;
-        if (!shouldShow) return;  // ← 이 한 줄 추가!
 
       const position = new kakao.maps.LatLng(lh.lat, lh.lng);
-        const markerImage = isYear ? markerImages.year
+        const markerImage = lh.tags.includes("month") && !isYear && !isStamp ? markerImages.month
+                 : isYear ? markerImages.year
                  : isStamp ? markerImages.stamp
                  : markerImages.none;
         const marker = new kakao.maps.Marker({ position, image: markerImage });
@@ -1433,6 +1471,7 @@ newMarkers.push(marker);
       // 스탬프 데이터 매칭
       const stamp = findStampData(name);
       const yearInfo = findYearData(name, lat, lng);
+      const monthlyInfo = findMonthlyData(name);
 
       window.REAL_LIGHTHOUSES.push({
         id: item.id, name,
@@ -1442,9 +1481,11 @@ newMarkers.push(marker);
         tags: [
           ...(stamp ? ["stamp"] : []),
           ...(yearInfo ? ["year"] : []),
+          ...(monthlyInfo ? ["month"] : []),
         ],
         stampCategory: stamp ? stamp.category : null,
         yearData: yearInfo || null,
+        monthlyData: monthlyInfo || null,
         ferry: [], reserveUrl: "#",
         contact: stamp ? stamp.contact : "",
         openTime: stamp ? stamp.openDate : "",
