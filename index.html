@@ -789,7 +789,7 @@ document.getElementById("btn-cctv").onclick = function() {
       stationEl.textContent = `${data.station} 관측소 · ${data.distKm}km`;
       content.innerHTML = data.items.map(item => `
         <div style="margin-bottom:1rem;">
-          <div style="font-size:0.72rem; color:var(--gray4); margin-bottom:0.3rem;">${item.imgCrtDt}</div>
+          <div style="font-size:0.72rem; color:var(--gray4); margin-bottom:0.3rem;">${item.imgDt}</div>
           <img src="${item.uri}" alt="해무 CCTV" style="width:100%; border-radius:8px;" onerror="this.parentElement.style.display='none'">
         </div>
       `).join('');
