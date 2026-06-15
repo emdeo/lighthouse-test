@@ -114,3 +114,5 @@ function getCurrentMonthlyLighthouse() {
 function getMonthlyLighthouse(year, month) {
   return MONTHLY_LIGHTHOUSE_DATA.find(d => d.year === year && d.month === month) || null;
 }
+
+window.MONTHLY_LIGHTHOUSE_DATA = MONTHLY_LIGHTHOUSE_DATA;
