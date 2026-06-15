@@ -505,7 +505,9 @@ document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 
     const d = new Date();
     d.setDate(d.getDate() + i);
     const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
-    const label = `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
+    const label = i === 0
+      ? `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]}) 오늘`
+      : `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
     return { dateStr, label };
   });
 
@@ -522,7 +524,17 @@ document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 
   }));
 
   const ferryEl = document.getElementById("detail-ferry");
-  ferryEl.innerHTML = `<div style="font-size:0.82rem; color:#666; margin-bottom:0.8rem;">📍 출발항: ${port.name} (${port.distKm}km)</div>`;
+  ferryEl.innerHTML = `<div style="font-size:0.82rem; color:#666; margin-bottom:0.8rem;">출발항: ${port.name} (${port.distKm}km)</div>`;
+
+  // 5일 전부 운항 없으면 안내 문구만 표시
+  const hasAny = results.some(r => r.items.length > 0);
+  if (!hasAny) {
+    document.getElementById("detail-ferry").innerHTML = `
+      <div style="font-size:0.82rem; color:#666; margin-bottom:0.5rem;">📍 출발항: ${port.name} (${port.distKm}km)</div>
+      <div style="font-size:0.85rem; color:var(--gray3); padding:0.8rem 0;">이 기간 내 운항 정보가 없어요. 아래에서 직접 확인해보세요.</div>
+    `;
+    return;
+  }
 
   results.forEach(({ label, items }) => {
     const block = document.createElement("div");
