@@ -494,8 +494,8 @@ document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 
 // 배편 정보 로드
 (async () => {
   if (!lh.lat || !lh.lng) return;
-  const port = findNearestPort(lh.lat, lh.lng, 30);
-  if (!port) return; // 30km 이내 항구 없으면 섹션 숨김 유지
+  const port = findNearestPort(lh.lat, lh.lng, 150);
+  if (!port) return;
 
   document.getElementById("ferry-section").style.display = "";
 
@@ -509,8 +509,8 @@ document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 
     const items = data.response?.body?.items?.item || [];
 
     if (!items.length) {
-      document.getElementById("detail-ferry").innerHTML =
-        `<div class="data-empty">오늘 운항 정보가 없습니다</div>`;
+      document.getElementById("ferry-section").style.display = "none";
+      return;
     } else {
       document.getElementById("detail-ferry").innerHTML = `
         <div style="font-size:0.82rem; color:#666; margin-bottom:0.5rem;">📍 출발항: ${port.name} (${port.distKm}km)</div>
