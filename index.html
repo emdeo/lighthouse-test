@@ -682,6 +682,23 @@ function openPopup(lh, markerEl) {
   // 내용 채우기
   document.getElementById("popup-emoji").textContent = lh.emoji;
 
+  // 등대 이미지 로드
+  const popupImg = document.getElementById('popup-img');
+  const popupEmoji = document.getElementById('popup-emoji');
+  popupImg.style.backgroundImage = '';
+  popupEmoji.style.display = '';
+  fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.url) {
+        popupImg.style.backgroundImage = `url(${data.url})`;
+        popupImg.style.backgroundSize = 'cover';
+        popupImg.style.backgroundPosition = 'center';
+        popupEmoji.style.display = 'none';
+      }
+    })
+    .catch(() => {});
+
 document.getElementById("popup-name").textContent = lh.name;
 document.getElementById("popup-desc").textContent = (lh.region ? lh.region + " · " : "") + (lh.desc || "");
 document.getElementById("popup-header-link").onclick = () => {
