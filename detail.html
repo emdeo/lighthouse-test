@@ -637,40 +637,46 @@ if (lh.lat && lh.lng) {
   document.querySelector(".weather-label").textContent = "좌표 정보가 없어 날씨를 불러올 수 없어요";
 }
 
-// 바다여행지수 (독립 호출)
+// 바다여행지수
+const seaTripIndexMap = { '매우좋음': { bg:'#bbf7d0', color:'#15803d' }, '좋음': { bg:'#dcfce7', color:'#16a34a' }, '보통': { bg:'#fef9c3', color:'#ca8a04' }, '나쁨': { bg:'#fee2e2', color:'#dc2626' }, '매우나쁨': { bg:'#fecaca', color:'#b91c1c' } };
+let seaTripData = [];
 if (lh.lat && lh.lng) {
-  const indexMap = { '매우좋음': { bg:'#bbf7d0', color:'#15803d' }, '좋음': { bg:'#dcfce7', color:'#16a34a' }, '보통': { bg:'#fef9c3', color:'#ca8a04' }, '나쁨': { bg:'#fee2e2', color:'#dc2626' }, '매우나쁨': { bg:'#fecaca', color:'#b91c1c' } };
   fetch(`${CONFIG.WEATHER_API_URL}/seatrip?lat=${lh.lat}&lng=${lh.lng}`)
     .then(r => r.json())
     .then(seaData => {
+      seaTripData = seaData.data || [];
       const today = new Date(Date.now() + 9*60*60*1000);
       const todayStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth()+1).padStart(2,'0')}-${String(today.getUTCDate()).padStart(2,'0')}`;
-      const todayItems = (seaData.data || []).filter(i => i.predcYmd === todayStr);
+      const todayItems = seaTripData.filter(i => i.predcYmd === todayStr);
       if (todayItems.length) {
         const worstIndex = ['매우나쁨','나쁨','보통','좋음','매우좋음'].find(idx => todayItems.some(i => i.totalIndex === idx)) || todayItems[0].totalIndex;
-        const style = indexMap[worstIndex] || { bg:'var(--gray2)', color:'var(--gray4)' };
+        const style = seaTripIndexMap[worstIndex] || { bg:'var(--gray2)', color:'var(--gray4)' };
         const badgeEl = document.getElementById('today-travel-badge');
         badgeEl.textContent = worstIndex;
         badgeEl.style.background = style.bg;
         badgeEl.style.color = style.color;
       }
-      (seaData.data || []).forEach(item => {
-        const dateKey = item.predcYmd.replace(/-/g, '');
-        const el = document.getElementById(`travel-${dateKey}`);
-        if (!el) return;
-        const existing = el.dataset.indices ? JSON.parse(el.dataset.indices) : [];
-        existing.push(item.totalIndex);
-        el.dataset.indices = JSON.stringify(existing);
-        const worst = ['매우나쁨','나쁨','보통','좋음','매우좋음'].find(idx => existing.includes(idx)) || existing[0];
-        const s = indexMap[worst] || { bg:'var(--gray2)', color:'var(--gray4)' };
-        el.textContent = worst;
-        el.style.background = s.bg;
-        el.style.color = s.color;
-        el.style.padding = '0.2rem 0.4rem';
-        el.style.borderRadius = '12px';
-      });
+      applySeaTripToForecast();
     })
     .catch(() => {});
+}
+
+function applySeaTripToForecast() {
+  seaTripData.forEach(item => {
+    const dateKey = item.predcYmd.replace(/-/g, '');
+    const el = document.getElementById(`travel-${dateKey}`);
+    if (!el) return;
+    const existing = el.dataset.indices ? JSON.parse(el.dataset.indices) : [];
+    existing.push(item.totalIndex);
+    el.dataset.indices = JSON.stringify(existing);
+    const worst = ['매우나쁨','나쁨','보통','좋음','매우좋음'].find(idx => existing.includes(idx)) || existing[0];
+    const s = seaTripIndexMap[worst] || { bg:'var(--gray2)', color:'var(--gray4)' };
+    el.textContent = worst;
+    el.style.background = s.bg;
+    el.style.color = s.color;
+    el.style.padding = '0.2rem 0.4rem';
+    el.style.borderRadius = '12px';
+  });
 }
 
 function wfToIcon(wf) {
@@ -779,6 +785,7 @@ if (lh.lat && lh.lng) {
     }
 
     renderForecast(days);
+    applySeaTripToForecast();
 
     // 뱃멀미지수 로드
     fetch(`${CONFIG.WEATHER_API_URL}/seasick?lat=${lh.lat}&lng=${lh.lng}`)
