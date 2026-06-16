@@ -165,8 +165,8 @@
     </div>
 
   <!-- 등질 정보 카드 -->
-  <div class="section-card" id="section-basic-info" style="background:#010d18;border:1px solid rgba(255,255,255,.08);">
-    <div class="section-title" style="color:rgba(255,255,255,.7);">💡 등질 정보</div>
+  <div class="section-card" id="section-basic-info">
+    <div class="section-title">💡 등질 정보</div>
     <div id="light-sim-container">
       <div style="color:rgba(255,255,255,.4);font-size:0.85rem;padding:1rem 0;">등질 정보를 불러오는 중...</div>
     </div>
@@ -525,7 +525,7 @@ function buildLightSimCard(code) {
 
   const barHtml = buildLightBar(uid, isFixed, isIso, isOc, isQ, isVQ, isLFl, isComposite, isMo, flashCnt, cnt1, cnt2, period, col);
 
-  return `<div style="background:#010d18;border-radius:10px;padding:14px 16px;border:1px solid rgba(255,255,255,.08)">
+  return `<div style="padding:4px 0">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
       <div style="position:relative;width:60px;height:72px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center">
         <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;
@@ -550,16 +550,16 @@ function buildLightSimCard(code) {
           ${flashCnt>1&&!isComposite?`<span style="font-size:10px;color:#f97316">${flashCnt}회 섬광</span>`:''}
           ${isComposite?`<span style="font-size:10px;color:#f97316">(${cnt1}+${cnt2})회</span>`:''}
         </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.75);line-height:1.7">${typeDesc}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">${code}</div>
+        <div style="font-size:11px;color:var(--gray4);line-height:1.7">${typeDesc}</div>
+        <div style="font-size:10px;color:var(--gray3);margin-top:4px">${code}</div>
       </div>
     </div>
     <div style="margin-top:4px">
-      <div style="font-size:10px;color:rgba(255,255,255,.6);margin-bottom:4px">등질 패턴 (1주기 ${period}초)</div>
-      <div style="display:flex;gap:1px;height:12px;border-radius:4px;overflow:hidden;background:#020e1a;border:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:10px;color:var(--gray4);margin-bottom:4px">등질 패턴 (1주기 ${period}초)</div>
+      <div style="display:flex;gap:1px;height:12px;border-radius:4px;overflow:hidden;background:var(--gray2);border:1px solid var(--gray3)">
         ${barHtml}
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.55);margin-top:3px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray3);margin-top:3px">
         <span>0s</span><span>${(period/4).toFixed(1)}s</span><span>${(period/2).toFixed(1)}s</span><span>${period}s</span>
       </div>
     </div>
