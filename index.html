@@ -251,31 +251,16 @@
           <div class="popup-meta" id="popup-meta"></div>
           <div class="popup-divider"></div>
 
-<!-- 개방시간 / 문의 / 문화공간 -->
-<div class="popup-info-rows" id="popup-info-rows">
-  <div class="popup-info-row">
-    <span class="popup-info-icon">🕐</span>
-    <div class="popup-info-content">
-      <span class="popup-info-label">개방시간</span>
-      <span class="popup-info-value" id="popup-open-time">정보 준비 중</span>
-    </div>
+<!-- 날씨 -->
+<div class="popup-weather">
+  <div class="weather-icon">☀️</div>
+  <div class="weather-info">
+    <div class="weather-temp" id="popup-temp">—°</div>
+    <div class="weather-desc" id="popup-weather-desc">날씨 정보 준비 중</div>
   </div>
-  <div class="popup-info-row">
-    <span class="popup-info-icon">📞</span>
-    <div class="popup-info-content">
-      <span class="popup-info-label">문의</span>
-      <span class="popup-info-value" id="popup-contact">정보 준비 중</span>
-    </div>
-  </div>
-  <div class="popup-info-row">
-    <span class="popup-info-icon">🏛</span>
-    <div class="popup-info-content">
-      <span class="popup-info-label">문화공간</span>
-      <span class="popup-info-value" id="popup-culture">정보 준비 중</span>
-    </div>
-  </div>
-
 </div>
+
+<div class="popup-divider"></div>
 
 <!-- 정보 더보기 버튼 -->
 <button id="btn-detail" style="
@@ -305,17 +290,6 @@
   <button class="dir-btn dir-kakao" id="btn-kakao">
     카카오맵 길찾기
   </button>
-</div>
-
-<div class="popup-divider"></div>
-
-<!-- 날씨 -->
-<div class="popup-weather">
-  <div class="weather-icon">☀️</div>
-  <div class="weather-info">
-    <div class="weather-temp" id="popup-temp">—°</div>
-    <div class="weather-desc" id="popup-weather-desc">날씨 정보 준비 중</div>
-  </div>
 </div>
 
 <div class="popup-bottom-buttons">
@@ -770,9 +744,9 @@ if (myLat !== null && myLng !== null) {
   const display = km >= 10
     ? Math.round(km) + " km"
     : km.toFixed(1) + " km";
-  distEl.textContent = "📍 내 위치에서 " + display;
+  distEl.textContent = "📍 내 위치로부터 " + display;
 } else {
-  distEl.textContent = "📍 내 위치에서 — km";
+  distEl.textContent = "📍 내 위치로부터 — km";
 }
 
   const stamp = findStampData(lh.name, lh.lat, lh.lng);
