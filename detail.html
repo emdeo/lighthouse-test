@@ -440,11 +440,11 @@ const TAG_INFO = {
 document.title = lh.name + " — 안녕, 등대";
 const mascotMsg = document.getElementById("mascot-message");
 if (lh.name.includes("방파제")) {
-  mascotMsg.innerHTML = "AAA";
+  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! /n 이 등대는 방파제 위에 세워진 등대야. /n 배가 들어오는 방향 기준으로 /n ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 /n ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ /n 🤷🏻 왜 어떤 등대는 흰색일까? /n 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 /n 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else if (lh.name.includes("방사제")) {
   mascotMsg.innerHTML = "🧭 등대 가이드 TIME! /n 이 등대는 방사제 위에 세워진 등대야. /n 배가 들어오는 방향 기준으로 /n ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 /n ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ /n 🤷🏻 왜 어떤 등대는 흰색일까? /n 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 /n 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else {
-  mascotMsg.innerHTML = "CCC";
+  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! /n 이 등대는 육지 끝단에 세워진 육지초인표지 등대야. /n 바다 위가 아닌 땅에서 배의 길을 안내하지 /n 육지초인표지 등대 = 대부분 흰색 🤍 /n 다른 등대는 어떤 모습일까? 😗";
 }
 document.getElementById("bc-name").textContent       = lh.name;
 document.getElementById("detail-emoji").textContent  = "🔦";
