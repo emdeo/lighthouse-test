@@ -705,6 +705,7 @@ document.getElementById("popup-header-link").onclick = () => {
   const params = new URLSearchParams({
   id:     lh.id   || "",
   name:   lh.name || "",
+  nameEn: lh.nameEn || "",
   lat:    lh.lat  || "",
   lng:    lh.lng  || "",
   region: lh.region || "",
@@ -738,6 +739,7 @@ window.location.href = `detail.html?${params.toString()}`;
   const params = new URLSearchParams({
     id:     lh.id   || "",
     name:   lh.name || "",
+    nameEn: lh.nameEn || "",
     lat:    lh.lat  || "",
     lng:    lh.lng  || "",
     region: lh.region || "",
@@ -1764,6 +1766,7 @@ function openPopupMobile(lh, markerEl) {
       const params = new URLSearchParams({
         id:     lh.id   || "",
         name:   lh.name || "",
+        nameEn: lh.nameEn || "",
         lat:    lh.lat  || "",
         lng:    lh.lng  || "",
         region: lh.region || "",

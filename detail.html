@@ -439,6 +439,7 @@ function getParam(name) {
 const lh = {
   id:            getParam("id"),
   name:          getParam("name")   || "알 수 없는 등대",
+  nameEn:        getParam("nameEn") || "",
   lat:           parseFloat(getParam("lat"))  || null,
   lng:           parseFloat(getParam("lng"))  || null,
   region:        getParam("region") || "",
@@ -488,7 +489,7 @@ const stampInfo = (typeof STAMP_DATA !== 'undefined')
   ? STAMP_DATA.find(s => s.name.replace(/\s/g, '') === lh.name.replace(/\s/g, '')) || null
   : null;
 document.getElementById("detail-region").textContent = (stampInfo && stampInfo.address) ? stampInfo.address : lh.region;
-document.getElementById("detail-desc").textContent = lh.desc || "";
+document.getElementById("detail-desc").textContent = lh.nameEn || lh.desc || "";
 document.getElementById("detail-story").textContent = (stampInfo && stampInfo.desc) ? stampInfo.desc : "상세 정보를 준비 중입니다.";
 const tagsEl = document.getElementById("detail-tags");
 tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
