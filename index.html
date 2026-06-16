@@ -113,7 +113,7 @@
         <div class="filter-group">
           <div class="filter-item filter-parent" id="toggle-stamp">
             <div class="filter-dot" style="background:#f59e0b;"></div>
-            등대 스탬프 투어
+            등대 스탬프 투어 <span id="cnt-stamp" style="font-size:10px;color:#9ca3af;margin-left:2px"></span>
             <span class="filter-arrow" id="arrow-stamp">▶</span>
           </div>
           <div class="filter-children" id="stamp-group">
@@ -121,22 +121,22 @@
               <div class="filter-check">✓</div>모두 표시
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-beautiful">
-              <div class="filter-check">✓</div>아름다운 등대
+              <div class="filter-check">✓</div>아름다운 등대 <span id="cnt-stamp-beautiful" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-history">
-              <div class="filter-check">✓</div>역사가 있는 등대
+              <div class="filter-check">✓</div>역사가 있는 등대 <span id="cnt-stamp-history" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-fun">
-              <div class="filter-check">✓</div>재미있는 등대
+              <div class="filter-check">✓</div>재미있는 등대 <span id="cnt-stamp-fun" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-rich">
-              <div class="filter-check">✓</div>풍요의 등대
+              <div class="filter-check">✓</div>풍요의 등대 <span id="cnt-stamp-rich" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-healing">
-              <div class="filter-check">✓</div>힐링의 등대
+              <div class="filter-check">✓</div>힐링의 등대 <span id="cnt-stamp-healing" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <div class="filter-item filter-child" data-group="stamp" data-key="stamp-sunrise">
-              <div class="filter-check">✓</div>일출이 멋진 등대
+              <div class="filter-check">✓</div>일출이 멋진 등대 <span id="cnt-stamp-sunrise" style="font-size:10px;color:#9ca3af"></span>
             </div>
             <a href="https://www.lighthouse-museum.or.kr/sea/passport" target="_blank" class="stamp-site-link">
               → 관련 사이트 보러가기
@@ -148,7 +148,7 @@
         <div class="filter-group">
           <div class="filter-item filter-parent" id="toggle-year">
             <div class="filter-dot" style="background:#10b981;"></div>
-            올해의 등대
+            올해의 등대 <span id="cnt-year" style="font-size:10px;color:#9ca3af;margin-left:2px"></span>
             <span class="filter-arrow" id="arrow-year">▶</span>
           </div>
           <div class="filter-children" id="year-group">
@@ -180,7 +180,7 @@
         <div class="filter-group">
           <div class="filter-item filter-parent" id="toggle-month">
             <div class="filter-dot" style="background:#3b82f6;"></div>
-            이달의 등대
+            이달의 등대 <span id="cnt-month" style="font-size:10px;color:#9ca3af;margin-left:2px"></span>
             <span class="filter-arrow" id="arrow-month">▶</span>
           </div>
           <div class="filter-children" id="month-group">
@@ -1521,6 +1521,46 @@ newMarkers.push(marker);
     // 처음 로드 시 바로 필터 적용해서 표시
     window.redrawLighthouseMarkers();
     console.log(`✅ 등대 데이터 ${markers.length}개 로드 완료`);
+    // 필터 카운트 표시
+    (function() {
+      const all = window.REAL_LIGHTHOUSES || [];
+      const sd  = window.STAMP_DATA || [];
+      const yd  = window.YEAR_DATA  || [];
+      const md  = window.MONTHLY_LIGHTHOUSE_DATA || [];
+
+      const clean = n => n.replace(/\s/g,'').replace(/등대$/,'');
+
+      // 전체
+      const el = id => document.getElementById(id);
+      const set = (id, n) => { if(el(id)) el(id).textContent = `(${n}개)`; };
+
+      set('cnt-all',   all.length);
+
+      // 스탬프
+      const stampAll = all.filter(lh => lh.tags.includes('stamp'));
+      set('cnt-stamp', stampAll.length);
+
+      const catMap = {
+        'stamp-beautiful': '아름', 'stamp-history': '역사',
+        'stamp-fun': '재미',       'stamp-rich':    '풍요',
+        'stamp-healing': '힐링',   'stamp-sunrise': '일출',
+      };
+      Object.entries(catMap).forEach(([key, cat]) => {
+        const cnt = stampAll.filter(lh => {
+          const info = sd.find(s => clean(s.name) === clean(lh.name));
+          return info && info.category === cat;
+        }).length;
+        set(`cnt-${key}`, cnt);
+      });
+
+      // 올해의 등대
+      const yearAll = all.filter(lh => lh.tags.includes('year'));
+      set('cnt-year', yearAll.length);
+
+      // 이달의 등대
+      const monthAll = all.filter(lh => lh.tags.includes('month'));
+      set('cnt-month', monthAll.length);
+    })();
 
   } catch (err) {
     console.error("❌ 등대 로드 실패:", err);
