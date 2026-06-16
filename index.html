@@ -750,9 +750,6 @@ if (myLat !== null && myLng !== null) {
 }
 
   const stamp = findStampData(lh.name, lh.lat, lh.lng);
-  document.getElementById("popup-open-time").textContent = stamp?.contact   || lh.openTime || "정보 준비 중";
-  document.getElementById("popup-contact").textContent   = stamp?.contact   || lh.contact  || "정보 준비 중";
-  document.getElementById("popup-culture").textContent   = stamp?.intro     || lh.culture  || "정보 준비 중";  
 
   // 날씨 불러오기
 document.getElementById("popup-temp").textContent = "—°";
