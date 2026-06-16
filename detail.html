@@ -133,7 +133,7 @@
   <div style="display:flex; align-items:center; margin-bottom:0.3rem; padding:0 .8rem; gap:0.4rem;">
     <div class="section-title" style="margin:0; flex:1;">📅 주간 기상 예보</div>
     <span style="width:1px; background:transparent; margin:0 .3rem; flex-shrink:0;"></span>
-    <span style="width:72px; text-align:center; font-size:0.72rem; font-weight:700; color:#16a34a; flex-shrink:0;">여행추천여부</span>
+    <span style="width:72px; text-align:center; font-size:0.72rem; font-weight:700; color:#16a34a; flex-shrink:0;">바다여행정보</span>
     <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316; flex-shrink:0;">뱃멀미지수</span>
     <span style="width:64px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899; flex-shrink:0;">갯벌체험지수</span>
   </div>
@@ -607,16 +607,6 @@ document.getElementById("btn-kakao").onclick = () => {
   window.open(`https://map.kakao.com/?q=${encodeURIComponent(lh.name)}`, "_blank");
 };
 
-// 여행 가능 여부 판단 함수
-function getTravelBadge(windSpeed, weatherId, waveHeight) {
-  if (windSpeed > 14) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (waveHeight !== null && waveHeight > 1.0) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (weatherId >= 95) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (windSpeed > 10) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  if (waveHeight !== null && waveHeight > 0.5) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  return { label: '여행 가능', bg: '#dcfce7', color: '#16a34a' };
-}
-
 if (lh.lat && lh.lng) {
   fetch(`${CONFIG.WEATHER_API_URL}/?lat=${lh.lat}&lng=${lh.lng}`)
     .then(r => r.json())
@@ -639,25 +629,46 @@ if (lh.lat && lh.lng) {
       document.querySelector(".weather-label").innerHTML =
         `${desc} · 체감 ${feels}°C<br>💨 ${windDir} ${wind}m/s · 💧 습도 ${humidity}% · ☁️ 구름 ${cloud}%`;
 
-      // 오늘 여행 가능 여부 (파고는 나중에 연결 — 현재 null)
-      const badge = getTravelBadge(wind, weatherId, null);
-      const badgeEl = document.getElementById('today-travel-badge');
-      badgeEl.textContent = badge.label;
-      badgeEl.style.background = badge.bg;
-      badgeEl.style.color = badge.color;
+      // 바다여행지수 API로 오늘 배지 표시
+      fetch(`${CONFIG.WEATHER_API_URL}/seatrip?lat=${lh.lat}&lng=${lh.lng}`)
+        .then(r => r.json())
+        .then(seaData => {
+          const today = new Date(Date.now() + 9*60*60*1000);
+          const todayStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth()+1).padStart(2,'0')}-${String(today.getUTCDate()).padStart(2,'0')}`;
+          const todayItems = (seaData.data || []).filter(i => i.predcYmd === todayStr);
+          if (!todayItems.length) return;
+          const indexMap = { '매우좋음': { bg:'#bbf7d0', color:'#15803d' }, '좋음': { bg:'#dcfce7', color:'#16a34a' }, '보통': { bg:'#fef9c3', color:'#ca8a04' }, '나쁨': { bg:'#fee2e2', color:'#dc2626' }, '매우나쁨': { bg:'#fecaca', color:'#b91c1c' } };
+          const worstIndex = ['매우나쁨','나쁨','보통','좋음','매우좋음'].find(idx => todayItems.some(i => i.totalIndex === idx)) || todayItems[0].totalIndex;
+          const style = indexMap[worstIndex] || { bg:'var(--gray2)', color:'var(--gray4)' };
+          const badgeEl = document.getElementById('today-travel-badge');
+          badgeEl.textContent = worstIndex;
+          badgeEl.style.background = style.bg;
+          badgeEl.style.color = style.color;
+
+          // 주간예보 행에도 날짜별로 채우기
+          (seaData.data || []).forEach(item => {
+            const dateKey = item.predcYmd.replace(/-/g, '');
+            const el = document.getElementById(`travel-${dateKey}`);
+            if (!el) return;
+            const existing = el.dataset.indices ? JSON.parse(el.dataset.indices) : [];
+            existing.push(item.totalIndex);
+            el.dataset.indices = JSON.stringify(existing);
+            const worst = ['매우나쁨','나쁨','보통','좋음','매우좋음'].find(idx => existing.includes(idx)) || existing[0];
+            const s = indexMap[worst] || { bg:'var(--gray2)', color:'var(--gray4)' };
+            el.textContent = worst;
+            el.style.background = s.bg;
+            el.style.color = s.color;
+            el.style.padding = '0.2rem 0.4rem';
+            el.style.borderRadius = '12px';
+          });
+        })
+        .catch(() => {});
     })
     .catch(() => {
       document.querySelector(".weather-label").textContent = "날씨 정보를 불러올 수 없어요";
     });
 } else {
   document.querySelector(".weather-label").textContent = "좌표 정보가 없어 날씨를 불러올 수 없어요";
-}
-function getTravelBadgeByForecast(d) {
-  const isThunder = d.desc.includes('뇌우');
-  const isRain = d.desc.includes('비') || d.desc.includes('눈');
-  if (isThunder || d.rnSt > 70) return { label: '여행 위험', bg: '#fee2e2', color: '#dc2626' };
-  if (isRain || d.rnSt > 50) return { label: '여행 주의', bg: '#fef9c3', color: '#ca8a04' };
-  return { label: '여행 가능', bg: '#dcfce7', color: '#16a34a' };
 }
 
 function wfToIcon(wf) {
@@ -691,7 +702,7 @@ function renderForecast(days) {
       <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
       <span style="flex:1; color:var(--gray4); font-size:0.82rem;">${d.desc}</span>
       <span style="width:1px; background:var(--gray3); align-self:stretch; margin:0 .3rem; flex-shrink:0;"></span>
-      <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; flex-shrink:0; width:72px; text-align:center; box-sizing:border-box; background:${getTravelBadgeByForecast(d).bg}; color:${getTravelBadgeByForecast(d).color};">${getTravelBadgeByForecast(d).label}</span>
+      <span style="font-size:0.72rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:12px; flex-shrink:0; width:72px; text-align:center; box-sizing:border-box; background:var(--gray2); color:var(--gray4);" id="travel-${d.dateKey}">—</span>
       <span style="font-size:0.72rem; flex-shrink:0; width:56px; text-align:center; color:var(--gray4); line-height:1.5;" id="seasick-${d.dateKey}">—</span>
       <span style="font-size:0.72rem; flex-shrink:0; width:64px; text-align:center; color:var(--gray4);" id="tidal-${d.dateKey}">—</span>
     </div>
