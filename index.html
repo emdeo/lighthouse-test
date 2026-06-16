@@ -706,6 +706,7 @@ document.getElementById("popup-header-link").onclick = () => {
   id:     lh.id   || "",
   name:   lh.name || "",
   nameEn: lh.nameEn || "",
+  light: lh.light || "",
   lat:    lh.lat  || "",
   lng:    lh.lng  || "",
   region: lh.region || "",
@@ -740,6 +741,7 @@ window.location.href = `detail.html?${params.toString()}`;
     id:     lh.id   || "",
     name:   lh.name || "",
     nameEn: lh.nameEn || "",
+    light: lh.light || "",
     lat:    lh.lat  || "",
     lng:    lh.lng  || "",
     region: lh.region || "",
@@ -1509,6 +1511,7 @@ newMarkers.push(marker);
         ferry: [], reserveUrl: "#",
         contact: stamp ? stamp.contact : "",
         openTime: stamp ? stamp.openDate : "",
+        light: item.light || "",
         lat, lng
       });
 
@@ -1768,6 +1771,7 @@ function openPopupMobile(lh, markerEl) {
         id:     lh.id   || "",
         name:   lh.name || "",
         nameEn: lh.nameEn || "",
+        light: lh.light || "",
         lat:    lh.lat  || "",
         lng:    lh.lng  || "",
         region: lh.region || "",
