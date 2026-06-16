@@ -272,10 +272,7 @@
       border-right:9px solid #fff0f3;
     "></div>
     <!-- 말풍선 내용 -->
-    <span id="mascot-message">
-      빨간색으로 칠해진 등대는 <strong>스탬프 투어 등대</strong>예요! 🏆<br>
-      전국 등대를 돌며 스탬프를 모아보세요.
-    </span>
+    <span id="mascot-message"></span>
   </div>
 </div>
 
@@ -441,6 +438,14 @@ const TAG_INFO = {
 };
 
 document.title = lh.name + " — 안녕, 등대";
+const mascotMsg = document.getElementById("mascot-message");
+if (lh.name.includes("방파제")) {
+  mascotMsg.innerHTML = "AAA";
+} else if (lh.name.includes("방사제")) {
+  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! /n 이 등대는 방사제 위에 세워진 등대야. /n 배가 들어오는 방향 기준으로 /n ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 /n ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ /n 🤷🏻 왜 어떤 등대는 흰색일까? /n 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 /n 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
+} else {
+  mascotMsg.innerHTML = "CCC";
+}
 document.getElementById("bc-name").textContent       = lh.name;
 document.getElementById("detail-emoji").textContent  = "🔦";
 
