@@ -1494,6 +1494,7 @@ newMarkers.push(marker);
 
       window.REAL_LIGHTHOUSES.push({
         id: item.id, name,
+        nameEn: item.nameEn || "",
         region: item.sea,
         desc: stamp ? stamp.intro : (item.light || ""),
         emoji: stamp ? "🏆" : yearInfo ? "🌟" : "🔦",
