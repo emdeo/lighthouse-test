@@ -523,8 +523,6 @@ function buildLightSimCard(code) {
   style.textContent = kf;
   document.head.appendChild(style);
 
-  const barHtml = buildLightBar(uid, isFixed, isIso, isOc, isQ, isVQ, isLFl, isComposite, isMo, flashCnt, cnt1, cnt2, period, col);
-
   return `<div style="padding:4px 0">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
       <div style="position:relative;width:60px;height:72px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center">
@@ -554,52 +552,7 @@ function buildLightSimCard(code) {
         <div style="font-size:10px;color:var(--gray3);margin-top:4px">${code}</div>
       </div>
     </div>
-    <div style="margin-top:4px">
-      <div style="font-size:10px;color:var(--gray4);margin-bottom:4px">등질 패턴 (1주기 ${period}초)</div>
-      <div style="display:flex;gap:1px;height:12px;border-radius:4px;overflow:hidden;background:var(--gray2);border:1px solid var(--gray3)">
-        ${barHtml}
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray3);margin-top:3px">
-        <span>0s</span><span>${(period/4).toFixed(1)}s</span><span>${(period/2).toFixed(1)}s</span><span>${period}s</span>
-      </div>
-    </div>
   </div>`;
-}
-
-function buildLightBar(uid, isFixed, isIso, isOc, isQ, isVQ, isLFl, isComposite, isMo, flashCnt, cnt1, cnt2, period, col) {
-  if (isFixed) return `<div style="flex:1;background:${col};opacity:0.85"></div>`;
-  const slots = 60;
-  let bars = new Array(slots).fill(0);
-  const onT = isLFl ? 2.0 : isQ ? 0.5 : isVQ ? 0.25 : 0.4;
-  const offT = isQ ? 0.5 : isVQ ? 0.25 : 0.5;
-  if (isIso) {
-    for (let i=0;i<slots;i++) bars[i] = i < slots/2 ? 1 : 0;
-  } else if (isOc) {
-    for (let i=0;i<slots;i++) bars[i] = i < slots*0.75 ? 1 : 0;
-  } else {
-    const flashes = [];
-    let pos = 0;
-    if (isComposite) {
-      for (let i=0;i<cnt1;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
-      pos+=0.8;
-      for (let i=0;i<cnt2;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
-    } else {
-      for (let i=0;i<flashCnt;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
-    }
-    for (let i=0;i<slots;i++) {
-      const t = (i/slots)*period;
-      bars[i] = flashes.some(([s,e]) => t>=s && t<e) ? 1 : 0;
-    }
-  }
-  let html = '', i = 0;
-  while (i < slots) {
-    const v = bars[i]; let j = i;
-    while (j < slots && bars[j] === v) j++;
-    const w = ((j-i)/slots*100).toFixed(2);
-    html += `<div style="width:${w}%;background:${v?col:'transparent'};opacity:${v?0.9:1};flex-shrink:0"></div>`;
-    i = j;
-  }
-  return html;
 }
 
 // 배편 정보 로드
