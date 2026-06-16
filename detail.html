@@ -218,19 +218,38 @@
   </div>
 </div>
 
-  <!-- 사진 갤러리 (자리 잡기용) -->
-  <div class="section-card">
-    <div class="section-title">📷 사진 갤러리</div>
-    <div class="gallery-grid">
-      <div class="gallery-cell">🌊</div>
-      <div class="gallery-cell">🌅</div>
-      <div class="gallery-cell">⛵</div>
-      <div class="gallery-cell">🏞️</div>
-      <div class="gallery-cell">🔦</div>
-      <div class="gallery-cell">🌃</div>
-    </div>
-    
+  <!-- 사진 갤러리 -->
+<div class="section-card" id="section-gallery">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="section-title" style="margin:0">📷 사진 갤러리</div>
+    <button onclick="pickLhPhoto()" style="
+      background:var(--primary,#3b82f6);color:#fff;border:none;
+      border-radius:20px;padding:6px 14px;font-size:12px;
+      font-weight:600;cursor:pointer;">
+      📸 사진 촬영
+    </button>
   </div>
+  <div id="lhPhotoGrid" style="
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+    <div style="grid-column:1/-1;text-align:center;padding:32px 0;
+      color:#aaa;font-size:13px;">
+      📭 등록된 사진이 없어요<br>
+      <span style="font-size:11px">📸 버튼으로 사진을 찍어보세요</span>
+    </div>
+  </div>
+</div>
+
+<!-- 사진 전체화면 뷰어 -->
+<div id="lhPhotoViewer" style="
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
+  z-index:9999;flex-direction:column;align-items:center;justify-content:center;">
+  <button onclick="closeLhViewer()" style="
+    position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);
+    border:none;color:#fff;font-size:20px;width:40px;height:40px;
+    border-radius:50%;cursor:pointer;">✕</button>
+  <img id="lhViewerImg" style="max-width:100%;max-height:85vh;object-fit:contain;">
+  <div id="lhViewerDate" style="color:rgba(255,255,255,.6);font-size:11px;margin-top:8px;"></div>
+</div>
 
   <!-- 등대 마스코트 말풍선 블록 -->
 <div class="section-card" style="display:flex; align-items:flex-start; gap:1.2rem; padding:1.5rem;">
@@ -1011,6 +1030,206 @@ async function loadAiInfo() {
 document.getElementById('btn-ai-load').addEventListener('click', loadAiInfo);
 document.getElementById('btn-ai-reload').addEventListener('click', loadAiInfo);
 
+/* ══ 사진 갤러리 ══ */
+const LhPhotoDB = (() => {
+  let _db = null;
+  function open() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('LhPhotoDB', 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('photos')) {
+          const st = db.createObjectStore('photos', {keyPath:'id', autoIncrement:true});
+          st.createIndex('lhId','lhId',{unique:false});
+        }
+      };
+      req.onsuccess = e => { _db = e.target.result; res(_db); };
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+  return {
+    save(lhId, dataUrl, thumb, date) {
+      return new Promise(async (res,rej) => {
+        const db = await open();
+        const t  = db.transaction('photos','readwrite');
+        const r  = t.objectStore('photos').add({lhId, dataUrl, thumb, date});
+        r.onsuccess = e => res(e.target.result);
+        r.onerror   = e => rej(e.target.error);
+      });
+    },
+    list(lhId) {
+      return new Promise(async (res,rej) => {
+        const db  = await open();
+        const t   = db.transaction('photos','readonly');
+        const req = t.objectStore('photos').index('lhId').getAll(lhId);
+        req.onsuccess = e => res(e.target.result||[]);
+        req.onerror   = e => rej(e.target.error);
+      });
+    },
+    delete(id) {
+      return new Promise(async (res,rej) => {
+        const db = await open();
+        const t  = db.transaction('photos','readwrite');
+        const r  = t.objectStore('photos').delete(id);
+        r.onsuccess = ()=>res();
+        r.onerror   = e=>rej(e.target.error);
+      });
+    }
+  };
+})();
+
+function _lhFmtDate(iso) {
+  const d = new Date(iso), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function _lhFmtDateFile(iso) {
+  const d = new Date(iso), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+function _lhToDM(deg, isLat) {
+  const d0 = Math.floor(Math.abs(deg));
+  const m0 = ((Math.abs(deg)-d0)*60).toFixed(3);
+  const dir = isLat ? (deg>=0?'N':'S') : (deg>=0?'E':'W');
+  return `${d0}°${m0}′${dir}`;
+}
+
+function _lhWatermark(file) {
+  return new Promise((res,rej) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1536;
+        const ratio = Math.min(1, MAX/Math.max(img.width, img.height));
+        const W = Math.round(img.width*ratio), H = Math.round(img.height*ratio);
+        const canvas = document.createElement('canvas');
+        canvas.width = W; canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, W, H);
+
+        const BAR_H   = Math.max(52, Math.round(H*0.09));
+        const FONT_LG = Math.max(17, Math.round(H*0.028));
+        const FONT_SM = Math.max(12, Math.round(H*0.020));
+        const PAD     = Math.round(W*0.02);
+        const now     = new Date().toISOString();
+
+        ctx.fillStyle = 'rgb(0,0,0)';
+        ctx.fillRect(0, H-BAR_H, W, BAR_H);
+        ctx.textBaseline = 'top';
+
+        ctx.font      = `bold ${FONT_LG}px "Malgun Gothic",sans-serif`;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText((lh.name||'등대').replace(/\s+/g,''), PAD, H-BAR_H+8);
+
+        const lat = lh.lat ? _lhToDM(lh.lat, true)  : '';
+        const lng = lh.lng ? _lhToDM(lh.lng, false) : '';
+        const locStr = (lat&&lng) ? `${lat}  ${lng}` : '';
+        ctx.font      = `${FONT_SM}px "Malgun Gothic",sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText(`${_lhFmtDate(now)}  ${locStr}`, PAD, H-BAR_H+FONT_LG+12);
+
+        ctx.fillStyle = 'rgba(0,200,220,0.8)';
+        ctx.font      = `bold ${FONT_SM}px Arial,sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.fillText('안녕, 등대', W-PAD, H-BAR_H+8);
+        ctx.textAlign = 'left';
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+        // 썸네일
+        const TH = 300, tR = Math.min(1, TH/Math.max(W,H));
+        const tc = document.createElement('canvas');
+        tc.width = Math.round(W*tR); tc.height = Math.round(H*tR);
+        tc.getContext('2d').drawImage(canvas, 0, 0, tc.width, tc.height);
+        const thumb = tc.toDataURL('image/jpeg', 0.55);
+
+        res({ dataUrl, thumb, date: now });
+      };
+      img.onerror = rej;
+      img.src = ev.target.result;
+    };
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function pickLhPhoto() {
+  const inp = document.createElement('input');
+  inp.type    = 'file';
+  inp.accept  = 'image/*';
+  inp.capture = 'environment';
+  inp.style.display = 'none';
+  inp.onchange = async e => {
+    const file = e.target.files?.[0];
+    if (!file) { document.body.removeChild(inp); return; }
+    try {
+      const { dataUrl, thumb, date } = await _lhWatermark(file);
+      const lhId = String(lh.id || lh.name);
+      await LhPhotoDB.save(lhId, dataUrl, thumb, date);
+
+      // 갤러리(다운로드) 자동 저장
+      const fname = `${(lh.name||'등대').replace(/\s+/g,'')}_${_lhFmtDateFile(date)}.jpg`;
+      const a = document.createElement('a');
+      a.href = dataUrl; a.download = fname;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => document.body.removeChild(a), 500);
+
+      await renderLhGallery();
+    } catch(err) {
+      console.error('사진 처리 오류', err);
+      alert('사진 처리 중 오류가 발생했습니다.');
+    }
+    document.body.removeChild(inp);
+  };
+  document.body.appendChild(inp);
+  inp.click();
+}
+
+async function renderLhGallery() {
+  const grid = document.getElementById('lhPhotoGrid');
+  if (!grid) return;
+  const lhId = String(lh.id || lh.name);
+  const photos = await LhPhotoDB.list(lhId);
+  if (!photos.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:#aaa;font-size:13px;">
+      📭 등록된 사진이 없어요<br><span style="font-size:11px">📸 버튼으로 사진을 찍어보세요</span></div>`;
+    return;
+  }
+  grid.innerHTML = photos.map(p => `
+    <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer"
+      onclick="openLhViewer(${p.id})">
+      <img src="${p.thumb||p.dataUrl}" style="width:100%;height:100%;object-fit:cover;">
+      <button onclick="event.stopPropagation();deleteLhPhoto(${p.id})" style="
+        position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);
+        border:none;color:#fff;font-size:11px;width:22px;height:22px;
+        border-radius:50%;cursor:pointer;line-height:1;">✕</button>
+    </div>`).join('');
+}
+
+async function openLhViewer(photoId) {
+  const lhId = String(lh.id || lh.name);
+  const photos = await LhPhotoDB.list(lhId);
+  const p = photos.find(x => x.id === photoId);
+  if (!p) return;
+  document.getElementById('lhViewerImg').src = p.dataUrl;
+  document.getElementById('lhViewerDate').textContent = _lhFmtDate(p.date);
+  document.getElementById('lhPhotoViewer').style.display = 'flex';
+}
+
+function closeLhViewer() {
+  document.getElementById('lhPhotoViewer').style.display = 'none';
+  document.getElementById('lhViewerImg').src = '';
+}
+
+async function deleteLhPhoto(photoId) {
+  if (!confirm('이 사진을 삭제하시겠습니까?')) return;
+  await LhPhotoDB.delete(photoId);
+  await renderLhGallery();
+}
+
+// 페이지 로드 시 갤러리 렌더
+renderLhGallery();
 </script>
 </body>
 </html>
