@@ -31,6 +31,7 @@ function parseItems(xml) {
     return {
       id: get('blfrNo'),
       name: get('buoyKr'),
+      nameEn: get('buoyEn'),
       type: get('buoyNm'),
       sea: get('seaNm'),
       light: get('lgt_property'),
