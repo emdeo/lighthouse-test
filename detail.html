@@ -164,34 +164,11 @@
       <div id="detail-toilet"><div class="data-empty">화장실 정보를 불러오는 중...</div></div>
     </div>
 
-  <!-- 기본 정보 카드 -->
-  <div class="section-card" id="section-basic-info">
-  <div class="section-title">🏗 기본 정보</div>
-    <div class="info-grid">
-      <div class="info-item">
-        <div class="info-label">건립 연도</div>
-        <div class="info-value" id="info-year">—</div>
-      </div>
-      <div class="info-item" id="item-height">
-        <div class="info-label">등대 높이</div>
-        <div class="info-value" id="info-height">—</div>
-      </div>
-      <div class="info-item" id="item-range">
-        <div class="info-label">광달 거리</div>
-        <div class="info-value" id="info-range">—</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">관리 기관</div>
-        <div class="info-value" id="info-org">—</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">좌표</div>
-        <div class="info-value" id="info-coords">—</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">방문 가능 여부</div>
-        <div class="info-value" id="info-visit">—</div>
-      </div>
+  <!-- 등질 정보 카드 -->
+  <div class="section-card" id="section-basic-info" style="background:#010d18;border:1px solid rgba(255,255,255,.08);">
+    <div class="section-title" style="color:rgba(255,255,255,.7);">💡 등질 정보</div>
+    <div id="light-sim-container">
+      <div style="color:rgba(255,255,255,.4);font-size:0.85rem;padding:1rem 0;">등질 정보를 불러오는 중...</div>
     </div>
   </div>
 
@@ -440,6 +417,7 @@ const lh = {
   id:            getParam("id"),
   name:          getParam("name")   || "알 수 없는 등대",
   nameEn:        getParam("nameEn") || "",
+  light:         getParam("light")  || "",
   lat:           parseFloat(getParam("lat"))  || null,
   lng:           parseFloat(getParam("lng"))  || null,
   region:        getParam("region") || "",
@@ -497,17 +475,132 @@ tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
   return `<span class="detail-tag" style="background:${info.color};color:${info.text};">${info.label}</span>`;
 }).join("");
 
-document.getElementById("info-year").textContent   = (stampInfo && stampInfo.openDate) ? stampInfo.openDate : "정보 준비 중";
-document.getElementById("info-height").textContent = (stampInfo && stampInfo.height)   ? stampInfo.height + "m"  : "정보 준비 중";
-document.getElementById("info-range").textContent  = lh.lightRange   || "정보 준비 중";
-document.getElementById("info-org").textContent    = lh.org          || "정보 준비 중";
-if (lh.id.startsWith("C")) {
-  document.getElementById("item-height").style.display = "none";
-  document.getElementById("item-range").style.display = "none";
+// 등질 시각화
+(function() {
+  const container = document.getElementById('light-sim-container');
+  if (!lh.light) {
+    container.innerHTML = '<div style="color:rgba(255,255,255,.4);font-size:0.85rem;padding:1rem 0;">등질 정보 없음</div>';
+    return;
+  }
+  container.innerHTML = buildLightSimCard(lh.light);
+})();
+
+function buildLightSimCard(code) {
+  if (!code) return '';
+  const t = code.trim().toUpperCase();
+  const col = t.includes('R') ? '#ef4444' : t.includes('G') ? '#22c55e' : t.includes('Y') ? '#eab308' : '#ffffff';
+  const colName = t.includes('R') ? '빨강' : t.includes('G') ? '초록' : t.includes('Y') ? '노랑' : '흰색';
+  const mP = code.match(/(\d+(\.\d+)?)s/i);
+  const period = mP ? parseFloat(mP[1]) : 4;
+  const isFixed = /^F\b/i.test(code) && !/Fl/i.test(code);
+  const isIso = /\bIso\b/i.test(code);
+  const isOc = /\bOc\b/i.test(code);
+  const isQ = /\bQ\b/i.test(code) && !/VQ/i.test(code);
+  const isVQ = /\bVQ\b/i.test(code);
+  const isLFl = /\bLFl\b/i.test(code);
+  const isComposite = /\((\d+)\+(\d+)\)/i.test(code);
+  const isMo = /\bMo\b/i.test(code);
+  let flashCnt = 1, cnt1 = 0, cnt2 = 0;
+  const mFl = code.match(/Fl\s*\((\d+)\)/i);
+  if (mFl) flashCnt = parseInt(mFl[1]);
+  const mComp = code.match(/\((\d+)\+(\d+)\)/i);
+  if (mComp) { cnt1 = parseInt(mComp[1]); cnt2 = parseInt(mComp[2]); }
+
+  const typeDesc = isFixed ? '부동등 — 계속 켜져 있음'
+    : isIso ? '등명암등 — 켜짐/꺼짐 동일 간격'
+    : isOc ? '명암등 — 켜짐이 더 긴 패턴'
+    : isVQ ? '초급섬광등 — 매우 빠른 섬광'
+    : isQ ? '급섬광등 — 빠른 섬광'
+    : isLFl ? '장섬광등 — 긴 섬광'
+    : isComposite ? `복합섬광등 — ${cnt1}+${cnt2}회 섬광`
+    : flashCnt > 1 ? `군섬광등 — ${flashCnt}회 섬광`
+    : '섬광등 — 짧은 섬광';
+
+  const uid = 'ls' + Math.random().toString(36).slice(2,7);
+  const onPct = isFixed ? 1 : isIso ? 0.5 : isOc ? 0.75 : 0.3;
+  const kf = `@keyframes ${uid}{0%,${onPct*100-.1}%{opacity:0.95}${onPct*100}%,100%{opacity:0}}`;
+  const style = document.createElement('style');
+  style.textContent = kf;
+  document.head.appendChild(style);
+
+  const barHtml = buildLightBar(uid, isFixed, isIso, isOc, isQ, isVQ, isLFl, isComposite, isMo, flashCnt, cnt1, cnt2, period, col);
+
+  return `<div style="background:#010d18;border-radius:10px;padding:14px 16px;border:1px solid rgba(255,255,255,.08)">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+      <div style="position:relative;width:60px;height:72px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center">
+        <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;
+          background:radial-gradient(circle,${col} 0%,transparent 70%);opacity:0;animation:${uid} ${period}s ease-in-out infinite;pointer-events:none"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="52" height="72" viewBox="0 0 52 72" style="position:relative;z-index:1;overflow:visible">
+          <line x1="4" y1="56" x2="48" y2="56" stroke="rgba(0,180,216,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="26" y1="50" x2="26" y2="66" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+          <ellipse cx="26" cy="68" rx="7" ry="2.5" fill="${col}" opacity="0.3"/>
+          <rect x="19" y="30" width="14" height="22" rx="3" fill="${col}" fill-opacity="0.18" stroke="${col}" stroke-width="1.2"/>
+          <line x1="19" y1="44" x2="33" y2="44" stroke="${col}" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="26" cy="24" r="9" fill="${col}" stroke="${col}" stroke-width="1.5" opacity="0" style="animation:${uid} ${period}s ease-in-out infinite"/>
+          <circle cx="23" cy="21" r="2.5" fill="white" opacity="0" style="animation:${uid} ${period}s ease-in-out infinite"/>
+          <rect x="21" y="18" width="10" height="10" rx="2" fill="${col}" fill-opacity="0.25" stroke="${col}" stroke-width="1"/>
+          <line x1="18" y1="28" x2="34" y2="28" stroke="${col}" stroke-width="1.2" opacity="0.6"/>
+        </svg>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${col};box-shadow:0 0 6px ${col};flex-shrink:0"></span>
+          <span style="font-size:13px;font-weight:700;color:${col}">${colName}</span>
+          <span style="font-size:10px;color:#aaa;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px">주기 ${period}s</span>
+          ${flashCnt>1&&!isComposite?`<span style="font-size:10px;color:#f97316">${flashCnt}회 섬광</span>`:''}
+          ${isComposite?`<span style="font-size:10px;color:#f97316">(${cnt1}+${cnt2})회</span>`:''}
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);line-height:1.7">${typeDesc}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">${code}</div>
+      </div>
+    </div>
+    <div style="margin-top:4px">
+      <div style="font-size:10px;color:rgba(255,255,255,.6);margin-bottom:4px">등질 패턴 (1주기 ${period}초)</div>
+      <div style="display:flex;gap:1px;height:12px;border-radius:4px;overflow:hidden;background:#020e1a;border:1px solid rgba(255,255,255,.06)">
+        ${barHtml}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.55);margin-top:3px">
+        <span>0s</span><span>${(period/4).toFixed(1)}s</span><span>${(period/2).toFixed(1)}s</span><span>${period}s</span>
+      </div>
+    </div>
+  </div>`;
 }
-document.getElementById("info-coords").textContent = lh.lat && lh.lng
-  ? `${lh.lat}°N, ${lh.lng}°E` : "정보 준비 중";
-document.getElementById("info-visit").textContent  = lh.visitAvail   || "정보 준비 중";
+
+function buildLightBar(uid, isFixed, isIso, isOc, isQ, isVQ, isLFl, isComposite, isMo, flashCnt, cnt1, cnt2, period, col) {
+  if (isFixed) return `<div style="flex:1;background:${col};opacity:0.85"></div>`;
+  const slots = 60;
+  let bars = new Array(slots).fill(0);
+  const onT = isLFl ? 2.0 : isQ ? 0.5 : isVQ ? 0.25 : 0.4;
+  const offT = isQ ? 0.5 : isVQ ? 0.25 : 0.5;
+  if (isIso) {
+    for (let i=0;i<slots;i++) bars[i] = i < slots/2 ? 1 : 0;
+  } else if (isOc) {
+    for (let i=0;i<slots;i++) bars[i] = i < slots*0.75 ? 1 : 0;
+  } else {
+    const flashes = [];
+    let pos = 0;
+    if (isComposite) {
+      for (let i=0;i<cnt1;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
+      pos+=0.8;
+      for (let i=0;i<cnt2;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
+    } else {
+      for (let i=0;i<flashCnt;i++) { flashes.push([pos,pos+onT]); pos+=onT+offT; }
+    }
+    for (let i=0;i<slots;i++) {
+      const t = (i/slots)*period;
+      bars[i] = flashes.some(([s,e]) => t>=s && t<e) ? 1 : 0;
+    }
+  }
+  let html = '', i = 0;
+  while (i < slots) {
+    const v = bars[i]; let j = i;
+    while (j < slots && bars[j] === v) j++;
+    const w = ((j-i)/slots*100).toFixed(2);
+    html += `<div style="width:${w}%;background:${v?col:'transparent'};opacity:${v?0.9:1};flex-shrink:0"></div>`;
+    i = j;
+  }
+  return html;
+}
 
 // 배편 정보 로드
 (async () => {
