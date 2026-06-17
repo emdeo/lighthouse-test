@@ -858,12 +858,7 @@ body.ar-page nav a:hover {
 }
 
 #horizon {
-  position: absolute;
-  left: 0; right: 0;
-  top: 62%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245,158,11,0.25), rgba(255,255,255,0.15), rgba(245,158,11,0.25), transparent);
-  pointer-events: none;
+  display: none;
 }
 
 #sea {
@@ -1220,14 +1215,12 @@ body.ar-page nav a:hover {
 /* ── 범위 슬라이더 ── */
 #range-control {
   position: fixed;
-  top: 60px;
+  bottom: 0;
   left: 0;
   right: 0;
-  background: var(--glass);
-  border-bottom: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  padding: 8px 20px;
-  z-index: 50;
+  background: transparent;
+  padding: 10px 20px;
+  z-index: 30;
   display: none;
   align-items: center;
   gap: 10px;
@@ -1235,7 +1228,7 @@ body.ar-page nav a:hover {
 
 #range-control label {
   font-size: .72rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   white-space: nowrap;
   margin-bottom: 0;
 }
