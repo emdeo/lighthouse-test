@@ -64,6 +64,9 @@
 
 <!-- 범위 조절 -->
 <div id="range-control">
+  <div id="status-dot" style="width:7px;height:7px;border-radius:50%;background:gray;flex-shrink:0;"></div>
+  <span id="status-text" style="font-size:.72rem;color:rgba(255,255,255,0.7);">탐색 중...</span>
+  <span style="color:rgba(255,255,255,0.2);margin:0 2px;">|</span>
   <label>표시 범위</label>
   <input type="range" id="range-slider" min="0" max="1" value="1">
   <span id="range-value">1km</span>
