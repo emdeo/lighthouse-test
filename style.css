@@ -1104,18 +1104,18 @@ body.ar-page nav a:hover {
 /* ── 상태바 ── */
 #status-bar {
   position: fixed;
-  bottom: 24px;
+  bottom: 52px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--glass);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(16px);
   border-radius: 24px;
-  padding: 10px 20px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: .8rem;
+  gap: 8px;
+  font-size: .75rem;
   color: rgba(255,255,255,0.7);
   z-index: 50;
   transition: opacity .3s;
@@ -1215,17 +1215,16 @@ body.ar-page nav a:hover {
 /* ── 범위 슬라이더 ── */
 #range-control {
   position: fixed;
-  bottom: 0;
+  bottom: 10px;
   left: 0;
   right: 0;
   background: transparent;
-  padding: 10px 20px;
+  padding: 6px 20px;
   z-index: 30;
   display: none;
   align-items: center;
   gap: 10px;
 }
-
 #range-control label {
   font-size: .72rem;
   color: rgba(255,255,255,0.85);
