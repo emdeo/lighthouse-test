@@ -132,6 +132,15 @@
     </div>
   </div>
 
+<!-- 오늘의 조석 정보 -->
+  <div class="section-card" id="tide-section">
+    <div class="section-title">🌊 오늘의 조석 정보</div>
+    <div id="tide-station" style="font-size:0.78rem; color:var(--gray3); margin-bottom:0.8rem;"></div>
+    <div id="tide-list" style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+      <div style="color:var(--gray3); font-size:.85rem; text-align:center; padding:1rem; grid-column:1/-1;">조석 정보를 불러오는 중...</div>
+    </div>
+  </div>
+
   <!-- 주간 기상 예보 -->
 <div class="section-card">
   <div style="display:flex; align-items:center; margin-bottom:0.3rem; padding:0 .8rem; gap:0.4rem;">
@@ -802,6 +811,49 @@ if (lh.lat && lh.lng) {
     });
 } else {
   document.querySelector(".weather-label").textContent = "좌표 정보가 없어 날씨를 불러올 수 없어요";
+}
+
+// 조석 정보
+if (lh.lat && lh.lng) {
+  fetch(`${CONFIG.WEATHER_API_URL}/tide?lat=${lh.lat}&lng=${lh.lng}`)
+    .then(r => r.json())
+    .then(data => {
+      const items = data.data || [];
+      const stationEl = document.getElementById('tide-station');
+      const listEl = document.getElementById('tide-list');
+
+      if (!items.length) {
+        stationEl.textContent = '조석 정보를 찾을 수 없어요';
+        listEl.innerHTML = '';
+        return;
+      }
+
+      stationEl.textContent = `📡 기준 관측소: ${data.station} (${data.distKm}km)`;
+
+      const typeLabel = { '1': '만조 ↑', '2': '간조 ↓', '3': '만조 ↑', '4': '간조 ↓' };
+      const typeColor = { '1': '#3b82f6', '2': '#f97316', '3': '#3b82f6', '4': '#f97316' };
+      const typeBg    = { '1': '#eff6ff', '2': '#fff7ed', '3': '#eff6ff', '4': '#fff7ed' };
+
+      listEl.innerHTML = items.map(item => {
+        const dt = item.tph_time || item.obsrTime || '';
+        const time = dt.length >= 16 ? dt.slice(11, 16) : dt;
+        const level = item.tph_level ?? item.obsrValue ?? '';
+        const type = String(item.hl_code ?? item.type ?? '');
+        const label = typeLabel[type] || (type === 'H' ? '만조 ↑' : '간조 ↓');
+        const color = typeColor[type] || '#888';
+        const bg    = typeBg[type]    || 'var(--gray1)';
+        return `
+          <div style="background:${bg}; border-radius:10px; padding:0.8rem; text-align:center;">
+            <div style="font-size:0.78rem; font-weight:700; color:${color}; margin-bottom:0.3rem;">${label}</div>
+            <div style="font-size:1.1rem; font-weight:700; color:#222;">${time}</div>
+            <div style="font-size:0.75rem; color:#888; margin-top:0.2rem;">${level}cm</div>
+          </div>`;
+      }).join('');
+    })
+    .catch(() => {
+      document.getElementById('tide-station').textContent = '조석 정보를 불러올 수 없어요';
+      document.getElementById('tide-list').innerHTML = '';
+    });
 }
 
 // 바다여행지수
