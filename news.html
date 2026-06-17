@@ -277,10 +277,11 @@ function buildMarkers() {
     .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
-  const occupied = [];
-
-  // after
-const seaTopY = window.innerHeight * 0.65; // 파란 패널 경계선 위치 (35% 높이 기준)
+ // after
+const seaTopY = window.innerHeight * 0.65; // 파란 패널 시작 Y
+const labelH = 44;   // 라벨 높이 (px)
+const labelGap = 6;  // 라벨 간격
+const occupied = []; // { x, y } 겹침 체크용
 
 candidates.forEach(lh => {
   const t = Math.min(lh.dist / maxRange, 1);
@@ -294,12 +295,24 @@ candidates.forEach(lh => {
     ? `${Math.round(lh.dist * 1000)}m`
     : `${lh.dist.toFixed(1)}km`;
 
+  // 겹침 방지: 같은 x 근처에 이미 라벨 있으면 아래로 내림
+  let labelY = seaTopY + 10;
+  let tries = 0;
+  while (
+    occupied.some(o => Math.abs(o.x - panX) < 120 && Math.abs(o.y - labelY) < labelH + labelGap) &&
+    tries < 6
+  ) {
+    labelY += labelH + labelGap;
+    tries++;
+  }
+  occupied.push({ x: panX, y: labelY });
+
   [panX, panX_left, panX_right].forEach(px => {
     const el = document.createElement("div");
     el.className = "ar-marker";
     el.style.cssText = `
       left: ${px}px;
-      top: ${seaTopY - 60}px;
+      top: ${labelY}px;
       opacity: ${opacity};
       transform: translateX(-50%);
       position: absolute;
