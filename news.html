@@ -55,7 +55,8 @@
   <div id="heading-display">N 0°</div>
 
   <!-- 등대 마커 오버레이 (파노라마 컨테이너) -->
-  <div id="ar-overlay" style="overflow:visible; pointer-events:none;"></div>
+  <!-- after -->
+<div id="ar-overlay" style="overflow:visible; pointer-events:none; z-index:20; position:absolute; inset:0;"></div>
 
   <!-- 드래그 힌트 -->
   <div id="drag-hint" id="drag-hint"></div>
@@ -317,7 +318,7 @@ candidates.forEach(lh => {
 
   const dotY   = horizonY;          // 등대 바닥 = 수평선
   const elY    = dotY - svgH;       // SVG 상단 Y
-  const lineH  = elY - labelY - Math.round(36 * scale); // 라벨~등대 사이 선
+  const lineH  = Math.max(4, elY - labelY - Math.round(36 * scale));
 
   [panX, panX_left, panX_right].forEach(px => {
     const el = document.createElement("div");
