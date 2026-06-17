@@ -1314,11 +1314,6 @@ body.ar-page nav a:hover {
   .ruler-tick .tick-label { font-size: 10px; }
   .ruler-tick.major .tick-label { font-size: 11px; }
 }
-/* 카메라 켜졌을 때 등대 SVG 모형과 연결선 숨기기 */
-.camera-on .ar-marker svg,
-.camera-on .ar-marker-line {
-  display: none;
-}
 /* 모든 등대 표시 체크박스 오른쪽 정렬 */
 #btn-all {
   justify-content: space-between;
