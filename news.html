@@ -63,23 +63,18 @@
 </div>
 
 <!-- 범위 조절 -->
-<div id="range-control">
-  <div id="status-dot" style="width:7px;height:7px;border-radius:50%;background:gray;flex-shrink:0;"></div>
-  <span id="status-text" style="font-size:.72rem;color:rgba(255,255,255,0.7);">탐색 중...</span>
-  <span style="color:rgba(255,255,255,0.2);margin:0 2px;">|</span>
-  <label>표시 범위</label>
-  <input type="range" id="range-slider" min="0" max="1" value="1">
-  <span id="range-value">1km</span>
-  <button id="compass-btn" style="
-    display:none;
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:8px;
-    color:#fff;
-    font-size:1.1rem;
-    padding:4px 10px;
-    cursor:pointer;
-    margin-left:6px;">🧭</button>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px; width:100%;">
+    <div style="display:flex; align-items:center; gap:6px;">
+      <div id="status-dot" style="width:7px;height:7px;border-radius:50%;background:gray;flex-shrink:0;"></div>
+      <span id="status-text" style="font-size:.72rem;color:rgba(255,255,255,0.7);">탐색 중...</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <label style="font-size:.72rem;color:rgba(255,255,255,0.85);white-space:nowrap;">표시 범위</label>
+      <input type="range" id="range-slider" min="0" max="1" value="1">
+      <span id="range-value" style="font-size:.75rem;color:var(--accent);">1km</span>
+      <button id="compass-btn" style="display:none;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:1.1rem;padding:4px 10px;cursor:pointer;">🧭</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── 하단 등대 정보 패널 ── -->
