@@ -501,8 +501,8 @@ function getFilteredList() {
     .map(([, cat]) => cat);
 
   return allData.filter(lh => {
-    const matchSearch = !searchQuery || lh.name.includes(searchQuery) || (lh.region || "").includes(searchQuery);
-    if (!matchSearch) return false;
+    const cleanQ = searchQuery.replace(/\s/g, '');
+    const matchSearch = !cleanQ || lh.name.replace(/\s/g, '').includes(cleanQ) || (lh.region || "").replace(/\s/g, '').includes(cleanQ);    if (!matchSearch) return false;
     if (!searchQuery) {
       // 스탬프 투어: 카테고리 매칭
       let matchStamp = false;
@@ -1061,8 +1061,9 @@ function renderSearchDropdown() {
   }
 
   const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
+  const cleanQuery = query.replace(/\s/g, '');
   const results = allData.filter(lh =>
-    lh.name.includes(query) || (lh.region || "").includes(query)
+    lh.name.replace(/\s/g, '').includes(cleanQuery) || (lh.region || "").replace(/\s/g, '').includes(cleanQuery)
   );
 
   if (!results.length) {
