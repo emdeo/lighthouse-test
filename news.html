@@ -277,8 +277,7 @@ function buildMarkers() {
     .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
-// after
-const occupied = []; // 겹침 체크용 { x, labelY }
+  const occupied = []; // 겹침 체크용 { x, labelY }
 
 candidates.forEach(lh => {
   const t       = Math.min(lh.dist / maxRange, 1);
