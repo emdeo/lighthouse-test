@@ -280,10 +280,11 @@ function buildMarkers() {
 // after
 const occupied = []; // 겹침 체크용 { x, labelY }
 
+candidates.forEach(lh => {// after
 candidates.forEach(lh => {
   const t       = Math.min(lh.dist / maxRange, 1);
   const opacity = Math.max(0.25, 1 - t * 0.75);
-  const scale   = Math.max(0.6, 1 - t * 0.4);  // 멀수록 작게
+  const scale   = Math.max(0.45, 1 - t * 0.55);
 
   const panX       = lh.bearing * pxPerDeg;
   const panX_left  = (lh.bearing - 360) * pxPerDeg;
@@ -293,23 +294,32 @@ candidates.forEach(lh => {
     ? `${Math.round(lh.dist * 1000)}m`
     : `${lh.dist.toFixed(1)}km`;
 
-  // 마커 Y: 수평선(62%) 근처, 가까울수록 아래쪽
-  const dotY  = horizonY + (t - 0.5) * 60;
+  const towerH  = Math.round(80 * scale);
+  const towerW  = Math.round(22 * scale);
+  const baseW   = Math.round(34 * scale);
+  const baseH   = Math.round(10 * scale);
+  const topW    = Math.round(28 * scale);
+  const topH    = Math.round(10 * scale);
+  const lampR   = Math.round(7  * scale);
+  const svgW    = Math.round(60 * scale);
+  const svgH    = towerH + baseH + topH + lampR * 2 + 4;
+  const cx      = svgW / 2;
 
-  // 라벨 Y: 마커 위로 올라가되, 겹치면 더 위로
-  const labelH = Math.round(44 * scale);
-  let labelY = dotY - 60 - labelH;
-  let tries = 0;
+  // 라벨 겹침 방지
+  let labelY = horizonY - svgH - Math.round(55 * scale);
+  let tries  = 0;
   while (
-    occupied.some(o => Math.abs(o.x - panX) < 110 && Math.abs(o.y - labelY) < labelH + 6) &&
+    occupied.some(o => Math.abs(o.x - panX) < 110 && Math.abs(o.y - labelY) < Math.round(44 * scale) + 6) &&
     tries < 6
   ) {
-    labelY -= labelH + 6;
+    labelY -= Math.round(44 * scale) + 6;
     tries++;
   }
   occupied.push({ x: panX, y: labelY });
 
-  const lineH = dotY - labelY - labelH; // 선 길이
+  const dotY   = horizonY;          // 등대 바닥 = 수평선
+  const elY    = dotY - svgH;       // SVG 상단 Y
+  const lineH  = elY - labelY - Math.round(36 * scale); // 라벨~등대 사이 선
 
   [panX, panX_left, panX_right].forEach(px => {
     const el = document.createElement("div");
@@ -328,19 +338,32 @@ candidates.forEach(lh => {
     el.innerHTML = `
       <div style="
         background: rgba(10,20,50,0.82);
-        border: 1px solid rgba(150,210,255,0.45);
-        border-radius: ${Math.round(8 * scale)}px;
-        padding: ${Math.round(4 * scale)}px ${Math.round(9 * scale)}px;
+        border: 1px solid rgba(255,200,80,0.5);
+        border-radius: ${Math.round(7*scale)}px;
+        padding: ${Math.round(3*scale)}px ${Math.round(8*scale)}px;
         text-align: center;
         white-space: nowrap;
-        transform: scale(${scale});
-        transform-origin: top center;
+        margin-bottom: 2px;
       ">
-        <div style="color:#fff; font-size:${Math.round(12 * scale)}px; font-weight:700; font-family:'Noto Sans KR',sans-serif;">${lh.name}</div>
-        <div style="color:rgba(150,210,255,0.85); font-size:${Math.round(10 * scale)}px; font-family:'Noto Sans KR',sans-serif;">${distStr}</div>
+        <div style="color:#fff; font-size:${Math.round(12*scale)}px; font-weight:700; font-family:'Noto Sans KR',sans-serif;">${lh.name}</div>
+        <div style="color:rgba(255,210,100,0.85); font-size:${Math.round(10*scale)}px; font-family:'Noto Sans KR',sans-serif;">${distStr}</div>
       </div>
-      <div style="width:1px; height:${lineH}px; background:rgba(150,210,255,0.4);"></div>
-      <div style="width:${Math.round(6*scale)}px; height:${Math.round(6*scale)}px; border-radius:50%; background:rgba(150,210,255,0.9);"></div>
+      <div style="width:1px; height:${lineH}px; background:rgba(255,200,80,0.5);"></div>
+      <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+        <!-- 등롱부(램프) -->
+        <circle cx="${cx}" cy="${lampR+2}" r="${lampR}" fill="#FFE066" opacity="0.95"/>
+        <!-- 등롱 테두리 -->
+        <rect x="${cx - topW/2}" y="${lampR*2+2}" width="${topW}" height="${topH}" rx="2" fill="#F5C400"/>
+        <!-- 탑 (사다리꼴: 위 좁고 아래 넓게) -->
+        <polygon points="
+          ${cx - towerW/2},${lampR*2+2+topH}
+          ${cx + towerW/2},${lampR*2+2+topH}
+          ${cx + baseW/2},${lampR*2+2+topH+towerH}
+          ${cx - baseW/2},${lampR*2+2+topH+towerH}
+        " fill="#FFD700"/>
+        <!-- 받침대 -->
+        <rect x="${cx - baseW/2 - 4}" y="${lampR*2+2+topH+towerH}" width="${baseW+8}" height="${baseH}" rx="2" fill="#F5C400"/>
+      </svg>
     `;
     el.addEventListener("click", () => openInfoPanel(lh, distStr));
     overlay.appendChild(el);
