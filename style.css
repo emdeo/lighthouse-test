@@ -1793,3 +1793,36 @@ html:has(body.detail-page) {
   line-height: 1.7;
   white-space: pre-line;
 }
+/* 이달의 등대 섹션 */
+.monthly-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0;
+  border-bottom: 1px solid var(--gray2);
+  margin-bottom: 0.2rem;
+}
+
+.monthly-desc-text {
+  font-size: 0.83rem;
+  color: var(--gray4);
+  line-height: 1.7;
+}
+
+.monthly-spot-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+}
+
+.monthly-spot-tag {
+  background: #eff6ff;
+  color: #1e40af;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+}

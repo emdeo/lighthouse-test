@@ -524,11 +524,32 @@ if (monthlyInfo && lh.tags.includes('month')) {
   subRows.style.display = "none";
   const extra = document.getElementById("monthly-extra");
   extra.style.display = "flex";
-  extra.innerHTML = `
-    ${monthlyInfo.food ? `<div class="detail-sub-row"><span class="detail-sub-icon">🍽</span><span><strong>${monthlyInfo.food}</strong></span></div>` : ''}
-    ${monthlyInfo.food_desc ? `<div class="detail-sub-row" style="font-size:0.83rem; color:var(--gray4); line-height:1.6;">${monthlyInfo.food_desc}</div>` : ''}
-    ${monthlyInfo.spot ? `<div class="detail-sub-row"><span class="detail-sub-icon">🗺</span><span style="font-size:0.83rem;">${monthlyInfo.spot.replace(/\\n/g, ' · ')}</span></div>` : ''}
-  `;
+
+  let extraHTML = '';
+
+  // 먹거리 섹션: food 또는 food_desc 중 하나라도 있을 때
+  if (monthlyInfo.food || monthlyInfo.food_desc) {
+    extraHTML += `<div class="monthly-section-title">🍽 이달의 먹거리</div>`;
+    if (monthlyInfo.food) {
+      extraHTML += `<div class="detail-sub-row"><span class="detail-sub-icon">🏷</span><span><strong>${monthlyInfo.food}</strong></span></div>`;
+    }
+    if (monthlyInfo.food_desc) {
+      extraHTML += `<div class="detail-sub-row monthly-desc-text">${monthlyInfo.food_desc}</div>`;
+    }
+  }
+
+  // 주변 관광지 섹션: spot 또는 spot_desc 중 하나라도 있을 때
+  if (monthlyInfo.spot || monthlyInfo.spot_desc) {
+    extraHTML += `<div class="monthly-section-title" style="margin-top:0.6rem;">🗺 주변 관광지</div>`;
+    if (monthlyInfo.spot) {
+      extraHTML += `<div class="detail-sub-row monthly-spot-tags">${monthlyInfo.spot.split(/\s{2,}|·/).map(s => s.trim()).filter(Boolean).map(s => `<span class="monthly-spot-tag">${s}</span>`).join('')}</div>`;
+    }
+    if (monthlyInfo.spot_desc) {
+      extraHTML += `<div class="detail-sub-row monthly-desc-text">${monthlyInfo.spot_desc}</div>`;
+    }
+  }
+
+  extra.innerHTML = extraHTML;
 } else {
   document.getElementById("detail-story").textContent = (stampInfo && stampInfo.desc) ? stampInfo.desc : "상세 정보를 준비 중입니다.";
 }
