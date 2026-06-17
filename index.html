@@ -661,7 +661,7 @@ function openPopup(lh, markerEl) {
   const popupEmoji = document.getElementById('popup-emoji');
   popupImg.style.backgroundImage = '';
   popupEmoji.style.display = '';
-  fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\n/g,' ').trim())}&id=...`)
+  fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\\n/g,' ').trim())}&id=${encodeURIComponent(lh.id)}`)
     .then(r => r.json())
     .then(data => {
       if (data.url) {
