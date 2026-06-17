@@ -277,15 +277,13 @@ function buildMarkers() {
     .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
-const vpH = document.getElementById("ar-viewport").getBoundingClientRect().height;
-const seaTopY = vpH * 0.65;
-const labelH = 44;   // 라벨 높이 (px)
-const labelGap = 6;  // 라벨 간격
-const occupied = []; // { x, y } 겹침 체크용
+// after
+const occupied = []; // 겹침 체크용 { x, labelY }
 
 candidates.forEach(lh => {
-  const t = Math.min(lh.dist / maxRange, 1);
-  const opacity = Math.max(0.4, 1 - t * 0.6);
+  const t       = Math.min(lh.dist / maxRange, 1);
+  const opacity = Math.max(0.25, 1 - t * 0.75);
+  const scale   = Math.max(0.6, 1 - t * 0.4);  // 멀수록 작게
 
   const panX       = lh.bearing * pxPerDeg;
   const panX_left  = (lh.bearing - 360) * pxPerDeg;
@@ -295,17 +293,23 @@ candidates.forEach(lh => {
     ? `${Math.round(lh.dist * 1000)}m`
     : `${lh.dist.toFixed(1)}km`;
 
-  // 겹침 방지: 같은 x 근처에 이미 라벨 있으면 아래로 내림
-  let labelY = seaTopY + 10;
+  // 마커 Y: 수평선(62%) 근처, 가까울수록 아래쪽
+  const dotY  = horizonY + (t - 0.5) * 60;
+
+  // 라벨 Y: 마커 위로 올라가되, 겹치면 더 위로
+  const labelH = Math.round(44 * scale);
+  let labelY = dotY - 60 - labelH;
   let tries = 0;
   while (
-    occupied.some(o => Math.abs(o.x - panX) < 120 && Math.abs(o.y - labelY) < labelH + labelGap) &&
+    occupied.some(o => Math.abs(o.x - panX) < 110 && Math.abs(o.y - labelY) < labelH + 6) &&
     tries < 6
   ) {
-    labelY += labelH + labelGap;
+    labelY -= labelH + 6;
     tries++;
   }
   occupied.push({ x: panX, y: labelY });
+
+  const lineH = dotY - labelY - labelH; // 선 길이
 
   [panX, panX_left, panX_right].forEach(px => {
     const el = document.createElement("div");
@@ -317,19 +321,26 @@ candidates.forEach(lh => {
       transform: translateX(-50%);
       position: absolute;
       pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     `;
     el.innerHTML = `
       <div style="
-        background: rgba(5,30,62,0.85);
-        border: 1px solid rgba(100,180,255,0.35);
-        border-radius: 8px;
-        padding: 5px 10px;
+        background: rgba(10,20,50,0.82);
+        border: 1px solid rgba(150,210,255,0.45);
+        border-radius: ${Math.round(8 * scale)}px;
+        padding: ${Math.round(4 * scale)}px ${Math.round(9 * scale)}px;
         text-align: center;
         white-space: nowrap;
+        transform: scale(${scale});
+        transform-origin: top center;
       ">
-        <div style="color:#fff; font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif;">${lh.name}</div>
-        <div style="color:rgba(150,210,255,0.8); font-size:10px; font-family:'Noto Sans KR',sans-serif;">${distStr}</div>
+        <div style="color:#fff; font-size:${Math.round(12 * scale)}px; font-weight:700; font-family:'Noto Sans KR',sans-serif;">${lh.name}</div>
+        <div style="color:rgba(150,210,255,0.85); font-size:${Math.round(10 * scale)}px; font-family:'Noto Sans KR',sans-serif;">${distStr}</div>
       </div>
+      <div style="width:1px; height:${lineH}px; background:rgba(150,210,255,0.4);"></div>
+      <div style="width:${Math.round(6*scale)}px; height:${Math.round(6*scale)}px; border-radius:50%; background:rgba(150,210,255,0.9);"></div>
     `;
     el.addEventListener("click", () => openInfoPanel(lh, distStr));
     overlay.appendChild(el);
