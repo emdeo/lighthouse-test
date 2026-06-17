@@ -303,22 +303,28 @@ candidates.forEach(lh => {
   const svgH    = towerH + baseH + topH + lampR * 2 + 4;
   const cx      = svgW / 2;
 
-  // 라벨 겹침 방지
-  let labelY = horizonY - svgH - Math.round(55 * scale);
-  let tries  = 0;
+  const labelH2 = Math.round(36 * scale); // 라벨 박스 높이
+  const lineMin = Math.round(10 * scale); // 최소 선 길이
+
+  // 등대 바닥을 horizonY에 딱 붙임
+  // 마커 top = labelY, 그 아래 라벨+선+SVG 순서
+  // 전체 높이 = labelH2 + lineH + svgH → 역산
+  // labelY + labelH2 + lineH + svgH = horizonY
+  // lineH는 최소 lineMin 보장
+  let lineH = lineMin;
+  let labelY = horizonY - svgH - lineH - labelH2;
+
+  // 겹침 방지: x 근처에 이미 라벨 있으면 위로 올림
+  let tries = 0;
   while (
-    occupied.some(o => Math.abs(o.x - panX) < 110 && Math.abs(o.y - labelY) < Math.round(44 * scale) + 6) &&
+    occupied.some(o => Math.abs(o.x - panX) < 110 && Math.abs(o.y - labelY) < labelH2 + 6) &&
     tries < 6
   ) {
-    labelY -= Math.round(44 * scale) + 6;
+    lineH += labelH2 + 6;
+    labelY -= labelH2 + 6;
     tries++;
   }
   occupied.push({ x: panX, y: labelY });
-
-  const dotY   = horizonY;          // 등대 바닥 = 수평선
-  const elY    = dotY - svgH;       // SVG 상단 Y
-  const lineH  = Math.max(4, elY - labelY - Math.round(36 * scale));
-
   [panX, panX_left, panX_right].forEach(px => {
     const el = document.createElement("div");
     el.className = "ar-marker";
