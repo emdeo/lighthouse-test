@@ -1156,8 +1156,8 @@ document.querySelectorAll(".map-ctrl-btn").forEach(btn => {
     if (title === "축소") window.kakaoMap.setLevel(window.kakaoMap.getLevel() + 1);
     if (title === "현위치") {
       if (myLat && myLng) {
-        window.kakaoMap.panTo(new kakao.maps.LatLng(myLat, myLng));
-      }
+        window.kakaoMap.setLevel(4);
+        window.kakaoMap.panTo(new kakao.maps.LatLng(myLat, myLng));      }
     }
   });
 });
