@@ -480,7 +480,7 @@ document.getElementById("bc-name").textContent       = lh.name;
 document.getElementById("detail-emoji").textContent  = "🔦";
 
 // 등대 이미지 로드
-fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\n/g,' ').trim())}&id=...`)
+fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\\n/g,' ').trim())}&id=${encodeURIComponent(lh.id)}`)
   .then(r => r.json())
   .then(data => {
     if (data.url) {
