@@ -513,6 +513,53 @@ tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
   return `<span class="detail-tag" style="background:${info.color};color:${info.text};">${info.label}</span>`;
 }).join("");
 
+// ── 이달의 등대 PDF 썸네일 ──
+if (lh.tags.includes("month")) {
+  const monthlyPdfFiles = {
+    "방두포등대": "2019_4_방두포등대.pdf",
+  };
+  const pdfKey = Object.keys(monthlyPdfFiles).find(k =>
+    lh.name.replace(/\s/g,'').includes(k.replace(/\s/g,''))
+  );
+  if (pdfKey) {
+    const pdfUrl = `https://raw.githubusercontent.com/ehdgml5032/hellolighthouse/main/${monthlyPdfFiles[pdfKey]}`;
+    const topCard = document.querySelector(".detail-top-card");
+    topCard.style.position = "relative";
+    const pdfBtn = document.createElement("div");
+    pdfBtn.style.cssText = `
+      position:absolute; top:12px; right:12px;
+      width:48px; height:48px;
+      background:#fff;
+      border:1.5px solid #e2e8f0;
+      border-radius:10px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      cursor:pointer;
+      box-shadow:0 2px 8px rgba(0,0,0,0.10);
+      gap:2px;
+      z-index:10;
+    `;
+    pdfBtn.innerHTML = `<span style="font-size:20px;">📄</span><span style="font-size:9px;color:#64748b;font-weight:600;">PDF</span>`;
+    pdfBtn.title = "이달의 등대 자료 보기";
+    pdfBtn.onclick = () => {
+      const viewer = document.getElementById("lhPhotoViewer");
+      const viewerImg = document.getElementById("lhViewerImg");
+      viewerImg.style.display = "none";
+      let iframe = document.getElementById("lhPdfIframe");
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "lhPdfIframe";
+        iframe.style.cssText = "width:95vw; height:85vh; border:none; border-radius:8px;";
+        viewerImg.parentNode.insertBefore(iframe, viewerImg);
+      }
+      iframe.src = pdfUrl;
+      document.getElementById("lhViewerDate").textContent = "이달의 등대 자료";
+      viewer.style.display = "flex";
+    };
+    topCard.appendChild(pdfBtn);
+  }
+}
+
 // 등질 시각화
 (function() {
   const container = document.getElementById('light-sim-container');
@@ -1233,7 +1280,11 @@ async function openLhViewer(photoId) {
 
 function closeLhViewer() {
   document.getElementById('lhPhotoViewer').style.display = 'none';
-  document.getElementById('lhViewerImg').src = '';
+  const viewerImg = document.getElementById('lhViewerImg');
+  viewerImg.src = '';
+  viewerImg.style.display = '';
+  const iframe = document.getElementById('lhPdfIframe');
+  if (iframe) iframe.src = '';
 }
 
 async function deleteLhPhoto(photoId) {
