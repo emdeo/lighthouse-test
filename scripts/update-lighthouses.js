@@ -67,10 +67,16 @@ async function main() {
 
   console.log('전체 항목:', allItems.length);
 
+ const EXCLUDE_IDS = [
+    "1204_A",
+    "2537.2",
+  ];
+
   const filtered = allItems
     .filter(d => d.name.includes('등대'))
     .filter(d => d.type === '고정표지')
-    .filter(d => isKorea(d.lat, d.lng));
+    .filter(d => isKorea(d.lat, d.lng))
+    .filter(d => !EXCLUDE_NAMES.includes(d.name));
 
   console.log('필터링 후:', filtered.length);
 
