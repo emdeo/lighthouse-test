@@ -280,7 +280,6 @@ function buildMarkers() {
 // after
 const occupied = []; // 겹침 체크용 { x, labelY }
 
-candidates.forEach(lh => {// after
 candidates.forEach(lh => {
   const t       = Math.min(lh.dist / maxRange, 1);
   const opacity = Math.max(0.25, 1 - t * 0.75);
