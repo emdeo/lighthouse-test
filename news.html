@@ -347,20 +347,31 @@ candidates.forEach(lh => {
         <div style="color:rgba(255,210,100,0.85); font-size:${Math.round(10*scale)}px; font-family:'Noto Sans KR',sans-serif;">${distStr}</div>
       </div>
       <div style="width:1px; height:${lineH}px; background:rgba(255,200,80,0.5);"></div>
+      // after
       <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
-        <!-- 등롱부(램프) -->
-        <circle cx="${cx}" cy="${lampR+2}" r="${lampR}" fill="#FFE066" opacity="0.95"/>
-        <!-- 등롱 테두리 -->
-        <rect x="${cx - topW/2}" y="${lampR*2+2}" width="${topW}" height="${topH}" rx="2" fill="#F5C400"/>
-        <!-- 탑 (사다리꼴: 위 좁고 아래 넓게) -->
-        <polygon points="
-          ${cx - towerW/2},${lampR*2+2+topH}
-          ${cx + towerW/2},${lampR*2+2+topH}
-          ${cx + baseW/2},${lampR*2+2+topH+towerH}
-          ${cx - baseW/2},${lampR*2+2+topH+towerH}
-        " fill="#FFD700"/>
+        <!-- 등롱 유리 -->
+        <rect x="${cx-topW/2}" y="2" width="${topW}" height="${topH}" rx="2" fill="#FFE066"/>
+        <!-- 등롱 하우징 -->
+        <rect x="${cx-topW/2}" y="${topH+2}" width="${topW}" height="${Math.round(7*scale)}" rx="1" fill="#E8B800"/>
+        <!-- 난간 -->
+        <rect x="${cx-topW/2-Math.round(4*scale)}" y="${topH+Math.round(9*scale)}" width="${topW+Math.round(8*scale)}" height="${Math.round(3*scale)}" rx="1" fill="#C8A000"/>
+        <!-- 난간 기둥 -->
+        <line x1="${cx-topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx-topW/2}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <line x1="${cx}" y1="${topH+Math.round(9*scale)}" x2="${cx}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <line x1="${cx+topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx+topW/2}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <!-- 탑 몸통 -->
+        <polygon points="${cx-towerW/2},${topH+Math.round(12*scale)} ${cx+towerW/2},${topH+Math.round(12*scale)} ${cx+baseW/2},${topH+Math.round(12*scale)+towerH} ${cx-baseW/2},${topH+Math.round(12*scale)+towerH}" fill="#FFD700"/>
+        <!-- 줄무늬 1 -->
+        <polygon points="${cx-towerW/2+Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2-Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2},${topH+Math.round(30*scale)} ${cx-towerW/2},${topH+Math.round(30*scale)}" fill="#E8B800" opacity="0.6"/>
+        <!-- 줄무늬 2 -->
+        <polygon points="${cx-baseW/2+Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(2*scale)},${topH+Math.round(58*scale)} ${cx-baseW/2+Math.round(2*scale)},${topH+Math.round(58*scale)}" fill="#E8B800" opacity="0.6"/>
+        <!-- 창문 -->
+        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(35*scale)}" width="${Math.round(10*scale)}" height="${Math.round(8*scale)}" rx="1" fill="#1a3a6a" stroke="#C8A000" stroke-width="0.8"/>
+        <!-- 문 -->
+        <rect x="${cx-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH-Math.round(14*scale)}" width="${Math.round(8*scale)}" height="${Math.round(13*scale)}" rx="1" fill="#1a3a6a" stroke="#C8A000" stroke-width="0.8"/>
         <!-- 받침대 -->
-        <rect x="${cx - baseW/2 - 4}" y="${lampR*2+2+topH+towerH}" width="${baseW+8}" height="${baseH}" rx="2" fill="#F5C400"/>
+        <rect x="${cx-baseW/2-Math.round(2*scale)}" y="${topH+Math.round(12*scale)+towerH}" width="${baseW+Math.round(4*scale)}" height="${baseH}" rx="2" fill="#E8B800"/>
+        <rect x="${cx-baseW/2-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH+baseH}" width="${baseW+Math.round(8*scale)}" height="${Math.round(4*scale)}" rx="1" fill="#C8A000"/>
       </svg>
     `;
     el.addEventListener("click", () => openInfoPanel(lh, distStr));
