@@ -404,17 +404,7 @@ function moveOverlay(heading) {
   // 350도~360도 구간에서는 복사본B(+360) 기준으로 자동 전환
 const adjustedHeading = heading > 180 ? heading - 360 : heading;
 let offsetX = -(adjustedHeading * pxPerDeg) + vw / 2 - totalW;
-
   overlay.style.transform = `translateX(${offsetX}px)`;
-
-  // 틸트에 따라 Y축도 이동
-  const vh = window.innerHeight - 52;
-  const tiltOffset = smoothTilt * 3;
-  markerEls.forEach(el => {
-    const baseY = parseFloat(el.style.top);
-    el.style.top = (parseFloat(el.dataset.baseY || baseY) + tiltOffset) + "px";
-    if (!el.dataset.baseY) el.dataset.baseY = baseY;
-  });
 }
 
 // GPS 업데이트 or 범위 변경 시 마커 재빌드
