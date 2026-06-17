@@ -1104,7 +1104,7 @@ body.ar-page nav a:hover {
 /* ── 상태바 ── */
 #status-bar {
   position: fixed;
-  bottom: 52px;
+  bottom: 46px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--glass);
@@ -1215,11 +1215,12 @@ body.ar-page nav a:hover {
 /* ── 범위 슬라이더 ── */
 #range-control {
   position: fixed;
-  bottom: 10px;
-  left: 0;
-  right: 0;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
   background: transparent;
-  padding: 6px 20px;
+  padding: 6px 16px;
   z-index: 30;
   display: none;
   align-items: center;
