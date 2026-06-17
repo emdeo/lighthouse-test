@@ -510,8 +510,8 @@ const stampInfo = (typeof STAMP_DATA !== 'undefined')
 document.getElementById("detail-region").textContent = (stampInfo && stampInfo.address) ? stampInfo.address : lh.region;
 document.getElementById("detail-desc").textContent = lh.nameEn || lh.desc || "";
 // 이달의 등대 데이터 연결
-const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE !== 'undefined')
-  ? MONTHLY_LIGHTHOUSE.find(m => m.name.replace(/\s/g,'') === lh.name.replace(/\s/g,'')) || null
+const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE_DATA !== 'undefined')
+  ? MONTHLY_LIGHTHOUSE_DATA.find(m => m.name.replace(/\s/g,'') === lh.name.replace(/\s/g,'')) || null
   : null;
 
 if (monthlyInfo && lh.tags.includes('month')) {

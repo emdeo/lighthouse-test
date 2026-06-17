@@ -1,4 +1,4 @@
-const MONTHLY_LIGHTHOUSE = [
+const MONTHLY_LIGHTHOUSE_DATA = [
   {
     no: 1, year: 2019, month: 1,
     name: "간절곶등대",
