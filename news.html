@@ -277,8 +277,8 @@ function buildMarkers() {
     .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
- // after
-const seaTopY = window.innerHeight * 0.65; // 파란 패널 시작 Y
+const vpH = document.getElementById("ar-viewport").getBoundingClientRect().height;
+const seaTopY = vpH * 0.65;
 const labelH = 44;   // 라벨 높이 (px)
 const labelGap = 6;  // 라벨 간격
 const occupied = []; // { x, y } 겹침 체크용
