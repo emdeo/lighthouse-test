@@ -21,16 +21,6 @@ const LIGHTHOUSE_DATA =
     "lng": 128.4276944
   },
   {
-    "id": "1204_A",
-    "name": "고성 대진항남방파제 등대",
-    "nameEn": "Daejin Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "Fl G 5s 14m 9M",
-    "lat": 38.5003333,
-    "lng": 128.4276944
-  },
-  {
     "id": "1206",
     "name": "고성 대진항\n북방파제 등대",
     "nameEn": "Daejin Hang",
@@ -5771,16 +5761,6 @@ const LIGHTHOUSE_DATA =
     "lng": 128.3792778
   },
   {
-    "id": "2189.4",
-    "name": "당포항\n서방파제 서단 등대",
-    "nameEn": "Dangpo Hang W Breakwater  W End",
-    "type": "고정표지",
-    "sea": "남해안",
-    "light": "Fl(2) Y 6s 8.9m 6M",
-    "lat": 34.7927778,
-    "lng": 128.3780556
-  },
-  {
     "id": "2192",
     "name": "추도\n등대",
     "nameEn": "Chudo",
@@ -7351,6 +7331,16 @@ const LIGHTHOUSE_DATA =
     "lng": 127.7060833
   },
   {
+    "id": "2482.6",
+    "name": "국동항\n파제제 동단 등대",
+    "nameEn": "Gukdong Hang",
+    "type": "고정표지",
+    "sea": "남해안",
+    "light": "Fl Y 6s 12m 9M",
+    "lat": 34.7243056,
+    "lng": 127.7158056
+  },
+  {
     "id": "2482.7",
     "name": "국동항\n파제제 서단 등대",
     "nameEn": "Gukdong Hang",
@@ -7889,16 +7879,6 @@ const LIGHTHOUSE_DATA =
     "light": "Fl Y 6s 12m 7M",
     "lat": 34.6039167,
     "lng": 127.53425
-  },
-  {
-    "id": "2537.2",
-    "name": "등대섬\n등표",
-    "nameEn": "Deungdaeseom",
-    "type": "고정표지",
-    "sea": "남해안",
-    "light": "Q(6)+LFl W 15s 10m 9M",
-    "lat": 34.6205278,
-    "lng": 127.5266944
   },
   {
     "id": "2537.3",
