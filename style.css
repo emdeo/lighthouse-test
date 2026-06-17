@@ -945,11 +945,12 @@ body.ar-page nav a:hover {
   border-top: 6px solid var(--accent);
 }
 
-/* ── AR 오버레이 ── */
+/* after */
 #ar-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 20;
 }
 
 .ar-marker {
