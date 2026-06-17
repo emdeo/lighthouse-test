@@ -529,7 +529,7 @@ if (monthlyInfo && lh.tags.includes('month')) {
 
   // 먹거리 섹션: food 또는 food_desc 중 하나라도 있을 때
   if (monthlyInfo.food || monthlyInfo.food_desc) {
-    extraHTML += `<div class="monthly-section-title">🍽 이달의 먹거리</div>`;
+    extraHTML += `<div class="monthly-section-title">🍽 주변 먹거리</div>`;
     if (monthlyInfo.food) {
       extraHTML += `<div class="detail-sub-row"><span class="detail-sub-icon">🏷</span><span><strong>${monthlyInfo.food}</strong></span></div>`;
     }
