@@ -661,7 +661,7 @@ function openPopup(lh, markerEl) {
   const popupEmoji = document.getElementById('popup-emoji');
   popupImg.style.backgroundImage = '';
   popupEmoji.style.display = '';
-  fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\s/g,''))}&id=${encodeURIComponent(lh.id || '')}`)
+  fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\n/g,' ').trim())}&id=...`)
     .then(r => r.json())
     .then(data => {
       if (data.url) {
@@ -1073,7 +1073,7 @@ function renderSearchDropdown() {
       <div class="search-result-item" data-id="${lh.id}">
         <span>${lh.emoji}</span>
         <div>
-          <div class="sr-name">${lh.name}</div>
+          <div class="sr-name">${lh.name.replace(/\n/g, ' ')}</div>
           <div class="sr-region">${lh.region || ""}</div>
         </div>
       </div>
