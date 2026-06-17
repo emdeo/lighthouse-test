@@ -511,7 +511,7 @@ document.getElementById("detail-region").textContent = (stampInfo && stampInfo.a
 document.getElementById("detail-desc").textContent = lh.nameEn || lh.desc || "";
 // 이달의 등대 데이터 연결
 const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE_DATA !== 'undefined')
-  ? MONTHLY_LIGHTHOUSE_DATA.find(m => m.name.replace(/\s/g,'') === lh.name.replace(/\s/g,'')) || null
+  ? MONTHLY_LIGHTHOUSE_DATA.find(m => m.name.split("\\n").join("").split(" ").join("") === lh.name.split("\\n").join("").split(" ").join("")) || null
   : null;
 
 if (monthlyInfo && lh.tags.includes('month')) {

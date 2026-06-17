@@ -381,7 +381,7 @@ function findYearData(name, lat, lng) {
 // 이달의 등대 데이터 매칭 (이름만 비교, 공백 제거)
 function findMonthlyData(name) {
   if (!window.MONTHLY_LIGHTHOUSE_DATA) return null;
-  const clean = n => n.replace(/\\n/g, "").replace(/\s+/g, "");
+  const clean = n => n.split("\\n").join("").split(" ").join("");
   return window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === clean(name)) || null;
 }
 
