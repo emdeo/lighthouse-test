@@ -76,7 +76,7 @@ async function main() {
     .filter(d => d.name.includes('등대'))
     .filter(d => d.type === '고정표지')
     .filter(d => isKorea(d.lat, d.lng))
-    .filter(d => !EXCLUDE_NAMES.includes(d.name));
+    .filter(d => !EXCLUDE_IDS.includes(d.id));
 
   console.log('필터링 후:', filtered.length);
 
