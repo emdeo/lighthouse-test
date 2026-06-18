@@ -1054,8 +1054,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
         <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
-        <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}"
-           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.naver.com/v5/search/${p.place_name.replace(/ /g,'+')}')}"
+        <a href="https://map.naver.com/v5/search/${p.place_name.replace(/ /g,'+')}" target="_blank"
            style="display:block; text-align:center; padding:0.3rem 1rem; border-radius:6px; font-size:0.75rem; font-weight:600; background:#03C75A; color:white; text-decoration:none;">네이버지도 길찾기</a>
         <a href="kakaomap://route?ep=${p.y},${p.x}&by=FOOT"
            onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.kakao.com/link/to/${encodeURIComponent(p.place_name)},${p.y},${p.x}')}"
@@ -1087,8 +1086,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=화장실&x=${l
         <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
-        <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}"
-           onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.naver.com/v5/search/${p.place_name.replace(/ /g,'+')}')}"
+        <a href="https://map.naver.com/v5/search/${p.place_name.replace(/ /g,'+')}" target="_blank"
            style="display:block; text-align:center; padding:0.3rem 1rem; border-radius:6px; font-size:0.75rem; font-weight:600; background:#03C75A; color:white; text-decoration:none;">네이버지도 길찾기</a>
         <a href="kakaomap://route?ep=${p.y},${p.x}&by=FOOT"
            onclick="if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){event.preventDefault(); window.open('https://map.kakao.com/link/to/${encodeURIComponent(p.place_name)},${p.y},${p.x}')}"
