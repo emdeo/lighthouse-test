@@ -1203,7 +1203,7 @@ body.ar-page nav a:hover {
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(320px, 85vw);
+  width: auto;
   background: rgba(5,15,35,0.75);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 24px;
@@ -1295,6 +1295,20 @@ body.ar-page nav a:hover {
 
   .ruler-tick .tick-label { font-size: 10px; }
   .ruler-tick.major .tick-label { font-size: 11px; }
+/* 모바일 팝업 - 화면 중앙 */
+  #popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2.5rem);
+    max-width: 380px;
+    max-height: 75vh;
+    right: auto;
+    overflow-y: auto;
+    z-index: 300;
+  }
+  #popup.visible { display: block; }
 }
 /* 모든 등대 표시 체크박스 오른쪽 정렬 */
 #btn-all {
