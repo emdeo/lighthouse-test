@@ -529,8 +529,9 @@ const storyEl1 = document.getElementById("detail-story");
   if (monthlyInfo.desc) { storyEl1.textContent = monthlyInfo.desc; storyEl1.style.display = ''; }
   else { storyEl1.style.display = 'none'; }
   // 빨간 박스: 기존 sub-rows 숨기고 먹거리/관광지 표시
-  const subRows = document.getElementById("detail-sub-rows");
-  subRows.style.display = "none";
+  document.getElementById("row-open").style.display = "none";
+  document.getElementById("row-contact").style.display = "none";
+  document.getElementById("row-culture").style.display = "none";
   const extra = document.getElementById("monthly-extra");
   extra.style.display = "flex";
 
