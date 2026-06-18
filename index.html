@@ -247,7 +247,7 @@
             <div class="popup-name" id="popup-name">등대 이름</div>
             <div class="popup-desc" id="popup-desc">설명</div>
           </div>
-          <div class="popup-dist" id="popup-dist">📍 내 위치에서 — km</div>
+          <div class="popup-dist" id="popup-dist">📍 내 위치로부터 — km</div>
           <div class="popup-meta" id="popup-meta"></div>
           <div class="popup-divider"></div>
 
@@ -261,8 +261,20 @@
 </div>
 
 <div class="popup-bottom-buttons" style="margin-top:0.6rem;">
-  <button class="popup-cctv-btn" id="btn-cctv">📹 실시간 CCTV</button>
-  <button class="popup-cctv-btn" id="btn-coastal-cctv" onclick="window.open('https://coast.mof.go.kr/coastScene/coastMediaService.do','_blank')">🌊 연안 CCTV</button>
+  <button class="popup-cctv-btn" id="btn-cctv">실시간 CCTV</button>
+  <button class="popup-cctv-btn" id="btn-coastal-cctv" onclick="window.open('https://coast.mof.go.kr/coastScene/coastMediaService.do','_blank')">연안 CCTV</button>
+</div>
+
+<div class="popup-divider"></div>
+
+<!-- 길찾기 버튼 -->
+<div class="dir-buttons">
+  <button class="dir-btn dir-naver" id="btn-naver">
+    네이버지도 길찾기
+  </button>
+  <button class="dir-btn dir-kakao" id="btn-kakao">
+    카카오맵 길찾기
+  </button>
 </div>
 
 <div class="popup-divider"></div>
@@ -284,18 +296,6 @@
    onmouseout="this.style.background='var(--white)';this.style.borderColor='var(--gray2)'">
   정보 더보기 &nbsp;›
 </button>
-
-<div class="popup-divider"></div>
-
-<!-- 길찾기 버튼 -->
-<div class="dir-buttons">
-  <button class="dir-btn dir-naver" id="btn-naver">
-    네이버지도 길찾기
-  </button>
-  <button class="dir-btn dir-kakao" id="btn-kakao">
-    카카오맵 길찾기
-  </button>
-</div>
 
 <!-- 해무 CCTV -->
 <div id="popup-fog-cctv" style="display:none; margin-top:0.8rem;">
