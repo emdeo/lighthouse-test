@@ -592,10 +592,13 @@ function buildLightSimCard(code) {
 
   return `<div style="padding:4px 0">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
-    <div style="position:relative;width:72px;height:140px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden">          <polygon points="70.87,9 -55,-45 -20,28" fill="${col}" opacity="0.2"/>
-          <polygon points="70.87,9 -30,-55 10,-10" fill="${col}" opacity="0.13"/>
-          <polygon points="70.87,9 196,-45 162,28" fill="${col}" opacity="0.2"/>
-          <polygon points="70.87,9 170,-55 130,-10" fill="${col}" opacity="0.13"/>
+    <div style="position:relative;width:72px;height:100px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;overflow:visible">
+        <svg style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:200px;height:80px;overflow:visible;pointer-events:none;z-index:2;opacity:0;animation:${uid} ${period}s ease-in-out infinite;" viewBox="-80 -80 300 95">
+          <defs><clipPath id="bc${uid}"><rect x="-200" y="-80" width="542" height="95"/></clipPath></defs>
+          <g clip-path="url(#bc${uid})">
+            <polygon points="70.87,9 -80,-60 -10,25" fill="${col}" opacity="0.25"/>
+            <polygon points="70.87,9 222,-60 152,25" fill="${col}" opacity="0.25"/>
+          </g>
         </svg>
         <!-- 문어등대 SVG (원본 viewBox 141.73x255.12) -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 255.12" width="72" height="100" style="position:relative;z-index:1;overflow:visible">
