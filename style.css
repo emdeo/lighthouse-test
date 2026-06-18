@@ -230,7 +230,7 @@
   /* map controls */
   .map-controls {
   position: absolute;
-  top: 24;
+  top: 80px;
   right: 16px;
 
   display: flex;
@@ -303,7 +303,7 @@
   /* ── POPUP ── */
   #popup {
     position: absolute;
-    top: 25px;
+    top: 80px;
     right: 64px;
     width: 270px;
     max-height: calc(100% - 2rem);
