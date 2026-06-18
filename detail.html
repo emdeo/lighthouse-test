@@ -91,15 +91,15 @@
         <span class="detail-sub-icon">📍</span>
         <span id="detail-region">위치 정보</span>
       </div>
-      <div class="detail-sub-row">
+      <div class="detail-sub-row" id="row-open" style="display:none;">
        <span class="detail-sub-icon">🕐</span>
        <span id="detail-sub-open">—</span>
       </div>
-      <div class="detail-sub-row">
+      <div class="detail-sub-row" id="row-contact" style="display:none;">
         <span class="detail-sub-icon">📞</span>
         <span id="detail-sub-contact">—</span>
       </div>
-      <div class="detail-sub-row">
+      <div class="detail-sub-row" id="row-culture" style="display:none;">
         <span class="detail-sub-icon">🏛</span>
         <span id="detail-sub-culture">—</span>
       </div>
@@ -495,6 +495,13 @@ const stampInfo = (typeof STAMP_DATA !== 'undefined')
   : null;
 document.getElementById("detail-region").textContent = (stampInfo && stampInfo.address) ? stampInfo.address : lh.region;
 document.getElementById("detail-desc").textContent = lh.nameEn || lh.desc || "";
+// 운영시간/전화/문화재 — 값 있을 때만 표시
+const openVal = (stampInfo && stampInfo.open) ? stampInfo.open : '';
+const contactVal = (stampInfo && stampInfo.contact) ? stampInfo.contact : '';
+const cultureVal = (stampInfo && stampInfo.culture) ? stampInfo.culture : '';
+if (openVal) { document.getElementById('detail-sub-open').textContent = openVal; document.getElementById('row-open').style.display = ''; }
+if (contactVal) { document.getElementById('detail-sub-contact').textContent = contactVal; document.getElementById('row-contact').style.display = ''; }
+if (cultureVal) { document.getElementById('detail-sub-culture').textContent = cultureVal; document.getElementById('row-culture').style.display = ''; }
 // 이달의 등대 데이터 연결
 const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE_DATA !== 'undefined')
   ? MONTHLY_LIGHTHOUSE_DATA.find(m => m.name.replace(/\s/g,'') === lh.name.replace(/\s/g,'')) || null
