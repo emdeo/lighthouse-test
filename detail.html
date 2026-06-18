@@ -142,21 +142,24 @@
   </div>
 
   <!-- 주간 기상 예보 -->
-<div class="section-card">
-  <div style="display:flex; align-items:center; margin-bottom:0.3rem; padding:0 .8rem; gap:0.4rem;">
-    <div class="section-title" style="margin:0; flex:1;">📅 주간 기상 예보</div>
-    <span style="width:1px; background:transparent; margin:0 .3rem; flex-shrink:0;"></span>
-    <span style="width:72px; text-align:center; font-size:0.72rem; font-weight:700; color:#16a34a; flex-shrink:0;">바다여행지수</span>
-    <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316; flex-shrink:0;">뱃멀미지수</span>
-    <span style="width:64px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899; flex-shrink:0;">갯벌체험지수</span>
-  </div>
-  <div id="forecast-list" style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
-    <div style="color:var(--gray3); font-size:.85rem; text-align:center; padding:1rem;">
-      예보 정보를 불러오는 중...
+<div class="section-card" style="padding:0; overflow:hidden;">
+  <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+    <div style="min-width:480px; padding:1rem 1rem 1rem;">
+      <div style="display:flex; align-items:center; margin-bottom:0.3rem; padding:0 .8rem; gap:0.4rem;">
+        <div class="section-title" style="margin:0; flex:1; min-width:120px;">📅 주간 기상 예보</div>
+        <span style="width:1px; background:transparent; margin:0 .3rem; flex-shrink:0;"></span>
+        <span style="width:72px; text-align:center; font-size:0.72rem; font-weight:700; color:#16a34a; flex-shrink:0;">바다여행지수</span>
+        <span style="width:56px; text-align:center; font-size:0.72rem; font-weight:700; color:#f97316; flex-shrink:0;">뱃멀미지수</span>
+        <span style="width:64px; text-align:center; font-size:0.72rem; font-weight:700; color:#ec4899; flex-shrink:0;">갯벌체험지수</span>
+      </div>
+      <div id="forecast-list" style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
+        <div style="color:var(--gray3); font-size:.85rem; text-align:center; padding:1rem;">
+          예보 정보를 불러오는 중...
+        </div>
+      </div>
     </div>
   </div>
 </div>
-
   <!-- 배편 정보 -->
   <div class="section-card" id="ferry-section" style="display:none;">
     <div class="section-title">⛴ 배편/교통 정보</div>
