@@ -540,7 +540,7 @@ if (monthlyInfo && lh.tags.includes('month')) {
   if (monthlyInfo.food || monthlyInfo.food_desc) {
     extraHTML += `<div class="monthly-section-title">🍽 주변 먹거리</div>`;
     if (monthlyInfo.food) {
-      extraHTML += `<div class="detail-sub-row"><span class="detail-sub-icon">🏷</span><span><strong>${monthlyInfo.food}</strong></span></div>`;
+      extraHTML += `<div class="detail-sub-row"><span><strong>${monthlyInfo.food}</strong></span></div>`;
     }
     if (monthlyInfo.food_desc) {
       extraHTML += `<div class="detail-sub-row monthly-desc-text">${monthlyInfo.food_desc}</div>`;
@@ -549,7 +549,7 @@ if (monthlyInfo && lh.tags.includes('month')) {
 
   // 주변 관광지 섹션: spot 또는 spot_desc 중 하나라도 있을 때
   if (monthlyInfo.spot || monthlyInfo.spot_desc) {
-    extraHTML += `<div class="monthly-section-title" style="margin-top:0.6rem;">🗺 주변 관광지</div>`;
+    extraHTML += `<div class="monthly-section-title" style="margin-top:0.6rem;">🗺️ 주변 관광지</div>`;
     if (monthlyInfo.spot) {
       extraHTML += `<div class="detail-sub-row monthly-spot-tags">${monthlyInfo.spot.split(/\s{2,}|·/).map(s => s.trim()).filter(Boolean).map(s => `<span class="monthly-spot-tag">${s}</span>`).join('')}</div>`;
     }
