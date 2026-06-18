@@ -163,7 +163,7 @@
   <div class="section-card" id="ferry-section" style="display:none;">
     <div class="section-title">⛴ 배편/교통 정보</div>
     <div class="ferry-table" id="detail-ferry"></div>
-    <button class="reserve-btn" id="detail-reserve">🎫 배편 예매하기</button>
+    <button class="reserve-btn" id="detail-reserve">배편 예매하기</button>
   </div>
 
   <!-- 주차장 정보 -->
@@ -271,7 +271,7 @@
     display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
     <div style="grid-column:1/-1;text-align:center;padding:32px 0;
       color:#aaa;font-size:13px;">
-      📭 등록된 사진이 없어요<br>
+      등록된 사진이 없어요<br>
       <span style="font-size:11px">📸 버튼으로 사진을 찍어보세요</span>
     </div>
   </div>
@@ -302,7 +302,7 @@
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
-    ">✨ AI 정보 가져오기</button>
+    ">AI 정보 가져오기</button>
   </div>
 
   <!-- API 키 입력 영역 -->
@@ -808,7 +808,7 @@ if (lh.lat && lh.lng) {
         return;
       }
 
-      stationEl.textContent = `📡 기준 관측소: ${data.station} (${data.distKm}km)`;
+      stationEl.textContent = `기준 관측소: ${data.station} (${data.distKm}km)`;
 
       const typeLabel = { '1': '만조 ↑', '2': '간조 ↓', '3': '만조 ↑', '4': '간조 ↓' };
       const typeColor = { '1': '#3b82f6', '2': '#f97316', '3': '#3b82f6', '4': '#f97316' };
