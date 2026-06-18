@@ -1774,6 +1774,23 @@ function openPopupMobile(lh, markerEl) {
       `<div class="popup-body">${restBody}</div>`
     );
 
+    // 시트 이미지 별도 업데이트
+    fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace(/\n/g,' ').trim())}&id=${encodeURIComponent(lh.id)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.url) {
+          const sheetImg = document.querySelector("#mobile-sheet-content .popup-img");
+          if (sheetImg) {
+            sheetImg.style.backgroundImage = `url(${data.url})`;
+            sheetImg.style.backgroundSize = 'cover';
+            sheetImg.style.backgroundPosition = 'center';
+            const emoji = sheetImg.querySelector(".popup-img-placeholder");
+            if (emoji) emoji.style.display = 'none';
+          }
+        }
+      })
+      .catch(() => {});
+
     // 시트: 이름/설명 클릭 → detail 이동
     const sheetContent = document.getElementById("mobile-sheet-content");
     const sheetNameEl = sheetContent.querySelector(".popup-name");
