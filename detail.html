@@ -157,7 +157,6 @@
   </div>
 </div>
 
-
   <!-- 배편 정보 -->
   <div class="section-card" id="ferry-section" style="display:none;">
     <div class="section-title">⛴ 배편/교통 정보</div>
@@ -591,8 +590,7 @@ function buildLightSimCard(code) {
 
   return `<div style="padding:4px 0">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
-    <div style="position:relative;width:72px;height:100px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden">        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 255.12" width="72" height="100" style="position:relative;z-index:1;overflow:visible">
-          <defs>
+    <div style="position:relative;width:72px;height:100px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;">          <defs>
             <style>
               .lsv-body { fill: #e6e7e8; }
               .lsv-shadow { fill: #d1d3d4; }
@@ -602,13 +600,13 @@ function buildLightSimCard(code) {
               .lsv-dome-outline { fill: #d1d3d4; }
             </style>
             <clipPath id="dc${uid}">
-              <rect x="-500" y="-500" width="1142" height="509"/>
+              <rect x="0" y="0" width="141.73" height="255.12"/>
             </clipPath>
           </defs>
           <!-- 빔 애니메이션 -->
           <g opacity="0" style="animation:${uid} ${period}s ease-in-out infinite;" clip-path="url(#dc${uid})">
-            <polygon points="70.87,7.5 -80,-30 -80,45" fill="${col}" opacity="0.25"/>
-            <polygon points="70.87,7.5 222,-30 222,45" fill="${col}" opacity="0.25"/>
+            <polygon points="70.87,7.5 -200,7.5 0,50" fill="${col}" opacity="0.25"/>
+            <polygon points="70.87,7.5 342,7.5 141.73,50" fill="${col}" opacity="0.25"/>
           </g>
           <!-- 꼭대기 돔 (발광, 등질 색상) -->
           <g>
