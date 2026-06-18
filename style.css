@@ -1297,16 +1297,16 @@ body.ar-page nav a:hover {
   .ruler-tick.major .tick-label { font-size: 11px; }
 /* 모바일 팝업 - 화면 중앙 */
   #popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: calc(100% - 2.5rem);
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: calc(100% - 2.5rem) !important;
     max-width: 380px;
     max-height: 75vh;
-    right: auto;
+    right: auto !important;
     overflow-y: auto;
-    z-index: 300;
+    z-index: 300 !important;
   }
   #popup.visible { display: block; }
 }
