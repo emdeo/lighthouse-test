@@ -1051,7 +1051,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
       <div style="flex:1; min-width:0;">
         <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
         <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
-        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
+        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
         <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}"
@@ -1084,7 +1084,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=화장실&x=${l
       <div style="flex:1; min-width:0;">
         <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
         <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
-        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍${Math.round(p.distance)}m</div>
+        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
         <a href="naver.maps://route/walk?dlat=${p.y}&dlng=${p.x}&dname=${encodeURIComponent(p.place_name)}"
