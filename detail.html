@@ -701,8 +701,9 @@ function buildLightSimCard(code) {
 
   document.getElementById("ferry-section").style.display = "";
 
-  const TAGO_KEY = "bfd3135cb93820e3cfcacd7aa745097a3d12d33568571c52e7f9fa60d959549b";
   const dayNames = ["일","월","화","수","목","금","토"];
+  // MTIS 출항지명 매칭용: 언더스코어 항구는 뒷부분만 사용 (제주_서귀포 → 서귀포)
+  const portQuery = port.name.includes("_") ? port.name.split("_")[1] : port.name;
 
   // 오늘~4일 날짜 배열 생성
   const dates = Array.from({length: 5}, (_, i) => {
@@ -715,12 +716,12 @@ function buildLightSimCard(code) {
     return { dateStr, label };
   });
 
-  // 날짜별로 API 병렬 호출
+  // 날짜별로 Workers /ferry 병렬 호출 (MTIS)
   const results = await Promise.all(dates.map(async ({ dateStr, label }) => {
     try {
-      const res = await fetch(`https://apis.data.go.kr/1613000/DmstcShipNvgInfo/GetShipOpratInfoList?serviceKey=${TAGO_KEY}&numOfRows=20&pageNo=1&_type=json&depNodeId=${port.nodeId}&strtRecpDt=${dateStr}&endRecpDt=${dateStr}`);
+      const res = await fetch(`${CONFIG.WEATHER_API_URL}/ferry?port=${encodeURIComponent(portQuery)}&date=${dateStr}`);
       const data = await res.json();
-      const items = data.response?.body?.items?.item || [];
+      const items = data.items || [];
       return { label, items: Array.isArray(items) ? items : [items] };
     } catch(e) {
       return { label, items: [] };
@@ -757,21 +758,29 @@ function buildLightSimCard(code) {
           <thead>
             <tr style="color:var(--gray4); font-size:0.78rem;">
               <th style="padding:3px 6px; font-weight:600; text-align:left;">도착지</th>
-              <th style="padding:3px 6px; font-weight:600; text-align:left;">출발</th>
-              <th style="padding:3px 6px; font-weight:600; text-align:left;">도착</th>
-              <th style="padding:3px 6px; font-weight:600; text-align:left;">요금</th>
+              <th style="padding:3px 6px; font-weight:600; text-align:left;">출항</th>
+              <th style="padding:3px 6px; font-weight:600; text-align:left;">운항상태</th>
             </tr>
           </thead>
           <tbody>
             ${items.map(it => {
-              const dep = String(it.depPlandTime).slice(8,12).replace(/(\d{2})(\d{2})/, "$1:$2");
-              const arr = String(it.arrPlandTime).slice(8,12).replace(/(\d{2})(\d{2})/, "$1:$2");
-              const charge = it.charge ? it.charge.toLocaleString() + "원" : "-";
+              const dep = String(it.sail_tm).padStart(4, "0").replace(/(\d{2})(\d{2})/, "$1:$2");
+              // 운항상태: 정상이면 그대로, 통제/비운항이면 사유 덧붙임
+              let status = it.nvg_se_nm || "-";
+              let color = "var(--gray4)";
+              if (it.nvg_se_nm === "통제" && it.cntrl_rsn_nm) {
+                status = `통제 (${it.cntrl_rsn_nm})`; color = "#c0392b";
+              } else if (it.nvg_se_nm === "비운" && it.nnavi_rsn_nm) {
+                status = `비운항 (${it.nnavi_rsn_nm})`; color = "#c0392b";
+              } else if (it.nvg_se_nm === "비운") {
+                status = "비운항"; color = "#c0392b";
+              } else if (it.nvg_se_nm === "정상") {
+                color = "#27ae60";
+              }
               return `<tr style="border-bottom:1px solid var(--gray2);">
-                <td style="padding:5px 6px;">${it.arrPlaceNm}</td>
+                <td style="padding:5px 6px;">${it.dest_nm}</td>
                 <td style="padding:5px 6px;">${dep}</td>
-                <td style="padding:5px 6px;">${arr}</td>
-                <td style="padding:5px 6px;">${charge}</td>
+                <td style="padding:5px 6px; color:${color};">${status}</td>
               </tr>`;
             }).join("")}
           </tbody>
