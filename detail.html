@@ -189,9 +189,9 @@
   <!-- 등대 마스코트 말풍선 블록 -->
 <div class="section-card" style="display:flex; flex-direction:column; gap:1rem; padding:1.5rem;">
   <!-- 설명 이미지 -->
-  <img src="흰색등대(낮)_PC버전.png" style="
+  <img id="mascot-img" src="흰색등대(낮)_PC버전.png" style="
     width:100%; border-radius:12px; object-fit:cover;
-    box-shadow:0 2px 8px rgba(0,0,0,0.12);
+    box-shadow:0 2px 8px rgba(0,0,0,0.12); display:none;
   ">
   <!-- 문어등대 + 말풍선 -->
   <div style="display:flex; align-items:flex-start; gap:1.2rem;">
@@ -453,8 +453,10 @@ const TAG_INFO = {
 document.title = lh.name + " — 안녕, 등대";
 const mascotMsg = document.getElementById("mascot-message");
 if (lh.name.includes("방파제")) {
+  document.getElementById("mascot-img").style.display = "block";
   mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 방파제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else if (lh.name.includes("방사제")) {
+  document.getElementById("mascot-img").style.display = "block";
   mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 방사제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else {
   mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 육지 끝단에 세워진 육지초인표지 등대야. <br> 바다 위가 아닌 땅에서 배의 길을 안내하지 <br> 육지초인표지 등대 = 대부분 흰색 🤍 <br> 다른 등대는 어떤 모습일까? 😗";
