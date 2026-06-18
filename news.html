@@ -71,8 +71,8 @@
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
       <label style="font-size:.72rem;color:rgba(255,255,255,0.85);white-space:nowrap;">표시 범위</label>
-      <input type="range" id="range-slider" min="0" max="1" value="1">
-      <span id="range-value" style="font-size:.75rem;color:var(--accent);">1km</span>
+      <input type="range" id="range-slider" min="0" max="1.5" step="0.5" value="1.5">
+      <span id="range-value" style="font-size:.75rem;color:var(--accent);">1.5km</span>
       <button id="compass-btn" style="display:none;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:1.1rem;padding:4px 10px;cursor:pointer;">🧭</button>
         </div>
     </div>
@@ -206,7 +206,7 @@ let myLat = null, myLng = null;
 let currentHeading = 0;
 let smoothHeading  = 0;
 let smoothTilt     = 0;
-let maxRange = 1;
+let maxRange = 1.5;
 let lighthouses = [];
 let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
