@@ -493,8 +493,24 @@ document.getElementById("detail-name").textContent   = lh.name;
 const stampInfo = (typeof STAMP_DATA !== 'undefined')
   ? STAMP_DATA.find(s => s.name.replace(/\s/g, '') === lh.name.replace(/\s/g, '')) || null
   : null;
-document.getElementById("detail-region").textContent = (stampInfo && stampInfo.address) ? stampInfo.address : lh.region;
-document.getElementById("detail-desc").textContent = lh.nameEn || lh.desc || "";
+// 영문명 + 해안 구분
+const seaLabel = lh.sea === '서해안' ? '서해안' : lh.sea === '동해안' ? '동해안' : lh.sea === '남해안' ? '남해안' : lh.sea || '';
+document.getElementById("detail-desc").textContent = (lh.nameEn ? lh.nameEn + (seaLabel ? ',  ' + seaLabel : '') : seaLabel);
+
+// 좌표 → 주소 변환 (카카오 API)
+fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lh.lng}&y=${lh.lat}`, {
+  headers: { Authorization: `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
+})
+.then(r => r.json())
+.then(data => {
+  const addr = data.documents?.[0]?.road_address?.address_name
+             || data.documents?.[0]?.address?.address_name
+             || '';
+  document.getElementById("detail-region").textContent = addr || lh.region || '';
+})
+.catch(() => {
+  document.getElementById("detail-region").textContent = lh.region || '';
+});
 // 운영시간/전화/문화재 — 값 있을 때만 표시
 const openVal = (stampInfo && stampInfo.open) ? stampInfo.open : '';
 const contactVal = (stampInfo && stampInfo.contact) ? stampInfo.contact : '';
