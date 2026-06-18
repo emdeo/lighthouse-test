@@ -1703,8 +1703,8 @@ html:has(body.detail-page) {
   }
   .mobile-nav-item.active { color: var(--navy); }
   .mobile-nav-item:hover { color: var(--navy); }
-  .mobile-nav-icon { font-size: 1.3rem; }
-  .mobile-nav-label { font-size: .6rem; }
+  .mobile-nav-icon { font-size: 1.4rem; }
+  .mobile-nav-label { font-size: .75rem; font-weight: 600; }
 
   /* 하단 시트 (필터/목록) */
   #mobile-sheet {
