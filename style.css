@@ -229,7 +229,7 @@
 
   /* map controls */
   .map-controls {
-    position: absolute; right: 1rem; top: 1rem;
+    position: absolute; right: 290px; top: 1rem;
     display: flex; flex-direction: column; gap: .4rem; z-index: 10;
   }
   .map-ctrl-btn {
@@ -296,9 +296,9 @@
   /* ── POPUP ── */
   #popup {
     position: absolute;
-    top: 1.2rem; right: 1.2rem;
-    width: 280px;
-    max-height: calc(100% - 2.4rem);
+    top: 1rem; right: 1rem;
+    width: 270px;
+    max-height: calc(100% - 2rem);
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
