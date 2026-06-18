@@ -274,7 +274,7 @@ function buildMarkers() {
       const bearing = getBearing(myLat, myLng, lh.lat, lh.lng);
       return { ...lh, dist, bearing };
     })
-    .filter(lh => lh.dist > 0.05 && lh.dist <= maxRange)
+    .filter(lh => lh.dist > 0 && lh.dist <= maxRange)
     .sort((a, b) => a.dist - b.dist);
 
   const occupied = []; // 겹침 체크용 { x, labelY }
