@@ -229,8 +229,15 @@
 
   /* map controls */
   .map-controls {
-    position: absolute; right: 290px; top: 1rem;
-    display: flex; flex-direction: column; gap: .4rem; z-index: 10;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+
+  z-index: 60;
   }
   .map-ctrl-btn {
     width: 36px; height: 36px;
@@ -296,7 +303,8 @@
   /* ── POPUP ── */
   #popup {
     position: absolute;
-    top: 1rem; right: 1rem;
+    top: 1rem;
+    right: 64px;
     width: 270px;
     max-height: calc(100% - 2rem);
     background: var(--white);
