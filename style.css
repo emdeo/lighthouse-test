@@ -1822,3 +1822,42 @@ html:has(body.detail-page) {
   font-size: 0.78rem;
   font-weight: 500;
 }
+/* 등질 정보 말풍선 */
+.light-bubble {
+  position: relative;
+  background: #1d4ed8;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.light-bubble::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 18px;
+  border-width: 8px 10px 8px 0;
+  border-style: solid;
+  border-color: transparent #1d4ed8 transparent transparent;
+}
+.light-bubble-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.light-bubble-code {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cfe0ff;
+  margin-bottom: 10px;
+}
+.light-bubble-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.light-bubble-items span {
+  display: inline-block;
+}

@@ -603,6 +603,13 @@ function buildLightSimCard(code) {
   const mComp = code.match(/\((\d+)\+(\d+)\)/i);
   if (mComp) { cnt1 = parseInt(mComp[1]); cnt2 = parseInt(mComp[2]); }
 
+  // 등대 높이(m)와 광달거리(M) 파싱
+  const mHeight = code.match(/(\d+(\.\d+)?)m\b/i);
+  const height = mHeight ? mHeight[1] : null;
+  const mRange = code.match(/(\d+(\.\d+)?)M\b/);
+  const range = mRange ? mRange[1] : null;
+  const rangeKm = range ? (parseFloat(range) * 1.609).toFixed(1) : null;
+
   const typeDesc = isFixed ? '부동등 — 계속 켜져 있음'
     : isIso ? '등명암등 — 켜짐/꺼짐 동일 간격'
     : isOc ? '명암등 — 켜짐이 더 긴 패턴'
@@ -679,15 +686,18 @@ function buildLightSimCard(code) {
         </svg>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${col};box-shadow:0 0 6px ${col};flex-shrink:0"></span>
-          <span style="font-size:13px;font-weight:700;color:${col}">${colName}</span>
-          <span style="font-size:10px;color:#aaa;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px">주기 ${period}s</span>
-          ${flashCnt>1&&!isComposite?`<span style="font-size:10px;color:#f97316">${flashCnt}회 섬광</span>`:''}
-          ${isComposite?`<span style="font-size:10px;color:#f97316">(${cnt1}+${cnt2})회</span>`:''}
+        <div class="light-bubble">
+          <div class="light-bubble-title">등질: 야간에도 항해자가 길을 쉽게 찾을 수 있도록, 불빛의 색깔, 깜빡이는 횟수, 주기를 각각 다르게 정해 놓은 일종의 신호</div>
+          <div class="light-bubble-code">${code}</div>
+          <div class="light-bubble-items">
+            <span>🟢 ${t.includes('R')?'R':t.includes('G')?'G':t.includes('Y')?'Y':'W'} : ${colName}색 불빛</span>
+            ${flashCnt>1?`<span>✨ (${flashCnt}) : ${flashCnt}번 점멸</span>`:''}
+            ${isComposite?`<span>✨ (${cnt1}+${cnt2}) : ${cnt1}+${cnt2}번 점멸</span>`:''}
+            <span>🔆 ${period}s : ${period}초 주기</span>
+            ${height?`<span>📏 ${height}m : 등대 높이</span>`:''}
+            ${range?`<span>☀️ ${range}M : 광달거리 ${range}해리(Mile) *1 Mile = 1.609 kM</span>`:''}
+          </div>
         </div>
-        <div style="font-size:11px;color:var(--gray4);line-height:1.7">${typeDesc}</div>
-        <div style="font-size:10px;color:var(--gray3);margin-top:4px">${code}</div>
       </div>
     </div>
   </div>`;
