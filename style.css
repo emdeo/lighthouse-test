@@ -1654,7 +1654,7 @@ html:has(body.detail-page) {
     transform: translate(-50%, -50%) !important;
     width: calc(100% - 2.5rem) !important;
     max-width: 380px !important;
-    max-height: 75vh !important;
+    max-height: 60vh !important;
     right: auto !important;
     bottom: auto !important;
     border-radius: 16px !important;
