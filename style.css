@@ -1298,8 +1298,8 @@ body.ar-page nav a:hover {
 /* 모바일 팝업 - 화면 중앙 */
   #popup {
     position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
+    top: 50vh !important;
+    left: 50vw !important;
     transform: translate(-50%, -50%) !important;
     width: calc(100% - 2.5rem) !important;
     max-width: 380px;
@@ -1724,23 +1724,11 @@ html:has(body.detail-page) {
 #mobile-sheet.open {
   transform: translateY(0);
 }
-  #mobile-sheet-handle {
-  flex-shrink: 0;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-}
-#mobile-sheet-handle-bar {
-  width: 40px; height: 4px;
-  background: var(--gray2);
-  border-radius: 2px;
-}
-  
+  #mobile-sheet-handle { display: none; }
+  #mobile-sheet-handle-bar { display: none; }
   #mobile-sheet-content {
   overflow-y: auto;
-  height: calc(100% - 32px);
+  height: 100%;
   padding: 0 1rem 2rem;
 }
 
