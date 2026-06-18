@@ -835,10 +835,10 @@ if (lh.lat && lh.lng) {
       const typeBg    = { '1': '#eff6ff', '2': '#fff7ed', '3': '#eff6ff', '4': '#fff7ed' };
 
       listEl.innerHTML = items.map(item => {
-        const dt = item.tph_time || item.obsrTime || '';
+        const dt = item.predcDt || '';
         const time = dt.length >= 16 ? dt.slice(11, 16) : dt;
-        const level = item.tph_level ?? item.obsrValue ?? '';
-        const type = String(item.hl_code ?? item.type ?? '');
+        const level = item.predcTdlvVl ?? '';
+        const type = String(item.extrSe ?? '');
         const label = typeLabel[type] || (type === 'H' ? '만조 ↑' : '간조 ↓');
         const color = typeColor[type] || '#888';
         const bg    = typeBg[type]    || 'var(--gray1)';
