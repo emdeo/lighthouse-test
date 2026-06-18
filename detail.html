@@ -509,8 +509,9 @@ const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE_DATA !== 'undefined')
 
 if (monthlyInfo && lh.tags.includes('month')) {
   // 파란 박스: desc
-  document.getElementById("detail-story").textContent = monthlyInfo.desc || "상세 정보를 준비 중입니다.";
-
+const storyEl1 = document.getElementById("detail-story");
+  if (monthlyInfo.desc) { storyEl1.textContent = monthlyInfo.desc; storyEl1.style.display = ''; }
+  else { storyEl1.style.display = 'none'; }
   // 빨간 박스: 기존 sub-rows 숨기고 먹거리/관광지 표시
   const subRows = document.getElementById("detail-sub-rows");
   subRows.style.display = "none";
@@ -543,7 +544,9 @@ if (monthlyInfo && lh.tags.includes('month')) {
 
   extra.innerHTML = extraHTML;
 } else {
-  document.getElementById("detail-story").textContent = (stampInfo && stampInfo.desc) ? stampInfo.desc : "상세 정보를 준비 중입니다.";
+  const storyEl2 = document.getElementById("detail-story");
+  if (stampInfo && stampInfo.desc) { storyEl2.textContent = stampInfo.desc; storyEl2.style.display = ''; }
+  else { storyEl2.style.display = 'none'; }
 }
 const tagsEl = document.getElementById("detail-tags");
 tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
