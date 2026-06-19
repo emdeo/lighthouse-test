@@ -335,8 +335,8 @@
   <!-- 로딩 상태 -->
   <div id="ai-loading" style="display:none; text-align:center; padding:2rem; color:var(--gray3);">
     <div style="font-size:1.5rem; margin-bottom:0.5rem;">🔍</div>
-    <div style="font-size:0.88rem;">AI가 웹을 검색하고 있어요...</div>
-    <div style="font-size:0.78rem; color:var(--gray3); margin-top:0.3rem;">잠시만 기다려주세요 (10~20초)</div>
+    <div id="ai-loading-step" style="font-size:0.88rem;">AI가 웹을 검색하고 있어요...</div>
+    <div style="font-size:0.78rem; color:var(--gray3); margin-top:0.3rem;">최대 1분 정도 걸릴 수 있어요</div>
   </div>
 
   <!-- 결과 영역 -->
@@ -1153,8 +1153,26 @@ function showAiSection(state) {
   document.getElementById('ai-error').style.display      = state === 'error'   ? 'block' : 'none';
 }
 
+let aiStepTimer = null;
 async function loadAiInfo() {
   showAiSection('loading');
+
+  // 로딩 단계 메시지 순환 (시간 흐름에 따라 자연스럽게 변경)
+  const steps = [
+    "AI가 웹을 검색하고 있어요...",
+    "자료를 모으는 중이에요...",
+    "정보를 정리하고 있어요...",
+    "거의 다 됐어요..."
+  ];
+  let stepIdx = 0;
+  const stepEl = document.getElementById('ai-loading-step');
+  if (stepEl) stepEl.textContent = steps[0];
+  clearInterval(aiStepTimer);
+  aiStepTimer = setInterval(() => {
+    stepIdx = Math.min(stepIdx + 1, steps.length - 1);
+    if (stepEl) stepEl.textContent = steps[stepIdx];
+  }, 8000);
+
   try {
     const res = await fetch(`${AI_WORKER_URL}?name=${encodeURIComponent(lh.name)}&lat=${lh.lat}&lng=${lh.lng}`);
     const data = await res.json();
@@ -1174,8 +1192,10 @@ async function loadAiInfo() {
       ? sources.map((s, i) => `<a href="${s}" target="_blank" class="ai-source-badge">출처 ${i+1}</a>`).join('')
       : '';
 
+    clearInterval(aiStepTimer);
     showAiSection('result');
   } catch (e) {
+    clearInterval(aiStepTimer);
     document.getElementById('ai-error').textContent = '정보를 불러오지 못했어요: ' + e.message;
     showAiSection('error');
   }
