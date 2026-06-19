@@ -1825,8 +1825,8 @@ html:has(body.detail-page) {
 /* 등질 정보 말풍선 */
 .light-bubble {
   position: relative;
-  background: #1b2e4b;
-  color: #fff;
+  background: #d6c785;
+  color: #000;
   border-radius: 14px;
   padding: 15px 17px;
 }
@@ -1837,13 +1837,13 @@ html:has(body.detail-page) {
   top: 20px;
   border-width: 7px 9px 7px 0;
   border-style: solid;
-  border-color: transparent #1b2e4b transparent transparent;
+  border-color: transparent #d6c785 transparent transparent;
 }
 .light-bubble-title {
   font-size: 12.5px;
   font-weight: 400;
   line-height: 1.6;
-  color: #afc2e0;
+  color: #4a4226;
   margin-bottom: 12px;
 }
 .light-bubble-code {
@@ -1851,8 +1851,8 @@ html:has(body.detail-page) {
   font-family: monospace;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
-  background: rgba(255,255,255,.12);
+  color: #000;
+  background: rgba(0,0,0,.08);
   padding: 3px 10px;
   border-radius: 6px;
   margin-bottom: 13px;
@@ -1862,7 +1862,7 @@ html:has(body.detail-page) {
   grid-template-columns: 1fr 1fr;
   gap: 9px 12px;
   font-size: 12px;
-  color: #e4ecf7;
+  color: #000;
 }
 .light-bubble-item {
   display: flex;

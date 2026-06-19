@@ -689,9 +689,9 @@ function buildLightSimCard(code) {
             <div class="light-bubble-item"><span class="light-bubble-dot" style="background:${col};"></span><b>${t.includes('R')?'R':t.includes('G')?'G':t.includes('Y')?'Y':'W'}</b> ${colName}색 불빛</div>
             ${flashCnt>1?`<div class="light-bubble-item">✨ <b>${flashCnt}</b>번 점멸</div>`:''}
             ${isComposite?`<div class="light-bubble-item">✨ <b>${cnt1}+${cnt2}</b>번 점멸</div>`:''}
-            <div class="light-bubble-item">🕐 <b>${period}s</b> 주기</div>
-            ${height?`<div class="light-bubble-item">📏 <b>${height}m</b> 높이</div>`:''}
-            ${range?`<div class="light-bubble-item">☀️ <b>${range}M</b> 광달거리</div>`:''}
+            <div class="light-bubble-item">🕐 <b>${period}s</b> 반복주기</div>
+            ${height?`<div class="light-bubble-item">📏 <b>${height}m</b> 해수면에서 불빛까지 높이</div>`:''}
+            ${range?`<div class="light-bubble-item">☀️ <b>${range}M</b> 불빛 도달 거리</div>`:''}
           </div>
         </div>
       </div>
