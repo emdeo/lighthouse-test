@@ -1849,7 +1849,7 @@ html:has(body.detail-page) {
   border-width: 8px 10px 8px 0;
   border-style: solid;
   border-color: transparent #e8d87f transparent transparent;
-  z-index: -1;
+  z-index: 1;
 }
 .light-bubble-title {
   font-size: 12.5px;
