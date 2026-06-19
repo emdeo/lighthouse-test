@@ -306,6 +306,9 @@
     ">AI 정보 가져오기</button>
   </div>
 
+  <!-- 참고 출처 뱃지 -->
+  <div id="ai-sources" style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.6rem;"></div>
+
   <!-- API 키 입력 영역 -->
   <div id="ai-key-area" style="margin-top:1rem; display:none;">
     <div style="font-size:0.82rem; color:var(--gray4); margin-bottom:0.5rem;">Gemini API 키를 입력해주세요 (<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ocean);">발급받기</a>)</div>
@@ -345,25 +348,17 @@
       <div id="ai-story" class="ai-block-content">—</div>
     </div>
 
-    <!-- 건립연도 + 출처 -->
-    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
-      <div class="ai-block" style="flex:1; min-width:140px;">
+    <!-- 건립연도 -->
+    <div style="margin-top:0.8rem;">
+      <div class="ai-block">
         <div class="ai-block-title">🏗 건립 연도</div>
         <div id="ai-era" class="ai-block-content">—</div>
       </div>
-      <div class="ai-block" style="flex:2; min-width:180px;">
-        <div class="ai-block-title">🔗 참고 출처</div>
-        <div id="ai-sources" class="ai-block-content">—</div>
-      </div>
     </div>
 
-    <!-- 시설/주의 -->
-    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.8rem;">
-      <div class="ai-block" style="flex:1; min-width:140px;">
-        <div class="ai-block-title">🅿 시설 안내</div>
-        <div id="ai-facilities" class="ai-block-content">—</div>
-      </div>
-      <div class="ai-block" style="flex:1; min-width:140px;">
+    <!-- 주의사항 -->
+    <div style="margin-top:0.8rem;">
+      <div class="ai-block">
         <div class="ai-block-title">⚠️ 주의사항</div>
         <div id="ai-notices" class="ai-block-content">—</div>
       </div>
@@ -1167,18 +1162,17 @@ async function loadAiInfo() {
 
     document.getElementById('ai-era').textContent       = data.era       || '정보 없음';
     document.getElementById('ai-story').textContent     = data.story     || '정보 없음';
-    document.getElementById('ai-facilities').textContent = data.facilities || '정보 없음';
     document.getElementById('ai-notices').textContent   = data.notices   || '정보 없음';
     document.getElementById('ai-food').textContent      = data.food      || '정보 없음';
     document.getElementById('ai-stay').textContent      = data.stay      || '정보 없음';
     document.getElementById('ai-spot').textContent      = data.spot      || '정보 없음';
     document.getElementById('ai-tips').textContent      = data.tips      || '정보 없음';
 
-    // 출처 링크 처리
+    // 출처 뱃지 처리 ("출처 1·출처 2" 형식, 클릭 시 이동)
     const sources = data.sources || [];
     document.getElementById('ai-sources').innerHTML = sources.length
-      ? sources.map(s => `<a href="${s}" target="_blank" style="display:block; color:var(--ocean); font-size:0.8rem; word-break:break-all;">${s}</a>`).join('')
-      : '정보 없음';
+      ? sources.map((s, i) => `<a href="${s}" target="_blank" class="ai-source-badge">출처 ${i+1}</a>`).join('')
+      : '';
 
     showAiSection('result');
   } catch (e) {

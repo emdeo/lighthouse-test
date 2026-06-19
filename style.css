@@ -1861,3 +1861,18 @@ html:has(body.detail-page) {
 .light-bubble-items span {
   display: inline-block;
 }
+/* AI 출처 뱃지 */
+.ai-source-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--sky, #e0f2fe);
+  color: var(--ocean, #0284c7);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ai-source-badge:hover {
+  background: var(--ocean, #0284c7);
+  color: #fff;
+}
