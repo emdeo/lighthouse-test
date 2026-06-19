@@ -1830,6 +1830,7 @@ html:has(body.detail-page) {
   color: #000;
   border-radius: 14px;
   padding: 15px 17px;
+  overflow: visible;
 }
 .light-bubble::before {
   content: "";
