@@ -1826,6 +1826,7 @@ html:has(body.detail-page) {
 .light-bubble {
   position: relative;
   background: #fdf6e3ff;
+  border: 1.5px solid #e8d87f; 
   color: #000;
   border-radius: 14px;
   padding: 15px 17px;
