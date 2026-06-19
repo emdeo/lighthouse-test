@@ -1835,18 +1835,18 @@ html:has(body.detail-page) {
 .light-bubble::before {
   content: "";
   position: absolute;
-  left: -9.5px;
-  top: 19px;
-  border-width: 8px 10px 8px 0;
+  left: -11px;
+  top: 17px;
+  border-width: 10px 12px 10px 0;
   border-style: solid;
   border-color: transparent #e8d87f transparent transparent;
 }
 .light-bubble::after {
   content: "";
   position: absolute;
-  left: -7px;
-  top: 20px;
-  border-width: 7px 9px 7px 0;
+  left: -8px;
+  top: 18.5px;
+  border-width: 8.5px 10px 8.5px 0;
   border-style: solid;
   border-color: transparent #fdf6e3ff transparent transparent;
 }
