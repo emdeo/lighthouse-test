@@ -948,11 +948,6 @@ body.ar-page nav a:hover {
   transition: opacity .3s;
 }
 
-.ar-marker:hover .ar-marker-card {
-  background: rgba(15,25,45,0.92);
-  transform: scale(1.05);
-}
-
 .tag-stamp { background: rgba(245,158,11,0.25); color: #f59e0b; }
 .tag-year  { background: rgba(16,185,129,0.25); color: #10b981; }
 /* ── 하단 정보 패널 ── */
@@ -1205,14 +1200,6 @@ body.ar-page nav a:hover {
     font-size: .72rem;
     padding: 5px 8px;
   }
-
-  .ar-marker-card {
-    padding: 10px 14px;
-    border-radius: 12px;
-  }
-  .ar-marker-name { font-size: .85rem; }
-  .ar-marker-dist { font-size: .75rem; }
-  .ar-marker-tag  { font-size: .65rem; }
 
   #status-bar {
     bottom: 24px;
@@ -1572,7 +1559,6 @@ html:has(body.detail-page) {
   /* 헤더: 로고 + 검색만 */
   #header { padding: 0 .75rem; gap: .6rem; }
   #header nav { display: none; }
-  #mobile-menu-btn { display: none; }
   .header-search { flex: 1; max-width: none; }
   .header-search input { font-size: 1rem; }
 
