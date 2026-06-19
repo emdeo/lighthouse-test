@@ -1836,7 +1836,7 @@ html:has(body.detail-page) {
   content: "";
   position: absolute;
   left: -10px;
-  top: 16px;
+  top: 24px;
   border-width: 8px 10px 8px 0;
   border-style: solid;
   border-color: transparent #e8d87f transparent transparent;
@@ -1845,7 +1845,7 @@ html:has(body.detail-page) {
   content: "";
   position: absolute;
   left: -8px;
-  top: 17px;
+  top: 25px;
   border-width: 7px 9px 7px 0;
   border-style: solid;
   border-color: transparent #fdf6e3ff transparent transparent;
