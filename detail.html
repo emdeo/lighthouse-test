@@ -583,7 +583,7 @@ function buildLightSimCard(code) {
   if (!code) return '';
   const t = code.trim().toUpperCase();
   const col = t.includes('R') ? '#ef4444' : t.includes('G') ? '#22c55e' : t.includes('Y') ? '#eab308' : '#94a3b8';
-  const colName = t.includes('R') ? '빨강' : t.includes('G') ? '초록' : t.includes('Y') ? '노랑' : '흰색';
+  const colName = t.includes('R') ? '빨강' : t.includes('G') ? '초록' : t.includes('Y') ? '노랑' : '흰';
   const mP = code.match(/(\d+(\.\d+)?)s/i);
   const period = mP ? parseFloat(mP[1]) : 4;
   const isFixed = /^F\b/i.test(code) && !/Fl/i.test(code);
