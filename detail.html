@@ -683,15 +683,15 @@ function buildLightSimCard(code) {
       </div>
       <div style="flex:1;min-width:0">
         <div class="light-bubble">
-          <div class="light-bubble-title">등질: 야간에도 항해자가 길을 쉽게 찾을 수 있도록, 불빛의 색깔, 깜빡이는 횟수, 주기를 각각 다르게 정해 놓은 일종의 신호</div>
+          <div class="light-bubble-title">등질이란, 야간에 항해자가 길을 찾도록, 불빛의 색깔·횟수·주기를 다르게 정해 놓은 신호예요</div>
           <div class="light-bubble-code">${code}</div>
           <div class="light-bubble-items">
-            <span>🟢 ${t.includes('R')?'R':t.includes('G')?'G':t.includes('Y')?'Y':'W'} : ${colName}색 불빛</span>
-            ${flashCnt>1?`<span>✨ (${flashCnt}) : ${flashCnt}번 점멸</span>`:''}
-            ${isComposite?`<span>✨ (${cnt1}+${cnt2}) : ${cnt1}+${cnt2}번 점멸</span>`:''}
-            <span>🔆 ${period}s : ${period}초 주기</span>
-            ${height?`<span>📏 ${height}m : 등대 높이</span>`:''}
-            ${range?`<span>☀️ ${range}M : 광달거리 ${range}해리(Mile) *1 Mile = 1.609 kM</span>`:''}
+            <div class="light-bubble-item"><span class="light-bubble-dot" style="background:${col};"></span><b>${t.includes('R')?'R':t.includes('G')?'G':t.includes('Y')?'Y':'W'}</b> ${colName}색 불빛</div>
+            ${flashCnt>1?`<div class="light-bubble-item">✨ <b>${flashCnt}</b>번 점멸</div>`:''}
+            ${isComposite?`<div class="light-bubble-item">✨ <b>${cnt1}+${cnt2}</b>번 점멸</div>`:''}
+            <div class="light-bubble-item">🕐 <b>${period}s</b> 주기</div>
+            ${height?`<div class="light-bubble-item">📏 <b>${height}m</b> 높이</div>`:''}
+            ${range?`<div class="light-bubble-item">☀️ <b>${range}M</b> 광달거리</div>`:''}
           </div>
         </div>
       </div>
