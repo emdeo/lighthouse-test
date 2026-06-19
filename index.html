@@ -209,14 +209,8 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
-    <!-- 추천 등대 목록 -->
-    <div class="lh-list-title">추천 등대 목록</div>
-    <div id="lh-list"></div>
-
   </aside>
 
   <!-- MAP -->
@@ -659,8 +653,6 @@ function selectLighthouse(lh) {
 // ════════════════════════════════════════
 function openPopup(lh, markerEl) {
   activeId = lh.id;
-  if (typeof renderList === "function") renderList();
-
   const popup = document.getElementById("popup");
 
   // 내용 채우기
@@ -849,7 +841,6 @@ function closePopup() {
   document.getElementById("popup").classList.remove("visible");
   activeId = null;
   renderMarkers();
-  renderList();
 }
 
 document.getElementById("popup-close").addEventListener("click", () => {
@@ -867,54 +858,6 @@ document.getElementById("popup-close").addEventListener("click", () => {
   }
   closePopup();
 });
-
-
-// ════════════════════════════════════════
-//  사이드 목록 렌더링
-// ════════════════════════════════════════
-function renderList() {
-  const container = document.getElementById("lh-list");
-  const filtered  = getFilteredList();
-
-  if (!filtered.length) {
-    container.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--gray3);font-size:.82rem;">검색 결과가 없습니다</div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map((lh, i) => {
-    const isActive = lh.id === activeId;
-    const tagHtml = (lh.tags || []).map(t => {
-      const c = TAG_INFO[t];
-      if (!c) return "";
-      return `<span class="lh-tag" style="background:${c.color};color:${c.text};">${c.label}</span>`;
-    }).join("");
-    return `
-      <div class="lh-item ${isActive ? "active" : ""}" data-id="${lh.id}">
-        <div class="lh-rank">${i+1}</div>
-        <div class="lh-thumb">${lh.emoji}</div>
-        <div class="lh-info">
-          <div class="lh-name">${lh.name}</div>
-          <div class="lh-loc">${lh.region}</div>
-        </div>
-        <div class="lh-tags">${tagHtml}</div>
-      </div>
-    `;
-  }).join("");
-
-  // 클릭 이벤트
-  container.querySelectorAll(".lh-item").forEach(item => {
-    item.addEventListener("click", () => {
-      const dataId = item.dataset.id;
-      // 샘플 데이터 + 해양조사원 데이터 둘 다에서 찾기
-      const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
-      const lh = allData.find(l => String(l.id) === String(dataId));
-      if (!lh) return;
-
-      // 카카오 지도 등대면 panTo로 이동 + 팝업 열기
-      selectLighthouse(lh);
-    });
-  });
-}
 
 // ════════════════════════════════════════
 //  필터 상태 — JS 객체가 유일한 진실
@@ -1003,7 +946,6 @@ document.querySelectorAll(".filter-child").forEach(el => {
 
     syncFilterUI();
     renderMarkers();
-    renderList();
     if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
   });
 });
@@ -1030,7 +972,6 @@ document.getElementById("btn-all").addEventListener("click", () => {
   syncFilterUI();
   closePopup();
   renderMarkers();
-  renderList();
    if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
 });
 
@@ -1047,11 +988,11 @@ document.getElementById("month-year-select").addEventListener("change", () => {
   // 월 선택 초기화
   document.getElementById("month-month-select").value = "";
   syncFilterUI();
-  renderMarkers(); renderList();
+  renderMarkers(); 
   if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
 });
 document.getElementById("month-month-select").addEventListener("change", () => {
-  renderMarkers(); renderList();
+  renderMarkers(); 
   if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
 });
 // 초기 UI 동기화
@@ -1110,7 +1051,6 @@ function renderSearchDropdown() {
 document.getElementById("search-input").addEventListener("input", e => {
   searchQuery = e.target.value.trim();
   renderSearchDropdown(); // ← 드롭다운에 결과 표시
-  // renderList()는 호출하지 않음 (추천 목록과 분리)
 });
 
 // 검색창 바깥 클릭 시 드롭다운 닫기
@@ -1172,11 +1112,7 @@ document.querySelectorAll(".map-ctrl-btn").forEach(btn => {
     }
   });
 });
-// ════════════════════════════════════════
-//  초기 렌더
-// ════════════════════════════════════════
 renderMarkers();
-renderList();
 
 // ════════════════════════════════════════
 //  카카오 지도 초기화

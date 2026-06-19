@@ -114,10 +114,8 @@
   }
   .panel-section {
     padding: 1rem 1.1rem;
-    border-bottom: 1px solid var(--gray2);
-    max-height: 60vh;
+    flex: 1;
     overflow-y: auto;
-    flex-shrink: 0;
   }
   .panel-section-title {
     font-size: .7rem; font-weight: 700;
@@ -149,17 +147,6 @@
   }
   .filter-dot {
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-
-  /* lighthouse list */
-  #lh-list { flex: 1; overflow-y: auto; min-height: 0; }
-  #lh-list::-webkit-scrollbar { width: 3px; }
-  #lh-list::-webkit-scrollbar-thumb { background: var(--gray2); border-radius: 2px; }
-  .lh-list-title {
-    padding: .9rem 1.1rem .4rem;
-    font-size: .7rem; font-weight: 700;
-    letter-spacing: .1em; text-transform: uppercase;
-    color: var(--gray3);
   }
   .lh-item {
     display: flex; align-items: center; gap: .8rem;
