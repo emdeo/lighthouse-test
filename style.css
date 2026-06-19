@@ -1835,9 +1835,9 @@ html:has(body.detail-page) {
 .light-bubble::before {
   content: "";
   position: absolute;
-  left: -11px;
-  top: 17px;
-  border-width: 10px 12px 10px 0;
+  left: -10px;
+  top: 16px;
+  border-width: 8px 10px 8px 0;
   border-style: solid;
   border-color: transparent #e8d87f transparent transparent;
 }
@@ -1845,8 +1845,8 @@ html:has(body.detail-page) {
   content: "";
   position: absolute;
   left: -8px;
-  top: 18.5px;
-  border-width: 8.5px 10px 8.5px 0;
+  top: 17px;
+  border-width: 7px 9px 7px 0;
   border-style: solid;
   border-color: transparent #fdf6e3ff transparent transparent;
 }
