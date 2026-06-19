@@ -1196,7 +1196,14 @@ async function loadAiInfo() {
     showAiSection('result');
   } catch (e) {
     clearInterval(aiStepTimer);
-    document.getElementById('ai-error').textContent = '정보를 불러오지 못했어요: ' + e.message;
+    const q = encodeURIComponent(lh.name.replace(/\n/g, ' ').trim());
+    document.getElementById('ai-error').innerHTML = `
+      <div style="margin-bottom:0.8rem;">정보를 불러오지 못했어요: ${e.message}</div>
+      <div style="font-size:0.82rem; color:var(--gray4); margin-bottom:0.6rem;">대신 검색으로 등대 정보를 찾아보세요</div>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <a href="https://search.naver.com/search.naver?query=${q}" target="_blank" class="ai-search-btn ai-search-naver">N 네이버 검색</a>
+        <a href="https://www.google.com/search?q=${q}" target="_blank" class="ai-search-btn ai-search-google">G 구글 검색</a>
+      </div>`;
     showAiSection('error');
   }
 }

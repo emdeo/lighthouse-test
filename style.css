@@ -1876,3 +1876,16 @@ html:has(body.detail-page) {
   background: var(--ocean, #0284c7);
   color: #fff;
 }
+/* AI 폴백 검색 버튼 */
+.ai-search-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+}
+.ai-search-naver { background: #03c75a; }
+.ai-search-google { background: #4285f4; }
+.ai-search-btn:hover { opacity: 0.88; }
