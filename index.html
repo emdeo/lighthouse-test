@@ -376,10 +376,23 @@ function findYearData(name, lat, lng) {
 }
 
 // 이달의 등대 데이터 매칭 (이름만 비교, 공백 제거)
-function findMonthlyData(name) {
+function findMonthlyData(name, lat, lng) {
   if (!window.MONTHLY_LIGHTHOUSE_DATA) return null;
   const clean = n => n.replace(/\s+/g, "");
-  return window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === clean(name)) || null;
+  const cleanName = clean(name);
+
+  // 동명이인 등대 예외 처리: 이름만으로 구분 안 되는 경우, 좌표로 한 번 더 확인
+  const DUPLICATE_NAME_COORDS = {
+    "대진항남방파제등대": { lat: 36.5581667, lng: 129.4345556 },
+  };
+  const exception = DUPLICATE_NAME_COORDS[cleanName];
+  if (exception) {
+    if (lat == null || lng == null) return null;
+    const isMatch = Math.abs(lat - exception.lat) <= 0.001 && Math.abs(lng - exception.lng) <= 0.001;
+    return isMatch ? (window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === cleanName) || null) : null;
+  }
+
+  return window.MONTHLY_LIGHTHOUSE_DATA.find(m => clean(m.name) === cleanName) || null;
 }
 
 function findStampData(name, lat, lng) {
@@ -1464,7 +1477,7 @@ newMarkers.push(marker);
       // 스탬프 데이터 매칭
       const stamp = findStampData(name, lat, lng);
       const yearInfo = findYearData(name, lat, lng);
-      const monthlyInfo = findMonthlyData(name);
+      const monthlyInfo = findMonthlyData(name, lat, lng);
 
       window.REAL_LIGHTHOUSES.push({
         id: item.id, name,
