@@ -761,7 +761,12 @@ function buildLightSimCard(code) {
     } else {
       block.innerHTML = `
         <div style="font-size:0.85rem; font-weight:700; color:var(--ocean); margin-bottom:0.4rem;">${label}</div>
-        <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.82rem; table-layout:fixed;">
+          <colgroup>
+            <col style="width:32%;">
+            <col style="width:22%;">
+            <col style="width:46%;">
+          </colgroup>
           <thead>
             <tr style="color:var(--gray4); font-size:0.78rem;">
               <th style="padding:3px 6px; font-weight:600; text-align:left;">도착지</th>
