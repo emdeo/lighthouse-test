@@ -1835,21 +1835,20 @@ html:has(body.detail-page) {
 .light-bubble::before {
   content: "";
   position: absolute;
-  left: -7px;
-  top: 20px;
-  border-width: 7px 9px 7px 0;
-  border-style: solid;
-  border-color: transparent #fdf6e3ff transparent transparent;
-}
-.light-bubble::after {
-  content: "";
-  position: absolute;
   left: -9.5px;
   top: 19px;
   border-width: 8px 10px 8px 0;
   border-style: solid;
   border-color: transparent #e8d87f transparent transparent;
-  z-index: 1;
+}
+.light-bubble::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 20px;
+  border-width: 7px 9px 7px 0;
+  border-style: solid;
+  border-color: transparent #fdf6e3ff transparent transparent;
 }
 .light-bubble-title {
   font-size: 12.5px;
