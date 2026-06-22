@@ -227,15 +227,20 @@
   z-index: 60;
   }
   .map-ctrl-btn {
-    width: 36px; height: 36px;
+    width: 44px; height: 44px;
     background: var(--white); border: none;
     border-radius: 8px; box-shadow: var(--shadow);
-    font-size: 1rem; cursor: pointer; color: var(--gray4);
+    font-size: 1.25rem; cursor: pointer; color: var(--gray4);
     display: flex; align-items: center; justify-content: center;
     transition: background .15s, color .15s;
   }
   .map-ctrl-btn:hover { background: var(--navy); color: var(--white); }
-
+  .map-ctrl-btn.layer-btn {
+    font-size: .72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .map-ctrl-btn.active { background: var(--navy); color: var(--white); }
   /* layer toggle */
   .map-layer-btn {
     position: absolute; right: 1rem; bottom: 3rem;
