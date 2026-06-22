@@ -1382,7 +1382,7 @@ async function renderLhGallery() {
   const photos = await LhPhotoDB.list(lhId);
   if (!photos.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:#aaa;font-size:13px;">
-      📭 등록된 사진이 없어요<br><span style="font-size:11px">📸 버튼으로 사진을 찍어보세요</span></div>`;
+    등록된 사진이 없어요<br><span style="font-size:11px">📸 버튼으로 사진을 찍어보세요</span></div>`;
     return;
   }
   grid.innerHTML = photos.map(p => `
