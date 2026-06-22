@@ -591,7 +591,14 @@ const storyEl1 = document.getElementById("detail-story");
 const tagsEl = document.getElementById("detail-tags");
 tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
   const info = TAG_INFO[t];
-  return `<span class="detail-tag" style="background:${info.color};color:${info.text};">${info.label}</span>`;
+  let label = info.label;
+  if (t === "year" && yearInfo && yearInfo.year) {
+    label = `${info.label} - ${yearInfo.year}`;
+  } else if (t === "month" && monthlyInfo && monthlyInfo.year && monthlyInfo.month) {
+    const mm = String(monthlyInfo.month).padStart(2, "0");
+    label = `${info.label} - ${monthlyInfo.year}.${mm}`;
+  }
+  return `<span class="detail-tag" style="background:${info.color};color:${info.text};">${label}</span>`;
 }).join("");
 
 // 등질 시각화

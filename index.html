@@ -690,11 +690,18 @@ window.location.href = `detail.html?${params.toString()}`;
     badges.push(`<span class="popup-badge" style="background:#fef3c7;color:#92400e;">스탬프 투어 - ${catLabel}</span>`);
   }
 
-  // 올해의 등대, 이달의 등대 라벨
+// 올해의 등대, 이달의 등대 라벨 (연도/월 포함)
   (lh.tags || []).filter(t => t !== "stamp").forEach(t => {
     const info = TAG_INFO[t];
     if (!info) return;
-    badges.push(`<span class="popup-badge" style="background:${info.color};color:${info.text};">${info.label}</span>`);
+    let label = info.label;
+    if (t === "year" && lh.yearData && lh.yearData.year) {
+      label = `${info.label} - ${lh.yearData.year}`;
+    } else if (t === "month" && lh.monthlyData && lh.monthlyData.year && lh.monthlyData.month) {
+      const mm = String(lh.monthlyData.month).padStart(2, "0");
+      label = `${info.label} - ${lh.monthlyData.year}.${mm}`;
+    }
+    badges.push(`<span class="popup-badge" style="background:${info.color};color:${info.text};">${label}</span>`);
   });
 
   metaEl.innerHTML = badges.join("");
