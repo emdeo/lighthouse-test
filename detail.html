@@ -474,14 +474,14 @@ fetch(`${CONFIG.WEATHER_API_URL}/image?name=${encodeURIComponent(lh.name.replace
   .then(data => {
     if (data.url) {
       const hero = document.getElementById('detail-hero');
-      hero.style.background = '#f1f5f9';
+      hero.style.background = '#fff';
       hero.style.height = '220px';
       hero.style.padding = '0';
       hero.style.cursor = 'pointer';
       hero.style.overflow = 'hidden';
       const img = document.createElement('img');
       img.src = data.url;
-      img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; border-radius:var(--radius);';
+      img.style.cssText = 'width:100%; height:100%; object-fit:contain; display:block; border-radius:var(--radius); background:#fff;';
       hero.innerHTML = '';
       hero.appendChild(img);
       // 클릭하면 전체화면 뷰어로
