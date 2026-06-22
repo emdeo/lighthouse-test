@@ -230,7 +230,7 @@
 </div>
       <!-- 지도 컨트롤 -->
       <div class="map-controls">
-        <button class="map-ctrl-btn" title="레이어">🗂</button>
+        <button class="map-ctrl-btn" title="레이어">🗺️</button>
         <button class="map-ctrl-btn" title="현위치">⦿</button>
         <button class="map-ctrl-btn" title="확대">＋</button>
         <button class="map-ctrl-btn" title="축소">－</button>
@@ -1097,6 +1097,11 @@ document.querySelectorAll(".map-ctrl-btn").forEach(btn => {
       if (myLat && myLng) {
         window.kakaoMap.setLevel(6);
         window.kakaoMap.panTo(new kakao.maps.LatLng(myLat, myLng));      }
+    }
+    if (title === "레이어") {
+      const isSatellite = window.kakaoMap.getMapTypeId() === kakao.maps.MapTypeId.HYBRID;
+      window.kakaoMap.setMapTypeId(isSatellite ? kakao.maps.MapTypeId.ROADMAP : kakao.maps.MapTypeId.HYBRID);
+      btn.classList.toggle("active", !isSatellite);
     }
   });
 });
