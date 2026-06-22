@@ -175,13 +175,13 @@
 
   <!-- 주차장 정보 -->
   <div class="section-card">
-    <div class="section-title">🅿 근처 주차장 (1km 이내)</div>
+    <div class="section-title">🅿 근처 공영주차장</div>
     <div id="detail-parking"><div class="data-empty">주차장 정보를 불러오는 중...</div></div>
   </div>
 
   <!-- 화장실 정보 -->
     <div class="section-card">
-      <div class="section-title">🚻 근처 화장실 (500m 이내)</div>
+      <div class="section-title">🚻 근처 공중화장실</div>
       <div id="detail-toilet"><div class="data-empty">화장실 정보를 불러오는 중...</div></div>
     </div>
 
@@ -1121,13 +1121,13 @@ if (lh.lat && lh.lng) {
 }
 
 // 주차장 정보 로드
-fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${lh.lng}&y=${lh.lat}&radius=1000&sort=distance`, {
+fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=공영주차장&x=${lh.lng}&y=${lh.lat}&sort=distance`, {
   headers: { 'Authorization': `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
 })
 .then(r => r.json())
 .then(data => {
   const parkingEl = document.getElementById('detail-parking');
-  const filtered = (data.documents || []).filter(p => p.place_name.includes('공영'));
+  const filtered = (data.documents || []).slice(0, 3);
   if (filtered.length === 0) {
     parkingEl.innerHTML = '<div class="data-empty">근처 공영주차장 정보가 없습니다</div>';
     return;
@@ -1154,17 +1154,18 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=주차장&x=${l
 });
 
 // 화장실 정보 로드
-fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=화장실&x=${lh.lng}&y=${lh.lat}&radius=500&sort=distance`, {
+fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=공중화장실&x=${lh.lng}&y=${lh.lat}&sort=distance`, {
   headers: { 'Authorization': `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
 })
 .then(r => r.json())
 .then(data => {
   const toiletEl = document.getElementById('detail-toilet');
-  if (!data.documents || data.documents.length === 0) {
+  const filtered = (data.documents || []).slice(0, 3);
+  if (filtered.length === 0) {
     toiletEl.innerHTML = '<div class="data-empty">근처 화장실 정보가 없습니다</div>';
     return;
   }
-  toiletEl.innerHTML = data.documents.map(p => `
+  toiletEl.innerHTML = filtered.map(p => `
     <div style="padding: 0.7rem 0; border-bottom: 1px solid var(--gray2); display:flex; justify-content:space-between; align-items:center; gap:0.8rem;">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
