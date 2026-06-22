@@ -579,7 +579,7 @@ tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
 
 // 등질 시각화
 (function() {
-  if (!lh.light) {
+  if (!lh.light || lh.name.includes("등표")) {
     document.getElementById('section-basic-info').style.display = 'none';
     return;
   }
