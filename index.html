@@ -664,7 +664,7 @@ function openPopup(lh, markerEl) {
     .catch(() => {});
 
 document.getElementById("popup-name").textContent = lh.name;
-document.getElementById("popup-desc").textContent = (lh.region ? lh.region + " · " : "") + (lh.desc || "");
+document.getElementById("popup-desc").textContent = [lh.region, lh.desc].filter(Boolean).join(" · ");
 document.getElementById("popup-header-link").onclick = () => {
   const params = new URLSearchParams({
   id:     lh.id   || "",
@@ -1415,7 +1415,7 @@ newMarkers.push(marker);
         nameEn: item.nameEn || "",
         sea: item.sea || "",
         region: item.sea,
-        desc: stamp ? stamp.intro : (item.light || ""),
+        desc: stamp ? stamp.intro : "",
         emoji: stamp ? "🏆" : yearInfo ? "🌟" : "🔦",
         tags: [
           ...(stamp ? ["stamp"] : []),
