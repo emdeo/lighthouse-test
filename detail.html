@@ -117,9 +117,9 @@
 
   <!-- 길찾기 -->
   <div class="section-card">
-    <div class="dir-buttons">
-      <button class="dir-btn dir-naver" id="btn-naver">네이버지도 길찾기</button>
-      <button class="dir-btn dir-kakao" id="btn-kakao">카카오맵 길찾기</button>
+    <div class="detail-dir-buttons">
+      <button class="detail-dir-btn detail-dir-naver" id="btn-naver">네이버지도 길찾기</button>
+      <button class="detail-dir-btn detail-dir-kakao" id="btn-kakao">카카오맵 길찾기</button>
     </div>
   </div>
 
@@ -134,9 +134,9 @@
   <div class="section-card">
     <div class="section-title">🌤 현재 날씨</div>
     <div class="weather-box">
-      <div class="weather-icon">☀️</div>
+      <div class="detail-weather-icon">☀️</div>
       <div style="flex:1;">
-        <div class="weather-temp">—°</div>
+        <div class="detail-weather-temp">—°</div>
         <div class="weather-label">날씨 정보 준비 중 (API 연결 예정)</div>
       </div>
       <div id="today-travel-badge" style="padding:0.4rem 0.8rem; border-radius:20px; font-size:0.82rem; font-weight:600; text-align:center; background:var(--gray2); color:var(--gray4); align-self:center; flex-shrink:0;">
@@ -866,9 +866,9 @@ if (lh.lat && lh.lng) {
       const dirs     = ["북","북동","동","남동","남","남서","서","북서"];
       const windDir  = dirs[Math.round(windDeg / 45) % 8];
 
-      document.querySelector(".weather-icon").innerHTML =
+      document.querySelector(".detail-weather-icon").innerHTML =
         `<img src="https://openweathermap.org/img/wn/${icon}@2x.png" style="width:56px;height:56px;">`;
-      document.querySelector(".weather-temp").textContent = temp + "°C";
+      document.querySelector(".detail-weather-temp").textContent = temp + "°C";
       document.querySelector(".weather-label").innerHTML =
         `${desc} · 체감 ${feels}°C<br>💨 ${windDir} ${wind}m/s · 💧 습도 ${humidity}% · ☁️ 구름 ${cloud}%`;
     })

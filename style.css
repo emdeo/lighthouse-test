@@ -1221,63 +1221,6 @@ body.ar-page nav a:hover {
   order: 1;
   margin-left: auto;
 }
-
-
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { font-family: var(--font-sans); color: var(--text); background: var(--sand); min-height: 100vh; }
-
-  /* ── HEADER ── */
-  #header {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-    height: var(--header-h);
-    background: var(--white);
-    border-bottom: 1px solid var(--gray2);
-    display: flex; align-items: center;
-    padding: 0 1.5rem;
-    gap: 1.5rem;
-    box-shadow: 0 2px 8px rgba(27,46,75,0.07);
-  }
-  .logo {
-    display: flex; align-items: center; gap: .55rem;
-    font-family: var(--font-serif);
-    font-size: 1.1rem; font-weight: 900;
-    color: var(--navy); white-space: nowrap;
-    text-decoration: none;
-    flex-shrink: 0;
-  }
-  .logo-beacon {
-    width: 28px; height: 28px;
-    background: var(--navy);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .9rem;
-    position: relative;
-  }
-  .logo-beacon::after {
-    content: '';
-    position: absolute; top: -3px; left: 50%; transform: translateX(-50%);
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--amber);
-    animation: beacon-pulse 2s ease-out infinite;
-  }
-  @keyframes beacon-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(245,158,11,.7); }
-    70%  { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
-    100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-  }
-  nav { margin-left: auto; display: flex; align-items: center; gap: .25rem; }
-  nav a {
-    padding: .4rem .85rem;
-    font-size: .8rem; font-weight: 500;
-    color: var(--gray4); text-decoration: none;
-    border-radius: 6px;
-    transition: background .15s, color .15s;
-    white-space: nowrap;
-  }
-  nav a:hover { background: var(--gray1); color: var(--navy); }
-  nav a.active { background: var(--navy); color: var(--white); }
-
   /* ── PAGE CONTENT ── */
   #page {
     padding-top: calc(var(--header-h) + 2rem);
@@ -1397,18 +1340,18 @@ body.ar-page nav a:hover {
   .ferry-route { color: var(--gray3); font-size: .78rem; }
   .ferry-avail { font-size: .76rem; color: var(--teal); font-weight: 600; }
 
-  /* direction buttons */
-  .dir-buttons { display: flex; gap: .6rem; }
-  .dir-btn {
+  /* direction buttons (detail.html 전용) */
+  .detail-dir-buttons { display: flex; gap: .6rem; }
+  .detail-dir-btn {
     flex: 1; padding: .65rem .5rem;
     border: none; border-radius: 8px;
     font-family: var(--font-sans); font-size: .8rem; font-weight: 700;
     cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .35rem;
     transition: opacity .15s, transform .1s;
   }
-  .dir-btn:hover { opacity: .88; transform: translateY(-1px); }
-  .dir-naver { background: #03c75a; color: var(--white); }
-  .dir-kakao { background: #fee500; color: #3c1e1e; }
+  .detail-dir-btn:hover { opacity: .88; transform: translateY(-1px); }
+  .detail-dir-naver { background: #03c75a; color: var(--white); }
+  .detail-dir-kakao { background: #fee500; color: #3c1e1e; }
 
   /* reserve button */
   .reserve-btn {
@@ -1421,15 +1364,15 @@ body.ar-page nav a:hover {
   }
   .reserve-btn:hover { background: var(--ocean); }
 
-  /* weather placeholder */
+  /* weather placeholder (detail.html 전용) */
   .weather-box {
     display: flex; align-items: center; gap: 1rem;
     padding: 1rem 1.2rem;
     background: var(--sky);
     border-radius: 10px;
   }
-  .weather-icon { font-size: 2.5rem; }
-  .weather-temp { font-size: 1.8rem; font-weight: 900; color: var(--navy); font-family: var(--font-serif); }
+  .detail-weather-icon { font-size: 2.5rem; }
+  .detail-weather-temp { font-size: 1.8rem; font-weight: 900; color: var(--navy); font-family: var(--font-serif); }
   .weather-label { font-size: .78rem; color: var(--gray4); margin-top: .15rem; }
 
   /* gallery placeholder */
@@ -1786,11 +1729,24 @@ html:has(body.detail-page) {
 .ai-search-google { background: #4285f4; }
 .ai-search-btn:hover { opacity: 0.88; }
 .link-section-title {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gray4, #6b7280);
-  margin: 1rem 0 0.4rem;
-  padding-top: 0.85rem;
+  margin: 1.3rem 0 0;
+  padding-top: 1.2rem;
   border-top: 1px solid var(--gray2, #e5e7eb);
   letter-spacing: 0.02em;
+}
+
+.link-section-desc {
+  font-size: 0.78rem;
+  color: var(--gray4, #9ca3af);
+  margin: 0rem 0 0.5rem;
+  line-height: 1.4;
+}
+
+.link-icon svg.icon-svg {
+  width: 28px;
+  height: 28px;
+  color: var(--ocean, #1a73c2);
 }
