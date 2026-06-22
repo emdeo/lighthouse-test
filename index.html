@@ -216,18 +216,6 @@
       <!-- 마커들 -->
       <div id="markers-layer"></div>
 
-      
-<!-- 해무 CCTV 모달 -->
-<div id="fog-cctv-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:#fff; border-radius:16px; padding:1.5rem; width:90%; max-width:480px; max-height:80vh; overflow-y:auto; position:relative;">
-    <button onclick="document.getElementById('fog-cctv-modal').style.display='none'" style="position:absolute; top:0.8rem; right:0.8rem; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--gray4);">✕</button>
-    <div style="font-size:1rem; font-weight:700; margin-bottom:0.3rem;">📷 해무 CCTV</div>
-    <div id="fog-cctv-modal-station" style="font-size:0.78rem; color:var(--gray4); margin-bottom:1rem;"></div>
-    <div id="fog-cctv-modal-content">
-      <div style="text-align:center; color:var(--gray4); padding:2rem;">불러오는 중...</div>
-    </div>
-  </div>
-</div>
       <!-- 지도 컨트롤 -->
       <div class="map-controls">
         <button class="map-ctrl-btn layer-btn" title="레이어">위성<br>지도</button>
@@ -238,6 +226,18 @@
 
       <div class="map-scale">— 50 km</div>
       <div class="map-attr">© 카카오맵 / 네이버 지도 연동 예정</div>
+    </div>
+  </div>
+</div>
+
+<!-- 해무 CCTV 모달 -->
+<div id="fog-cctv-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:16px; padding:1.5rem; width:90%; max-width:480px; max-height:80vh; overflow-y:auto; position:relative;">
+    <button onclick="document.getElementById('fog-cctv-modal').style.display='none'" style="position:absolute; top:0.8rem; right:0.8rem; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--gray4);">✕</button>
+    <div style="font-size:1rem; font-weight:700; margin-bottom:0.3rem;">📷 해무 CCTV</div>
+    <div id="fog-cctv-modal-station" style="font-size:0.78rem; color:var(--gray4); margin-bottom:1rem;"></div>
+    <div id="fog-cctv-modal-content">
+      <div style="text-align:center; color:var(--gray4); padding:2rem;">불러오는 중...</div>
     </div>
   </div>
 </div>
