@@ -53,20 +53,6 @@
   </div>
 </div>
 
-<!-- 온보딩 오버레이 -->
-<div id="onboarding">
-  <div id="onboarding-card">
-    <div id="onboarding-title">🔆 안녕, 등대 사용법</div>
-    <div id="onboarding-body">
-      <div class="ob-row">
-        <div class="ob-highlight">옵션 필터</div>
-        <div class="ob-desc">등대 위치 확인</div>
-      </div>
-    </div>
-    <button id="onboarding-close">확인했어요</button>
-  </div>
-</div>
-
 <!-- ── HEADER ── -->
 <header id="header">
   <a href="index.html" class="logo">
@@ -1072,11 +1058,6 @@ document.getElementById("links-overlay").addEventListener("click", e => {
   if (e.target === document.getElementById("links-overlay")) {
     document.getElementById("links-overlay").classList.remove("visible");
   }
-});
-
-// 온보딩 닫기
-document.getElementById("onboarding-close").addEventListener("click", () => {
-  document.getElementById("onboarding").style.display = "none";
 });
 // ── 패널 접기/펼치기 ──
 const panelToggleBtn = document.getElementById("panel-toggle");
