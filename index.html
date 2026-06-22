@@ -727,7 +727,7 @@ window.location.href = `detail.html?${params.toString()}`;
 
   // 길찾기 딥링크
   document.getElementById("btn-naver").onclick = () => {
-    const url = `https://map.naver.com/v5/search/${encodeURIComponent(lh.name)}`;
+    const url = `https://map.naver.com/p/search/${encodeURIComponent(lh.name)}`;
     window.open(url, "_blank");
     showToast("네이버 지도로 이동합니다");
   };
