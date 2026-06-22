@@ -70,6 +70,7 @@ async function main() {
  const EXCLUDE_IDS = [
     "1204_A",
     "2537.2",
+    "3306.5",
   ];
 
   const filtered = allItems
