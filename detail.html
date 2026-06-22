@@ -3,7 +3,8 @@
 <head>
   <script src="config.js"></script>
   <script src="port_data.js"></script>
-<script src="stamp_data.js"></script>
+<script src="lighthouses.js"></script>
+<script src="year_data.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>등대 상세 정보 — 안녕, 등대</title>
@@ -54,6 +55,11 @@
     <img src="문어등대.png" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
     <span>안녕, 등대</span>
   </a>
+  <div class="header-search" style="position:relative;">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="검색: 등대 이름 입력" autocomplete="off">
+    <div id="search-dropdown"></div>
+  </div>
   <nav>
     <a href="index.html">등대 지도</a>
     <a href="news.html">실시간 등대 식별</a>
@@ -430,8 +436,8 @@ const lh = {
   lng:           parseFloat(getParam("lng"))  || null,
   region:        getParam("region") || "",
   desc:          getParam("desc")   || "",
-  tags:          getParam("tags")   ? getParam("tags").split(",") : [],
-  stampCategory: getParam("stampCategory") || "",
+  tags:          [],
+  stampCategory: "",
   builtYear:  null,
   height:     null,
   lightRange: null,
@@ -520,6 +526,25 @@ if (cultureVal) { document.getElementById('detail-sub-culture').textContent = cu
 const monthlyInfo = (typeof MONTHLY_LIGHTHOUSE_DATA !== 'undefined')
   ? MONTHLY_LIGHTHOUSE_DATA.find(m => m.name.replace(/\s/g,'') === lh.name.replace(/\s/g,'')) || null
   : null;
+
+// 올해의 등대 매칭 (이름 + 좌표 오차범위)
+const yearInfo = (typeof YEAR_DATA !== 'undefined')
+  ? YEAR_DATA.find(y => {
+      const clean = n => n.replace(/\s/g, '').replace(/\(.*?\)/g, '');
+      if (clean(y.name) !== clean(lh.name)) return false;
+      if (!y.lat || !y.lng || !lh.lat || !lh.lng) return true;
+      return Math.abs(y.lat - lh.lat) <= 0.01 && Math.abs(y.lng - lh.lng) <= 0.01;
+    }) || null
+  : null;
+
+// 배지(태그)는 URL 파라미터가 아니라 직접 매칭한 결과로 결정
+// → 지도에서 들어오든 검색에서 들어오든 항상 정확하게 표시됨 (C안)
+lh.tags = [
+  ...(stampInfo  ? ["stamp"] : []),
+  ...(yearInfo   ? ["year"]  : []),
+  ...(monthlyInfo ? ["month"] : []),
+];
+lh.stampCategory = stampInfo ? (stampInfo.category || "") : "";
 
 if (monthlyInfo && lh.tags.includes('month')) {
   // 파란 박스: desc
@@ -1419,6 +1444,71 @@ async function deleteLhPhoto(photoId) {
 
 // 페이지 로드 시 갤러리 렌더
 renderLhGallery();
+
+// ════════════════════════════════════════
+//  헤더 검색 (다른 등대로 바로 이동)
+// ════════════════════════════════════════
+function renderDetailSearchDropdown() {
+  const dropdown = document.getElementById("search-dropdown");
+  const query = document.getElementById("search-input").value.trim();
+
+  if (!query) {
+    dropdown.classList.remove("visible");
+    dropdown.innerHTML = "";
+    return;
+  }
+
+  const allData = [
+    ...(typeof LIGHTHOUSE_DATA !== 'undefined' ? LIGHTHOUSE_DATA : []),
+    ...(typeof LIGHTHOUSE_CUSTOM_DATA !== 'undefined' ? LIGHTHOUSE_CUSTOM_DATA : []),
+  ];
+  const cleanQuery = query.replace(/\s/g, '');
+  const results = allData.filter(item =>
+    item.name && item.name.replace(/\s/g, '').includes(cleanQuery)
+  );
+
+  if (!results.length) {
+    dropdown.innerHTML = `<div class="search-no-result">검색 결과가 없습니다</div>`;
+  } else {
+    dropdown.innerHTML = results.map(item => `
+      <div class="search-result-item" data-id="${item.id}">
+        <span>🔦</span>
+        <div>
+          <div class="sr-name">${(item.name || "").replace(/\n/g, ' ')}</div>
+          <div class="sr-region">${item.sea || ""}</div>
+        </div>
+      </div>
+    `).join("");
+
+    dropdown.querySelectorAll(".search-result-item").forEach(el => {
+      el.addEventListener("click", () => {
+        const item = allData.find(i => String(i.id) === String(el.dataset.id));
+        if (!item) return;
+        const params = new URLSearchParams({
+          id:     item.id     || "",
+          name:   item.name   || "",
+          nameEn: item.nameEn || "",
+          sea:    item.sea    || "",
+          light:  item.light  || "",
+          lat:    item.lat    || "",
+          lng:    item.lng    || "",
+          region: item.sea    || "",
+        });
+        window.location.href = `detail.html?${params.toString()}`;
+      });
+    });
+  }
+
+  dropdown.classList.add("visible");
+}
+
+document.getElementById("search-input").addEventListener("input", renderDetailSearchDropdown);
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".header-search")) {
+    document.getElementById("search-dropdown").classList.remove("visible");
+  }
+});
 </script>
 </body>
 </html>
