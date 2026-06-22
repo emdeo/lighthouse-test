@@ -1456,6 +1456,13 @@ newMarkers.push(marker);
     // 처음 로드 시 바로 필터 적용해서 표시
     window.redrawLighthouseMarkers();
     console.log(`✅ 등대 데이터 ${markers.length}개 로드 완료`);
+
+    // detail.html에서 "지도로 돌아가기"로 돌아온 경우, 그 등대를 바로 선택
+    const focusId = new URLSearchParams(window.location.search).get("focus");
+    if (focusId) {
+      const target = window.REAL_LIGHTHOUSES.find(l => String(l.id) === String(focusId));
+      if (target) selectLighthouse(target);
+    }
     // 필터 카운트 표시
     (function() {
       const all = window.REAL_LIGHTHOUSES || [];
