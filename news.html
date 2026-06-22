@@ -226,12 +226,22 @@ function prepareLighthouses() {
         name: d.name,
         region: d.sea || "",
         lat: d.lat, lng: d.lng,
+        light: d.light || "",
         desc: stamp ? stamp.intro : (d.light || ""),
         isStamp: !!stamp,
         isYear:  !!year,
         stampCat: stamp ? stamp.category : null,
       };
     });
+}
+
+// 등질 코드(R/G/Y) → 마커 색상 매핑
+function getLightColors(code) {
+  const t = (code || "").toUpperCase();
+  if (t.includes("R")) return { main:"#ef4444", light:"#fca5a5", dark:"#b91c1c" };
+  if (t.includes("G")) return { main:"#22c55e", light:"#86efac", dark:"#15803d" };
+  if (t.includes("Y")) return { main:"#eab308", light:"#fde047", dark:"#a16207" };
+  return { main:"#e5e7eb", light:"#f9fafb", dark:"#9ca3af" }; // 흰색 등대
 }
 
 // ════════════════════════════════════════
@@ -280,6 +290,7 @@ function buildMarkers() {
   const occupied = []; // 겹침 체크용 { x, labelY }
 
 candidates.forEach(lh => {
+  const lc      = getLightColors(lh.light);
   const t       = Math.min(lh.dist / maxRange, 1);
   const opacity = Math.max(0.5, 1 - t * 0.5);
   const scale   = Math.max(0.75, 1.2 - t * 0.75);
@@ -355,28 +366,28 @@ candidates.forEach(lh => {
       <div style="width:1px; height:${lineH}px; background:rgba(255,200,80,0.5);"></div>
       <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
         <!-- 등롱 유리 -->
-        <rect x="${cx-topW/2}" y="2" width="${topW}" height="${topH}" rx="2" fill="#FFE066"/>
+        <rect x="${cx-topW/2}" y="2" width="${topW}" height="${topH}" rx="2" fill="${lc.light}"/>
         <!-- 등롱 하우징 -->
-        <rect x="${cx-topW/2}" y="${topH+2}" width="${topW}" height="${Math.round(7*scale)}" rx="1" fill="#E8B800"/>
+        <rect x="${cx-topW/2}" y="${topH+2}" width="${topW}" height="${Math.round(7*scale)}" rx="1" fill="${lc.main}"/>
         <!-- 난간 -->
-        <rect x="${cx-topW/2-Math.round(4*scale)}" y="${topH+Math.round(9*scale)}" width="${topW+Math.round(8*scale)}" height="${Math.round(3*scale)}" rx="1" fill="#C8A000"/>
+        <rect x="${cx-topW/2-Math.round(4*scale)}" y="${topH+Math.round(9*scale)}" width="${topW+Math.round(8*scale)}" height="${Math.round(3*scale)}" rx="1" fill="${lc.dark}"/>
         <!-- 난간 기둥 -->
-        <line x1="${cx-topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx-topW/2}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
-        <line x1="${cx}" y1="${topH+Math.round(9*scale)}" x2="${cx}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
-        <line x1="${cx+topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx+topW/2}" y2="${topH+Math.round(12*scale)}" stroke="#B09000" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <line x1="${cx-topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx-topW/2}" y2="${topH+Math.round(12*scale)}" stroke="${lc.dark}" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <line x1="${cx}" y1="${topH+Math.round(9*scale)}" x2="${cx}" y2="${topH+Math.round(12*scale)}" stroke="${lc.dark}" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
+        <line x1="${cx+topW/2}" y1="${topH+Math.round(9*scale)}" x2="${cx+topW/2}" y2="${topH+Math.round(12*scale)}" stroke="${lc.dark}" stroke-width="${Math.max(1,Math.round(1.5*scale))}"/>
         <!-- 탑 몸통 -->
-        <polygon points="${cx-towerW/2},${topH+Math.round(12*scale)} ${cx+towerW/2},${topH+Math.round(12*scale)} ${cx+baseW/2},${topH+Math.round(12*scale)+towerH} ${cx-baseW/2},${topH+Math.round(12*scale)+towerH}" fill="#FFD700"/>
+        <polygon points="${cx-towerW/2},${topH+Math.round(12*scale)} ${cx+towerW/2},${topH+Math.round(12*scale)} ${cx+baseW/2},${topH+Math.round(12*scale)+towerH} ${cx-baseW/2},${topH+Math.round(12*scale)+towerH}" fill="${lc.main}"/>
         <!-- 줄무늬 1 -->
-        <polygon points="${cx-towerW/2+Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2-Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2},${topH+Math.round(30*scale)} ${cx-towerW/2},${topH+Math.round(30*scale)}" fill="#E8B800" opacity="0.6"/>
+        <polygon points="${cx-towerW/2+Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2-Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2},${topH+Math.round(30*scale)} ${cx-towerW/2},${topH+Math.round(30*scale)}" fill="${lc.dark}" opacity="0.6"/>
         <!-- 줄무늬 2 -->
-        <polygon points="${cx-baseW/2+Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(2*scale)},${topH+Math.round(58*scale)} ${cx-baseW/2+Math.round(2*scale)},${topH+Math.round(58*scale)}" fill="#E8B800" opacity="0.6"/>
+        <polygon points="${cx-baseW/2+Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(2*scale)},${topH+Math.round(58*scale)} ${cx-baseW/2+Math.round(2*scale)},${topH+Math.round(58*scale)}" fill="${lc.dark}" opacity="0.6"/>
         <!-- 창문 -->
-        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(35*scale)}" width="${Math.round(10*scale)}" height="${Math.round(8*scale)}" rx="1" fill="#1a3a6a" stroke="#C8A000" stroke-width="0.8"/>
+        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(35*scale)}" width="${Math.round(10*scale)}" height="${Math.round(8*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 문 -->
-        <rect x="${cx-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH-Math.round(14*scale)}" width="${Math.round(8*scale)}" height="${Math.round(13*scale)}" rx="1" fill="#1a3a6a" stroke="#C8A000" stroke-width="0.8"/>
+        <rect x="${cx-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH-Math.round(14*scale)}" width="${Math.round(8*scale)}" height="${Math.round(13*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 받침대 -->
-        <rect x="${cx-baseW/2-Math.round(2*scale)}" y="${topH+Math.round(12*scale)+towerH}" width="${baseW+Math.round(4*scale)}" height="${baseH}" rx="2" fill="#E8B800"/>
-        <rect x="${cx-baseW/2-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH+baseH}" width="${baseW+Math.round(8*scale)}" height="${Math.round(4*scale)}" rx="1" fill="#C8A000"/>
+        <rect x="${cx-baseW/2-Math.round(2*scale)}" y="${topH+Math.round(12*scale)+towerH}" width="${baseW+Math.round(4*scale)}" height="${baseH}" rx="2" fill="${lc.main}"/>
+        <rect x="${cx-baseW/2-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH+baseH}" width="${baseW+Math.round(8*scale)}" height="${Math.round(4*scale)}" rx="1" fill="${lc.dark}"/>
       </svg>
     `;
     el.addEventListener("click", () => openInfoPanel(lh, distStr));
