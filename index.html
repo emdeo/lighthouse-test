@@ -654,8 +654,10 @@ function openPopup(lh, markerEl) {
     .then(data => {
       if (data.url) {
         popupImg.style.backgroundImage = `url(${data.url})`;
-        popupImg.style.backgroundSize = 'cover';
+        popupImg.style.backgroundSize = 'contain';
         popupImg.style.backgroundPosition = 'center';
+        popupImg.style.backgroundRepeat = 'no-repeat';
+        popupImg.style.backgroundColor = '#fff';
         popupEmoji.style.display = 'none';
       }
     })
