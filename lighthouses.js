@@ -3091,16 +3091,6 @@ const LIGHTHOUSE_DATA =
     "lng": 129.454
   },
   {
-    "id": "1352.4",
-    "name": "제전항\n방파제 등대 조사등",
-    "nameEn": "Jejeon Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 11m",
-    "lat": 35.60775,
-    "lng": 129.45925
-  },
-  {
     "id": "1353",
     "name": "정자항\n남방파제 등대",
     "nameEn": "Jeongja Hang",
@@ -5761,6 +5751,16 @@ const LIGHTHOUSE_DATA =
     "lng": 128.3792778
   },
   {
+    "id": "2189.4",
+    "name": "당포항\n서방파제 서단 등대",
+    "nameEn": "Dangpo Hang W Breakwater  W End",
+    "type": "고정표지",
+    "sea": "남해안",
+    "light": "Fl(2) Y 6s 8.9m 6M",
+    "lat": 34.7927778,
+    "lng": 128.3780556
+  },
+  {
     "id": "2192",
     "name": "추도\n등대",
     "nameEn": "Chudo",
@@ -7049,6 +7049,26 @@ const LIGHTHOUSE_DATA =
     "light": "Fl Y 4s 12m 6M",
     "lat": 34.9463889,
     "lng": 127.8261111
+  },
+  {
+    "id": "2433.13",
+    "name": "광양항\n포스코 인터 C호 씨버스 등대",
+    "nameEn": "Gwangyang Hang No C",
+    "type": "고정표지",
+    "sea": "남해안",
+    "light": "Fl(4) Y 8s 12m 9M",
+    "lat": 34.8862222,
+    "lng": 127.7918889
+  },
+  {
+    "id": "2433.14",
+    "name": "광양항\n포스코 인터 D호 씨버스 등대",
+    "nameEn": "Gwangyang Hang No D",
+    "type": "고정표지",
+    "sea": "남해안",
+    "light": "Fl(4) Y 8s 12m 9M",
+    "lat": 34.8923611,
+    "lng": 127.7934167
   },
   {
     "id": "2433.4",
@@ -8491,16 +8511,6 @@ const LIGHTHOUSE_DATA =
     "lng": 126.8346389
   },
   {
-    "id": "2581.1",
-    "name": "보옥항\n남방파제 등대",
-    "nameEn": "Book Hang S Breakwater",
-    "type": "고정표지",
-    "sea": "남해안",
-    "light": "Fl R 4s 19m 9M",
-    "lat": 34.1300278,
-    "lng": 126.5079722
-  },
-  {
     "id": "2581.2",
     "name": "보옥항\n북방파제 등대",
     "nameEn": "Book Hang N Breakwater",
@@ -8745,7 +8755,7 @@ const LIGHTHOUSE_DATA =
     "name": "화도\n등대",
     "nameEn": "Hwado",
     "type": "고정표지",
-    "sea": "남해���",
+    "sea": "남해안",
     "light": "Fl W 5s 92m 6M",
     "lat": 33.7293611,
     "lng": 126.3573889
@@ -11926,7 +11936,7 @@ const LIGHTHOUSE_DATA =
     "nameEn": "Seonyudo Hang",
     "type": "고정표지",
     "sea": "서해안",
-    "light": "Fl(2) G 6s 14m 8M",
+    "light": "Fl(2) G 6s 14m 7M",
     "lat": 35.8276944,
     "lng": 126.4195556
   },
@@ -11936,7 +11946,7 @@ const LIGHTHOUSE_DATA =
     "nameEn": "Seonyudo Hang",
     "type": "고정표지",
     "sea": "서해안",
-    "light": "Fl(2) R 6s 14m 8M",
+    "light": "Fl(2) R 6s 14m 7M",
     "lat": 35.8268889,
     "lng": 126.4201944
   },
@@ -12989,16 +12999,6 @@ const LIGHTHOUSE_DATA =
     "light": "Fl R 6s 15m 8M",
     "lat": 37.0537222,
     "lng": 126.4514444
-  },
-  {
-    "id": "3306.5",
-    "name": "등대여\n등표",
-    "nameEn": "Deungdaeyeo",
-    "type": "고정표지",
-    "sea": "서해안",
-    "light": "Fl(2) W 5s 16m 7M",
-    "lat": 37.0497222,
-    "lng": 125.9811111
   },
   {
     "id": "3307",
