@@ -579,9 +579,8 @@ tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
 
 // 등질 시각화
 (function() {
-  const row = document.getElementById('light-badge-row');
   if (!lh.light) {
-    row.innerHTML = '<span class="light-badge" style="opacity:.6;">등질 정보 없음</span>';
+    document.getElementById('section-basic-info').style.display = 'none';
     return;
   }
   buildLightSimCard(lh.light);
