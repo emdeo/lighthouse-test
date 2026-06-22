@@ -1785,3 +1785,12 @@ html:has(body.detail-page) {
 .ai-search-naver { background: #03c75a; }
 .ai-search-google { background: #4285f4; }
 .ai-search-btn:hover { opacity: 0.88; }
+.link-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray4, #6b7280);
+  margin: 1rem 0 0.4rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--gray2, #e5e7eb);
+  letter-spacing: 0.02em;
+}
