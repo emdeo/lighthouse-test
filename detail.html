@@ -693,7 +693,7 @@ function buildLightSimCard(code) {
 // 배편 정보 로드
 (async () => {
   if (!lh.lat || !lh.lng) return;
-  const port = findNearestPort(lh.lat, lh.lng, 150);
+  const port = findNearestPort(lh.lat, lh.lng, 250);
   if (!port) return;
 
   const regionKeywords = await regionKeywordsReady;
