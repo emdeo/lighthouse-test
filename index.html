@@ -892,7 +892,8 @@ function closePopup() {
   renderMarkers();
 }
 
-document.getElementById("popup-close").addEventListener("click", () => {
+document.getElementById("popup-close").addEventListener("click", (e) => {
+  e.stopPropagation();
   // 팝업 닫기 + 마커 정리
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
   if (window.selectedMarker) {
