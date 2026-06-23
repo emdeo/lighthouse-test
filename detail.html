@@ -437,12 +437,12 @@ document.title = lh.name + " — 안녕, 등대";
 const mascotMsg = document.getElementById("mascot-message");
 if (lh.name.includes("방파제")) {
   document.getElementById("mascot-img").style.display = "block";
-  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 방파제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
+  mascotMsg.innerHTML = "<b>🧭 등대 가이드 TIME!</b> <br> 이 등대는 방파제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else if (lh.name.includes("방사제")) {
   document.getElementById("mascot-img").style.display = "block";
-  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 방사제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
+  mascotMsg.innerHTML = "<b>🧭 등대 가이드 TIME!</b> <br> 이 등대는 방사제 위에 세워진 등대야. <br> 배가 들어오는 방향 기준으로 <br> ⬅️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚 <br> ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️ <br> 🤷🏻 왜 어떤 등대는 흰색일까? <br> 산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서 <br> 주변 환경에 따라 흰색 등대를 사용하기도 해 😉";
 } else {
-  mascotMsg.innerHTML = "🧭 등대 가이드 TIME! <br> 이 등대는 육지 끝단에 세워진 육지초인표지 등대야. <br> 바다 위가 아닌 땅에서 배의 길을 안내하지 <br> 육지초인표지 등대 = 대부분 흰색 🤍 <br> 다른 등대는 어떤 모습일까? 😗";
+  mascotMsg.innerHTML = "<b>🧭 등대 가이드 TIME!</b> <br> 이 등대는 육지 끝단에 세워진 육지초인표지 등대야. <br> 바다 위가 아닌 땅에서 배의 길을 안내하지 <br> 육지초인표지 등대 = 대부분 흰색 🤍 <br> 다른 등대는 어떤 모습일까? 😗";
 }
 document.getElementById("bc-name").textContent       = lh.name;
 document.getElementById("detail-emoji").textContent  = "🔦";
@@ -691,7 +691,7 @@ function buildLightSimCard(code) {
   `;
 
   // 보라 말풍선 - 설명문장 + 가이드 메시지 합치기
-  const descHtml = `<div class="light-explain-desc">등질이란, 야간에 항해자가 길을 찾도록, 불빛의 색깔·횟수·주기를 다르게 정해 놓은 신호예요</div>`;
+  const descHtml = `<div class="light-explain-desc"><b>등질</b>이란, 야간에 항해자가 길을 찾도록, 불빛의 색깔·횟수·주기를 다르게 정해 놓은 신호예요</div>`;
   const mascotMsgEl = document.getElementById('mascot-message');
   if (mascotMsgEl) {
     mascotMsgEl.innerHTML = descHtml + mascotMsgEl.innerHTML;
@@ -844,7 +844,7 @@ if (lh.lat && lh.lng) {
         `<img src="https://openweathermap.org/img/wn/${icon}@2x.png" style="width:56px;height:56px;">`;
       document.querySelector(".detail-weather-temp").textContent = temp + "°C";
       document.querySelector(".weather-label").innerHTML =
-        `${desc} · 체감 ${feels}°C<br>💨 ${windDir} ${wind}m/s · 💧 습도 ${humidity}% · ☁️ 구름 ${cloud}%`;
+        `${desc} · 체감 ${feels}°C<br> ${windDir}풍 ${wind}m/s ·  습도 ${humidity}% ·  구름 ${cloud}%`;
     })
     .catch(() => {
       document.querySelector(".weather-label").textContent = "날씨 정보를 불러올 수 없어요";
@@ -1057,15 +1057,15 @@ if (lh.lat && lh.lng) {
         items.forEach(item => {
           const dateKey = item.predcYmd.replace(/-/g, '');
           if (dateKey === todayKey) return;
-          if (!byDate[dateKey]) byDate[dateKey] = [];
-          const label = item.predcNoonSeCd === '일'
-            ? (item.totalIndex || '—')
-            : item.predcNoonSeCd + ' ' + (item.totalIndex || '—');
-          byDate[dateKey].push(label);
+          if (!byDate[dateKey]) byDate[dateKey] = {};
+          const noon = item.predcNoonSeCd || '일';
+          byDate[dateKey][noon] = item.totalIndex || '—'; // 같은 날짜+오전/오후가 중복 와도 덮어써서 한 번만 남김
         });
-        Object.entries(byDate).forEach(([dateKey, labels]) => {
+        Object.entries(byDate).forEach(([dateKey, noonMap]) => {
           const el = document.getElementById(`seasick-${dateKey}`);
-          if (el) el.innerHTML = labels.join('<br>');
+          if (!el) return;
+          const labels = Object.entries(noonMap).map(([noon, idx]) => noon === '일' ? idx : `${noon} ${idx}`);
+          el.innerHTML = labels.join('<br>');
         });
       })
       .catch(() => {});
