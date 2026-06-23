@@ -911,13 +911,34 @@ document.getElementById("popup-close").addEventListener("click", () => {
 // ════════════════════════════════════════
 //  필터 상태 — JS 객체가 유일한 진실
 // ════════════════════════════════════════
-
 // 각 그룹의 체크 상태를 JS Set으로 관리
 const filterState = {
   stamp: new Set(),
   year:  new Set(),
   month: new Set(),
 };
+
+// 필터 상태를 localStorage에 저장/복원 (페이지 이동 후에도 유지)
+function saveFilterState() {
+  try {
+    localStorage.setItem('lh-filter-state', JSON.stringify({
+      stamp: [...filterState.stamp],
+      year:  [...filterState.year],
+      month: [...filterState.month],
+    }));
+  } catch (e) {}
+}
+function restoreFilterState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('lh-filter-state'));
+    if (saved) {
+      filterState.stamp = new Set(saved.stamp || []);
+      filterState.year  = new Set(saved.year  || []);
+      filterState.month = new Set(saved.month || []);
+    }
+  } catch (e) {}
+}
+restoreFilterState();
 
 // 그룹별 전체 키 목록 (모두 표시 제외)
 const GROUP_KEYS = {
@@ -941,6 +962,7 @@ function syncFilterUI() {
     filterState.year.has("year-all")   &&
     filterState.month.has("month-all");
   document.getElementById("check-all").parentElement.classList.toggle("checked", allChecked);
+  saveFilterState();
 }
 
 // ── 그룹의 -all 상태를 개별 항목에 맞게 자동 업데이트 ──
