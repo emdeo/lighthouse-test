@@ -478,18 +478,22 @@ const seaLabel = lh.sea === '서해안' ? '서해안' : lh.sea === '동해안' ?
 document.getElementById("detail-desc").textContent = (lh.nameEn ? lh.nameEn + (seaLabel ? ',  ' + seaLabel : '') : seaLabel);
 
 // 좌표 → 주소 변환 (카카오 API)
-fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lh.lng}&y=${lh.lat}`, {
+const regionKeywordsReady = fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lh.lng}&y=${lh.lat}`, {
   headers: { Authorization: `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
 })
 .then(r => r.json())
 .then(data => {
-  const addr = data.documents?.[0]?.road_address?.address_name
-             || data.documents?.[0]?.address?.address_name
-             || '';
+  const doc = data.documents?.[0];
+  const addr = doc?.road_address?.address_name || doc?.address?.address_name || '';
   document.getElementById("detail-region").textContent = addr || lh.region || '';
+  const a = doc?.address || {};
+  const region2 = (a.region_2depth_name || '').replace(/(시|군|구)$/, '');
+  const region3 = (a.region_3depth_name || '').replace(/(읍|면|동|리)$/, '');
+  return [region2, region3].filter(Boolean);
 })
 .catch(() => {
   document.getElementById("detail-region").textContent = lh.region || '';
+  return [];
 });
 // 운영시간/전화/문화재 — 값 있을 때만 표시
 const openVal = (stampInfo && stampInfo.open) ? stampInfo.open : '';
@@ -692,6 +696,8 @@ function buildLightSimCard(code) {
   const port = findNearestPort(lh.lat, lh.lng, 150);
   if (!port) return;
 
+  const regionKeywords = await regionKeywordsReady;
+
   document.getElementById("ferry-section").style.display = "";
 
   const dayNames = ["일","월","화","수","목","금","토"];
@@ -714,8 +720,16 @@ function buildLightSimCard(code) {
     try {
       const res = await fetch(`${CONFIG.WEATHER_API_URL}/ferry?port=${encodeURIComponent(portQuery)}&date=${dateStr}`);
       const data = await res.json();
-      const items = data.items || [];
-      return { label, items: Array.isArray(items) ? items : [items] };
+      const rawItems = data.items || [];
+      const allItems = Array.isArray(rawItems) ? rawItems : [rawItems];
+      // 도착지(dest_nm) 또는 운항/면허 항로명(경유지 포함)에 지역 키워드가 있는 배편만 남김
+      const items = regionKeywords.length
+        ? allItems.filter(it => {
+            const routeText = (it.dest_nm || '') + (it.nvg_seawy_nm || '') + (it.lcns_seawy_nm || '');
+            return regionKeywords.some(kw => routeText.includes(kw));
+          })
+        : allItems;
+      return { label, items };
     } catch(e) {
       return { label, items: [] };
     }
