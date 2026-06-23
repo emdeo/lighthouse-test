@@ -272,6 +272,10 @@
     position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);
     border:none;color:#fff;font-size:20px;width:40px;height:40px;
     border-radius:50%;cursor:pointer;">✕</button>
+  <button onclick="shareLhViewerImage()" style="
+    position:absolute;top:16px;right:64px;background:rgba(255,255,255,.15);
+    border:none;color:#fff;font-size:18px;width:40px;height:40px;
+    border-radius:50%;cursor:pointer;">공유</button>
   <img id="lhViewerImg" onclick="event.stopPropagation()" style="max-width:100%;max-height:85vh;object-fit:contain;">
   <div id="lhViewerDate" style="color:rgba(255,255,255,.6);font-size:11px;margin-top:8px;"></div>
 </div>
@@ -1399,10 +1403,18 @@ async function renderLhGallery() {
     <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer"
       onclick="openLhViewer(${p.id})">
       <img src="${p.thumb||p.dataUrl}" style="width:100%;height:100%;object-fit:cover;">
-      <button onclick="event.stopPropagation();deleteLhPhoto(${p.id})" style="
-        position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);
-        border:none;color:#fff;font-size:11px;width:22px;height:22px;
-        border-radius:50%;cursor:pointer;line-height:1;">✕</button>
+      <button onclick="shareLhPhotoById(${p.id}, event)" style="
+        position:absolute;top:4px;left:4px;background:rgba(0,0,0,.5);
+        border:none;color:#fff;font-size:12px;width:22px;height:22px;
+        border-radius:50%;cursor:pointer;line-height:1;"></button>
+      <button onclick="closeLhViewer()" style="
+    position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);
+    border:none;color:#fff;font-size:20px;width:40px;height:40px;
+    border-radius:50%;cursor:pointer;">✕</button>
+  <button onclick="shareLhViewerImage()" style="
+    position:absolute;top:16px;right:64px;background:rgba(255,255,255,.15);
+    border:none;color:#fff;font-size:18px;width:40px;height:40px;
+    border-radius:50%;cursor:pointer;">공유</button>
     </div>`).join('');
 }
 
@@ -1419,6 +1431,39 @@ async function openLhViewer(photoId) {
 function closeLhViewer() {
   document.getElementById('lhPhotoViewer').style.display = 'none';
   document.getElementById('lhViewerImg').src = '';
+}
+
+// 사진 공유하기 (Web Share API)
+async function shareLhImage(dataUrl, fname) {
+  try {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], fname, { type: blob.type || 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: lh.name || '등대 사진' });
+    } else {
+      alert('이 브라우저는 사진 공유 기능을 지원하지 않아요. 사진은 갤러리에 저장되어 있으니 직접 첨부해서 보내주세요.');
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('공유 오류', err);
+  }
+}
+
+async function shareLhPhotoById(photoId, ev) {
+  if (ev) ev.stopPropagation();
+  const lhId = String(lh.id || lh.name);
+  const photos = await LhPhotoDB.list(lhId);
+  const p = photos.find(x => x.id === photoId);
+  if (!p) return;
+  const fname = `${(lh.name||'등대').replace(/\s+/g,'')}_${_lhFmtDateFile(p.date)}.jpg`;
+  shareLhImage(p.dataUrl, fname);
+}
+
+function shareLhViewerImage() {
+  const src = document.getElementById('lhViewerImg').src;
+  if (!src) return;
+  const fname = `${(lh.name||'등대').replace(/\s+/g,'')}.jpg`;
+  shareLhImage(src, fname);
 }
 
 async function deleteLhPhoto(photoId) {
