@@ -1892,6 +1892,18 @@ html:has(body.detail-page) {
 }
 .tutorial-next-btn:hover { background: var(--ocean); }
 
+.tutorial-prev-btn {
+  background: rgba(255,255,255,.7);
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  border-radius: 12px;
+  padding: .7rem 1.3rem;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.tutorial-prev-btn:hover { background: var(--white); }
+
 .tutorial-skip-btn {
   position: fixed; top: 20px; right: 20px;
   width: 44px; height: 44px;
@@ -1903,4 +1915,31 @@ html:has(body.detail-page) {
   cursor: pointer;
   z-index: 10001;
   box-shadow: var(--shadow);
+}
+/* ── 사용법 튜토리얼: 모바일 전체 최적화 (이미지 크기는 그대로) ── */
+@media (max-width: 768px) {
+  .tutorial-bubble {
+    width: auto;
+    max-width: calc(100vw - 180px);
+    padding: 1.2rem 1.4rem 1.1rem;
+    border-radius: 20px;
+  }
+  .tutorial-text {
+    font-size: .95rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+  .tutorial-progress {
+    font-size: .78rem;
+  }
+  .tutorial-next-btn {
+    padding: .55rem 1.1rem;
+    font-size: .85rem;
+    border-radius: 9px;
+  }
+  .tutorial-prev-btn {
+    padding: .5rem 1rem;
+    font-size: .85rem;
+    border-radius: 9px;
+  }
 }

@@ -303,6 +303,7 @@
       <div class="tutorial-bubble-tail"></div>
       <div class="tutorial-text" id="tutorial-text"></div>
       <div class="tutorial-bottom-row">
+        <button class="tutorial-prev-btn" id="tutorial-prev-btn">◀ 이전</button>
         <span class="tutorial-progress" id="tutorial-progress"></span>
         <button class="tutorial-next-btn" id="tutorial-next-btn">다음 ▶</button>
       </div>
@@ -1800,12 +1801,12 @@ const TUTORIAL_STEPS = [
   { target: null, img: 'tutorial-mascot-1.png',
     text: '안녕! 나는 등대 안내자야.<br>사이트 이용법과 등대정보를<br>소개해줄게.' },
   { target: '#filter-list', mobileNeedsPanel: true, img: 'tutorial-mascot-2.png',
-    text: '<b>[옵션 필터]</b><br>주제를 선택하면 테마별 등대만 볼 수 있어.<br>• 노란색: 스탬프 등대<br>• 초록색: 올해의 등대 <br>• 파란색: 이달의 등대' },
+    text: '<b>[옵션 필터]</b>옵션을 선택하면 테마별 등대만 볼 수 있어.<br>• 노란색: 스탬프 등대<br>• 초록색: 올해의 등대 <br>• 파란색: 이달의 등대' },
   { target: '.header-search', img: 'tutorial-mascot-1.png',
     text: '<b>[검색 기능]</b><br>궁금한 등대 이름을 검색해봐.' },
   { target: '#header nav', targetMobile: '#mobile-nav', img: 'tutorial-mascot-3.png',
     text: '<b>[화면 설정]</b><br>• 등대 지도 → 지도로 보기<br>• 실시간 등대 식별 → AR로 등대 확인<br>• 관련 사이트 바로가기 → 관련 사이트로 이동',
-    textMobile: '<b>[화면 설정]</b><br>하단 메뉴에서<br>• 필터 → 등대 필터<br>• 등대 식별 → AR로 등대 확인<br>• 관련사이트 → 관련 사이트로 이동<br>• 도움말 → 이 설명 다시 보기' },
+    textMobile: '<b>[메뉴]</b><br>하단 메뉴에서<br>• 필터 → 등대 필터<br>• 등대 식별 → AR로 등대 확인<br>• 관련사이트 → 관련 사이트로 이동<br>• 도움말 → 이 설명 다시 보기' },
   { target: '.map-controls', img: 'tutorial-mascot-2.png',
     text: '<b>[지도 설정 버튼]</b><br>• 위성지도 → 위성지도로 전환<br>• ⦿ → 내 위치 보기<br>• ＋ / － → 지도 확대·축소' },
   { target: '#map-container', img: 'tutorial-mascot-3.png',
@@ -1863,6 +1864,7 @@ function renderTutorialStep() {
   const mascotImg = document.getElementById('tutorial-mascot-img');
   const textEl = document.getElementById('tutorial-text');
   const nextBtn = document.getElementById('tutorial-next-btn');
+  const prevBtn = document.getElementById('tutorial-prev-btn');
   const progressEl = document.getElementById('tutorial-progress');
 
   const isMobile = window.innerWidth <= 768;
@@ -1874,6 +1876,7 @@ function renderTutorialStep() {
   textEl.innerHTML = stepText;
   progressEl.textContent = (tutorialIdx + 1) + ' / ' + TUTORIAL_STEPS.length;
   nextBtn.textContent = (tutorialIdx === TUTORIAL_STEPS.length - 1) ? '확인' : '다음 ▶';
+  prevBtn.style.visibility = (tutorialIdx === 0) ? 'hidden' : 'visible';
 
   // 자리 옮기기 전에 살짝 투명하게 — 사라짐→자리잡음→나타남 흐름으로 자연스럽게 보이도록
   wrap.style.opacity = '0';
@@ -1886,7 +1889,17 @@ function renderTutorialStep() {
   // 이 단계에 패널이 필요한데 안 열려있으면 열기
   if (needsPanel && sheetMode !== 'filter') {
     openFilterSheet();
-    setTimeout(settle, 320); // 시트가 다 열린 뒤 위치 계산
+    // 패널 슬라이드 애니메이션이 "진짜로 끝난 시점"에 위치 계산 (기기 속도에 안 좌우되도록)
+    let settled = false;
+    const doSettle = () => {
+      if (settled) return;
+      settled = true;
+      mobileSheet.removeEventListener('transitionend', onSheetReady);
+      settle();
+    };
+    const onSheetReady = (e) => { if (e.propertyName === 'height') doSettle(); };
+    mobileSheet.addEventListener('transitionend', onSheetReady);
+    setTimeout(doSettle, 500); // transitionend를 못 받는 경우를 위한 안전장치
   // 이 단계에 패널이 필요 없는데 (어떤 이유로든) 열려있으면 닫기
   } else if (!needsPanel && sheetMode === 'filter') {
     closeSheet();
@@ -1915,6 +1928,13 @@ document.getElementById('tutorial-next-btn').addEventListener('click', () => {
     closeTutorial();
   } else {
     tutorialIdx++;
+    renderTutorialStep();
+  }
+});
+
+document.getElementById('tutorial-prev-btn').addEventListener('click', () => {
+  if (tutorialIdx > 0) {
+    tutorialIdx--;
     renderTutorialStep();
   }
 });
