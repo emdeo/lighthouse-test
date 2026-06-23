@@ -487,9 +487,14 @@ const regionKeywordsReady = fetch(`https://dapi.kakao.com/v2/local/geo/coord2add
   const addr = doc?.road_address?.address_name || doc?.address?.address_name || '';
   document.getElementById("detail-region").textContent = addr || lh.region || '';
   const a = doc?.address || {};
-  const region2 = (a.region_2depth_name || '').replace(/(시|군|구)$/, '');
-  const region3 = (a.region_3depth_name || '').replace(/(읍|면|동|리)$/, '');
-  return [region2, region3].filter(Boolean);
+  // 단어 단위로 쪼개서 각 단어의 행정구역 접미사(시/군/구/읍/면/동/리)를 떼어냄
+  const splitKeywords = (name) =>
+    (name || '').split(/\s+/).map(w => w.replace(/(시|군|구|읍|면|동|리)$/, '')).filter(Boolean);
+  const keywords = [
+    ...splitKeywords(a.region_2depth_name),
+    ...splitKeywords(a.region_3depth_name),
+  ];
+  return [...new Set(keywords)];
 })
 .catch(() => {
   document.getElementById("detail-region").textContent = lh.region || '';
