@@ -272,10 +272,12 @@
     position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);
     border:none;color:#fff;font-size:20px;width:40px;height:40px;
     border-radius:50%;cursor:pointer;">✕</button>
-  <button onclick="shareLhViewerImage()" style="
+  <button onclick="event.stopPropagation();shareLhViewerImage()" style="
     position:absolute;top:16px;right:64px;background:rgba(255,255,255,.15);
-    border:none;color:#fff;font-size:18px;width:40px;height:40px;
-    border-radius:50%;cursor:pointer;">공유</button>
+    border:none;color:#fff;font-size:13px;font-weight:600;
+    padding:6px 14px 6px 10px;border-radius:999px;cursor:pointer;
+    display:flex;align-items:center;gap:5px;line-height:1;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>공유</button>
   <img id="lhViewerImg" onclick="event.stopPropagation()" style="max-width:100%;max-height:85vh;object-fit:contain;">
   <div id="lhViewerDate" style="color:rgba(255,255,255,.6);font-size:11px;margin-top:8px;"></div>
 </div>
@@ -1404,17 +1406,15 @@ async function renderLhGallery() {
       onclick="openLhViewer(${p.id})">
       <img src="${p.thumb||p.dataUrl}" style="width:100%;height:100%;object-fit:cover;">
       <button onclick="shareLhPhotoById(${p.id}, event)" style="
-        position:absolute;top:4px;left:4px;background:rgba(0,0,0,.5);
-        border:none;color:#fff;font-size:12px;width:22px;height:22px;
-        border-radius:50%;cursor:pointer;line-height:1;"></button>
-      <button onclick="closeLhViewer()" style="
-    position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);
-    border:none;color:#fff;font-size:20px;width:40px;height:40px;
-    border-radius:50%;cursor:pointer;">✕</button>
-  <button onclick="shareLhViewerImage()" style="
-    position:absolute;top:16px;right:64px;background:rgba(255,255,255,.15);
-    border:none;color:#fff;font-size:18px;width:40px;height:40px;
-    border-radius:50%;cursor:pointer;">공유</button>
+        position:absolute;top:4px;left:4px;background:rgba(0,0,0,.55);
+        border:none;color:#fff;font-size:10px;font-weight:600;
+        padding:3px 8px 3px 6px;border-radius:999px;cursor:pointer;
+        display:flex;align-items:center;gap:3px;line-height:1;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>공유</button>
+      <button onclick="event.stopPropagation();deleteLhPhoto(${p.id})" style="
+        position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);
+        border:none;color:#fff;font-size:11px;width:22px;height:22px;
+        border-radius:50%;cursor:pointer;line-height:1;">✕</button>
     </div>`).join('');
 }
 
