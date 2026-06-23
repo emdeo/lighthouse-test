@@ -233,6 +233,10 @@
       </div>
     </div>
   </div>
+
+  <div class="panel-footer">
+    <button id="btn-tutorial" class="btn-tutorial">❓ 사용법 보기</button>
+  </div>
   </aside>
 
   <!-- MAP -->
@@ -287,6 +291,23 @@
     border:none; color:#fff; font-size:20px; width:40px; height:40px;
     border-radius:50%; cursor:pointer;">✕</button>
   <img id="idx-photo-viewer-img" onclick="event.stopPropagation()" style="max-width:100%; max-height:85vh; object-fit:contain;">
+</div>
+
+<!-- 사용법 튜토리얼 -->
+<div id="tutorial-overlay">
+  <div class="tutorial-highlight" id="tutorial-highlight"></div>
+  <button class="tutorial-skip-btn" id="tutorial-skip-btn" title="닫기">✕</button>
+  <div class="tutorial-wrap" id="tutorial-wrap">
+    <img id="tutorial-mascot-img" class="tutorial-mascot-img" src="tutorial-mascot-1.png" alt="등대 안내자">
+    <div class="tutorial-bubble" id="tutorial-bubble">
+      <div class="tutorial-bubble-tail"></div>
+      <div class="tutorial-text" id="tutorial-text"></div>
+      <div class="tutorial-bottom-row">
+        <span class="tutorial-progress" id="tutorial-progress"></span>
+        <button class="tutorial-next-btn" id="tutorial-next-btn">다음 ▶</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 팝업 -->
@@ -363,13 +384,16 @@
 <!-- 모바일 하단 내비게이션 바 -->
 <nav id="mobile-nav">
   <button class="mobile-nav-item" id="mobile-sheet-btn">
-    <span class="mobile-nav-label">필터/목록</span>
+    <span class="mobile-nav-label">필터</span>
   </button>
   <div style="width:1px; min-width:1px; height:30px; background:#ddd; flex-shrink:0;"></div>  <a href="news.html" class="mobile-nav-item">
     <span class="mobile-nav-label">등대 식별</span>
   </a>
   <div style="width:1px; min-width:1px; height:30px; background:#ddd; flex-shrink:0;"></div>  <button class="mobile-nav-item" id="mobile-links-btn">
     <span class="mobile-nav-label">관련사이트</span>
+  </button>
+  <div style="width:1px; min-width:1px; height:30px; background:#ddd; flex-shrink:0;"></div>  <button class="mobile-nav-item" id="mobile-tutorial-btn">
+    <span class="mobile-nav-label">도움말</span>
   </button>
 </nav>
 
@@ -1741,8 +1765,8 @@ mobileSheetContent.addEventListener("touchend", () => {
 
 mobileOverlay.addEventListener("click", closeSheet);
 
-// 필터/목록 버튼
-document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
+// 필터 패널 열기 (필터/목록 버튼 + 튜토리얼에서 공용으로 사용)
+function openFilterSheet() {
   // 이전 시트 상태 정리 (popup 모드였으면 마커 복원도 포함)
   if (sheetMode && sheetMode !== "filter") closeSheet();
 
@@ -1759,13 +1783,155 @@ document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
   mobileOverlay.classList.add("visible");
   snapTo(SNAP_HALF);
   sheetMode = "filter";
-});
+}
+
+// 필터/목록 버튼
+document.getElementById("mobile-sheet-btn").addEventListener("click", openFilterSheet);
 
 // 관련사이트 버튼
 document.getElementById("mobile-links-btn").addEventListener("click", () => {
   document.getElementById("links-overlay").classList.add("visible");
 });
 
+</script>
+
+<script>
+const TUTORIAL_STEPS = [
+  { target: null, img: 'tutorial-mascot-1.png',
+    text: '안녕! 나는 등대 안내자야.<br>사이트 이용법과 등대정보를<br>소개해줄게.' },
+  { target: '#filter-list', mobileNeedsPanel: true, img: 'tutorial-mascot-2.png',
+    text: '<b>[옵션 필터]</b><br>원하는 주제를 선택하면 테마별·연도별 등대만 볼 수 있어.<br>• 노란색: 등대 스탬프 마커<br>• 초록색: 올해의 등대 마커<br>• 파란색: 이달의 등대 마커' },
+  { target: '.header-search', img: 'tutorial-mascot-1.png',
+    text: '<b>[검색 기능]</b><br>궁금한 등대 이름을 검색해봐.' },
+  { target: '#header nav', targetMobile: '#mobile-nav', img: 'tutorial-mascot-3.png',
+    text: '<b>[화면 설정]</b><br>• 등대 지도 → 지도로 보기<br>• 실시간 등대 식별 → AR로 등대 확인<br>• 관련 사이트 바로가기 → 관련 사이트로 이동',
+    textMobile: '<b>[화면 설정]</b><br>하단 메뉴에서<br>• 필터/목록 → 등대 검색·필터<br>• 등대 식별 → AR로 등대 확인<br>• 관련사이트 → 관련 사이트로 이동<br>• 도움말 → 이 설명 다시 보기' },
+  { target: '.map-controls', img: 'tutorial-mascot-2.png',
+    text: '<b>[지도 설정 버튼]</b><br>• 위성지도 → 위성지도로 전환<br>• ⦿ → 내 위치 보기<br>• ＋ / － → 지도 확대·축소' },
+  { target: '#map-container', img: 'tutorial-mascot-3.png',
+    text: '<b>[지도 내 아이콘]</b><br>원 안의 숫자는 그 지역의 등대 수야.<br>아이콘을 누르면 그 지역 등대들이 자세히 보여.' },
+  { target: '#map-container', img: 'tutorial-mascot-1.png',
+    text: '<b>[상세페이지]</b><br>지도에서 등대 마커를 누르면 여행 정보가 담긴 팝업이 열려.<br>거기 "상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
+  { target: null, img: 'tutorial-mascot-1.png',
+    text: '이제 소개는 끝났어!<br>우리 사이트를 활용해서 편리한 여행 하길 바랄게:)<br><br>P.S. 참고로 내 실물은 호미곶에서 볼 수 있어 &gt;&lt;' },
+];
+
+let tutorialIdx = 0;
+let tutorialOpenedPanel = false;
+
+function positionTutorial(targetSel) {
+  const highlight = document.getElementById('tutorial-highlight');
+  const wrap = document.getElementById('tutorial-wrap');
+  const targetEl = targetSel ? document.querySelector(targetSel) : null;
+  const wrapW = wrap.offsetWidth || 620;
+  const wrapH = wrap.offsetHeight || 280;
+  const topSafe = 76; // 우상단 닫기(X) 버튼 영역을 가리지 않기 위한 최소 높이
+
+  if (targetEl) {
+    const r = targetEl.getBoundingClientRect();
+    const pad = 8;
+    highlight.style.opacity = '1';
+    highlight.style.top = (r.top - pad) + 'px';
+    highlight.style.left = (r.left - pad) + 'px';
+    highlight.style.width = (r.width + pad * 2) + 'px';
+    highlight.style.height = (r.height + pad * 2) + 'px';
+
+    let wrapTop = r.bottom + pad + 18;
+    if (wrapTop + wrapH > window.innerHeight) {
+      wrapTop = Math.max(topSafe, r.top - pad - 18 - wrapH);
+    }
+    let wrapLeft = Math.min(r.left, window.innerWidth - wrapW - 10);
+    wrapLeft = Math.max(10, wrapLeft);
+
+    wrap.style.top = wrapTop + 'px';
+    wrap.style.left = wrapLeft + 'px';
+  } else {
+    highlight.style.opacity = '0';
+    highlight.style.width = '0px';
+    highlight.style.height = '0px';
+    highlight.style.top = '50%';
+    highlight.style.left = '50%';
+
+    wrap.style.top = Math.max(topSafe, (window.innerHeight - wrapH) / 2) + 'px';
+    wrap.style.left = ((window.innerWidth - wrapW) / 2) + 'px';
+  }
+}
+
+function renderTutorialStep() {
+  const step = TUTORIAL_STEPS[tutorialIdx];
+  const wrap = document.getElementById('tutorial-wrap');
+  const mascotImg = document.getElementById('tutorial-mascot-img');
+  const textEl = document.getElementById('tutorial-text');
+  const nextBtn = document.getElementById('tutorial-next-btn');
+  const progressEl = document.getElementById('tutorial-progress');
+
+  const isMobile = window.innerWidth <= 768;
+  const targetSel = (isMobile && step.targetMobile !== undefined) ? step.targetMobile : step.target;
+  const stepText  = (isMobile && step.textMobile) ? step.textMobile : step.text;
+  const needsPanel = isMobile && step.mobileNeedsPanel;
+
+  mascotImg.src = step.img;
+  textEl.innerHTML = stepText;
+  progressEl.textContent = (tutorialIdx + 1) + ' / ' + TUTORIAL_STEPS.length;
+  nextBtn.textContent = (tutorialIdx === TUTORIAL_STEPS.length - 1) ? '확인' : '다음 ▶';
+
+  // 자리 옮기기 전에 살짝 투명하게 — 사라짐→자리잡음→나타남 흐름으로 자연스럽게 보이도록
+  wrap.style.opacity = '0';
+
+  const settle = () => {
+    positionTutorial(targetSel);
+    requestAnimationFrame(() => { wrap.style.opacity = '1'; });
+  };
+
+  // 이 단계에 패널이 필요한데 안 열려있으면 열기
+  if (needsPanel && sheetMode !== 'filter') {
+    openFilterSheet();
+    setTimeout(settle, 320); // 시트가 다 열린 뒤 위치 계산
+  // 이 단계에 패널이 필요 없는데 (어떤 이유로든) 열려있으면 닫기
+  } else if (!needsPanel && sheetMode === 'filter') {
+    closeSheet();
+    setTimeout(settle, 90);
+  } else {
+    setTimeout(settle, 90); // 짧게 사라졌다가 새 위치에 나타남
+  }
+}
+
+function openTutorial() {
+  tutorialIdx = 0;
+  document.getElementById('tutorial-overlay').classList.add('active');
+  renderTutorialStep();
+}
+
+function closeTutorial() {
+  document.getElementById('tutorial-overlay').classList.remove('active');
+  if (sheetMode === 'filter') closeSheet();
+}
+
+document.getElementById('btn-tutorial').addEventListener('click', openTutorial);
+document.getElementById('mobile-tutorial-btn').addEventListener('click', openTutorial);
+
+document.getElementById('tutorial-next-btn').addEventListener('click', () => {
+  if (tutorialIdx === TUTORIAL_STEPS.length - 1) {
+    closeTutorial();
+  } else {
+    tutorialIdx++;
+    renderTutorialStep();
+  }
+});
+
+document.getElementById('tutorial-skip-btn').addEventListener('click', closeTutorial);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('tutorial-overlay').classList.contains('active')) {
+    closeTutorial();
+  }
+});
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('tutorial-overlay').classList.contains('active')) {
+    renderTutorialStep();
+  }
+});
 </script>
 </body>
 </html>
