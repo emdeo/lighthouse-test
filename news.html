@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<script>
+// 카카오톡 인앱 브라우저면 카메라/센서 권한이 제한되어 있어서,
+// 사파리/크롬(기본 브라우저)으로 자동으로 한 번 더 열어줌
+(function () {
+  var ua = navigator.userAgent || '';
+  if (/KAKAOTALK/i.test(ua)) {
+    location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href);
+  }
+})();
+</script>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
