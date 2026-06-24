@@ -542,9 +542,9 @@ lh.tags = [
 lh.stampCategory = stampInfo ? (stampInfo.category || "") : "";
 
 if (monthlyInfo && lh.tags.includes('month')) {
-  // 파란 박스: desc
+// 파란 박스: summary
 const storyEl1 = document.getElementById("detail-story");
-  if (monthlyInfo.desc) { storyEl1.textContent = monthlyInfo.desc; storyEl1.style.display = ''; }
+  if (monthlyInfo.summary) { storyEl1.textContent = monthlyInfo.summary; storyEl1.style.display = ''; }
   else { storyEl1.style.display = 'none'; }
   // 빨간 박스: 기존 sub-rows 숨기고 먹거리/관광지 표시
   document.getElementById("row-open").style.display = "none";
