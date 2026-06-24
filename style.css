@@ -2043,8 +2043,8 @@ html:has(body.detail-page) {
 }
 .ar-tutorial-chevrons {
   justify-content: space-between;
-  width: 280px;
-  font-size: 2.6rem;
+  width: 340px;
+  font-size: 4rem;
   color: rgba(255,229,200,0.9);
   font-weight: 700;
   letter-spacing: 2px;
@@ -2052,9 +2052,26 @@ html:has(body.detail-page) {
   top: 38%;
   left: 50%;
   transform: translate(-50%, -50%);
+  text-shadow: 0 0 14px rgba(255, 200, 120, 0.85);
+}
+.ar-tutorial-chevrons span:first-child {
+  display: inline-block;
+  animation: chevron-bounce-left 1.2s ease-in-out infinite;
+}
+.ar-tutorial-chevrons span:last-child {
+  display: inline-block;
+  animation: chevron-bounce-right 1.2s ease-in-out infinite;
+}
+@keyframes chevron-bounce-left {
+  0%, 100% { transform: translateX(0); opacity: 0.65; }
+  50%      { transform: translateX(-16px); opacity: 1; }
+}
+@keyframes chevron-bounce-right {
+  0%, 100% { transform: translateX(0); opacity: 0.65; }
+  50%      { transform: translateX(16px); opacity: 1; }
 }
 @media (max-width: 768px) {
-  .ar-tutorial-chevrons { font-size: 2rem; width: 200px; top: 32%; }
+  .ar-tutorial-chevrons { font-size: 3rem; width: 260px; top: 32%; }
 }
 /* ── AR 사용법 안내: 가짜 등대 마커들 ── */
 .ar-tutorial-marker {
