@@ -2100,3 +2100,11 @@ html:has(body.detail-page) {
 .scroll-top-btn.visible {
   display: flex;
 }
+/* ── AR 페이지: 지도로 돌아가기 버튼 (detail.html과 같은 .back-btn 스타일 재사용) ── */
+.ar-back-btn {
+  position: fixed;
+  top: 64px;
+  left: 20px;
+  z-index: 60;
+  margin-bottom: 0;
+}
