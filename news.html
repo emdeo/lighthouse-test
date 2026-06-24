@@ -29,16 +29,42 @@
 
 <!-- ── 시작 오버레이 ── -->
 <div id="start-overlay">
-  <div class="start-icon">🔦</div>
-  <h2>실시간 등대 식별</h2>
-  <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별합니다.<br>폰을 돌리면 등대가 실제 방향으로 따라와요.</p>
-  <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
-    <div class="start-feature"><span>📍</span><span>GPS 위치 권한이 필요합니다</span></div>
-    <div class="start-feature"><span>🧭</span><span>모바일: 나침반 센서로 방향 자동 인식</span></div>
-    <div class="start-feature"><span>📷</span><span>모바일: 카메라 권한으로 AR 모드 활성화</span></div>
-    <div class="start-feature"><span>🖱️</span><span>데스크탑: 드래그로 방향 탐색</span></div>
+  <div class="start-wrap">
+    <img src="tutorial-mascot-1.png" alt="등대 안내자" class="start-mascot-img">
+    <div class="start-bubble">
+      <div class="start-bubble-tail"></div>
+      <h2>실시간 등대 식별</h2>
+      <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별해줄게.<br>폰을 돌리면 등대가 실제 방향으로 따라와!</p>
+      <div class="start-features">
+        <div class="start-feature"><span>📍</span><span>이 기능은 GPS 위치 권한이 필요해</span></div>
+        <div class="start-feature"><span>📷</span><span>모바일은 카메라 권한이 필요해!</span></div>
+        <div class="start-feature"><span>🖱️</span><span>데스크탑은 드래그로 방향 탐색하면 돼</span></div>
+      </div>
+      <button id="start-btn">시작하기</button>
+    </div>
   </div>
-  <button id="start-btn">시작하기</button>
+</div>
+
+<!-- ── AR 사용법 안내 (3단계) ── -->
+<div id="ar-tutorial-overlay">
+  <div class="ar-tutorial-chevrons" id="ar-tutorial-chevrons" style="display:none;"><span>«</span><span>»</span></div>
+
+  <!-- 가짜 등대 마커들이 JS로 동적으로 들어갈 자리 -->
+  <div id="ar-tutorial-markers" style="position:fixed; inset:0; pointer-events:none;"></div>
+
+  <button class="tutorial-skip-btn" id="ar-tutorial-skip-btn" title="건너뛰기" style="position:fixed; top:20px; right:20px;">✕</button>
+  <div class="tutorial-wrap" id="ar-tutorial-wrap" style="position:fixed; bottom:90px; left:24px; top:auto; right:auto;">
+    <img id="ar-tutorial-mascot-img" class="tutorial-mascot-img" src="tutorial-mascot-1.png" alt="등대 안내자">
+    <div class="tutorial-bubble">
+      <div class="tutorial-bubble-tail"></div>
+      <div class="tutorial-text" id="ar-tutorial-text"></div>
+      <div class="tutorial-bottom-row">
+        <button class="tutorial-prev-btn" id="ar-tutorial-prev-btn">◀ 이전</button>
+        <span class="tutorial-progress" id="ar-tutorial-progress"></span>
+        <button class="tutorial-next-btn" id="ar-tutorial-next-btn">다음 ▶</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── AR 뷰포트 ── -->
@@ -666,10 +692,13 @@ async function startCamera() {
   }
 }
 
-// ════════════════════════════════════════
-//  범위 슬라이더
-// ════════════════════════════════════════
 document.getElementById("range-slider").addEventListener("input", e => {
+  if (arTutorialActive) {
+    arTutorialRange = +e.target.value;
+    document.getElementById("range-value").textContent = arTutorialRange + "km";
+    positionArTutorialMarkers();
+    return;
+  }
   maxRange = +e.target.value;
   document.getElementById("range-value").textContent = maxRange + "km";
   setStatus(`위치 확인됨 · ${maxRange}km 이내 표시`, "active");
@@ -677,10 +706,9 @@ document.getElementById("range-slider").addEventListener("input", e => {
 });
 
 // ════════════════════════════════════════
-//  시작 버튼
+//  AR 진짜 시작 (GPS/카메라/센서) — 기존 로직 그대로, 함수로만 분리
 // ════════════════════════════════════════
-document.getElementById("start-btn").addEventListener("click", () => {
-  document.getElementById("start-overlay").style.display = "none";
+function beginARExperience() {
   document.getElementById("range-control").style.display = "flex";
   arActive = true;
 
@@ -695,14 +723,12 @@ document.getElementById("start-btn").addEventListener("click", () => {
   startDesktopDrag(); // 항상 드래그 활성화
 
   if (isMobile) {
-    // 모바일: 나침반 버튼 표시
     document.getElementById("compass-btn").style.display = "block";
 
     const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
                   typeof DeviceOrientationEvent.requestPermission === "function";
 
     if (isIOS) {
-      // iOS: 센서 권한을 지금 바로 요청 (클릭 컨텍스트 안에서!)
       DeviceOrientationEvent.requestPermission()
         .then(res => {
           if (res === "granted") {
@@ -718,15 +744,254 @@ document.getElementById("start-btn").addEventListener("click", () => {
           setStatus("센서 권한 요청 실패 · 드래그로 탐색하세요", "warn");
         });
     } else {
-      // Android: 바로 카메라 + 센서 시작
       startCamera();
       attachSensorHandler();
     }
   }
 
   setStatus("주변 등대를 탐색 중...", "active");
+}
+
+// ── AR 사용법 안내 전용 가짜 상태 (실제 GPS/센서와 완전히 분리) ──
+let arTutorialActive = false;
+let arTutorialHeading = 0;
+let arTutorialSmoothHeading = 0;
+let arTutorialRange = 3;
+let arTutorialDragHandlers = null;
+let arTutorialSensorFns = null;
+
+function buildArTutorialMarkers(list) {
+  const container = document.getElementById('ar-tutorial-markers');
+  container.innerHTML = '';
+  list.forEach(lh => {
+    const lc = getLightColors(lh.light);
+    const distStr = lh.dist < 1 ? Math.round(lh.dist * 1000) + 'm' : lh.dist.toFixed(1) + 'km';
+    const el = document.createElement('div');
+    el.className = 'ar-tutorial-marker';
+    el.dataset.bearing = lh.bearing;
+    el.dataset.dist = lh.dist;
+    el.innerHTML = `
+      <div class="ar-tutorial-marker-label">
+        <div class="ar-tutorial-marker-name">${lh.name}</div>
+        <div class="ar-tutorial-marker-dist">${distStr}</div>
+      </div>
+      <div class="ar-tutorial-marker-line"></div>
+      <svg width="60" height="148" viewBox="0 0 60 148" xmlns="http://www.w3.org/2000/svg">
+        <rect x="16" y="2" width="28" height="10" rx="2" fill="${lc.light}"/>
+        <rect x="16" y="12" width="28" height="7" rx="1" fill="${lc.main}"/>
+        <rect x="12" y="19" width="36" height="3" rx="1" fill="${lc.dark}"/>
+        <line x1="16" y1="19" x2="16" y2="22" stroke="${lc.dark}" stroke-width="2"/>
+        <line x1="30" y1="19" x2="30" y2="22" stroke="${lc.dark}" stroke-width="2"/>
+        <line x1="44" y1="19" x2="44" y2="22" stroke="${lc.dark}" stroke-width="2"/>
+        <polygon points="19,22 41,22 47,132 13,132" fill="${lc.main}"/>
+        <polygon points="20,32 40,32 41,40 19,40" fill="${lc.dark}" opacity="0.6"/>
+        <polygon points="17,60 43,60 45,68 15,68" fill="${lc.dark}" opacity="0.6"/>
+        <rect x="25" y="45" width="10" height="8" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
+        <rect x="26" y="118" width="8" height="13" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
+        <rect x="11" y="132" width="38" height="10" rx="2" fill="${lc.main}"/>
+        <rect x="9" y="142" width="42" height="4" rx="1" fill="${lc.dark}"/>
+      </svg>
+    `;
+    container.appendChild(el);
+  });
+  positionArTutorialMarkers();
+}
+
+function positionArTutorialMarkers() {
+  const pxPerDeg = DEG_PER_PX();
+  document.querySelectorAll('#ar-tutorial-markers .ar-tutorial-marker').forEach(el => {
+    const bearing = parseFloat(el.dataset.bearing);
+    const dist = parseFloat(el.dataset.dist);
+    let diff = bearing - arTutorialHeading;
+    diff = ((diff + 180) % 360 + 360) % 360 - 180; // -180~180 정규화
+    const x = window.innerWidth / 2 + diff * pxPerDeg;
+    el.style.left = x + 'px';
+    el.style.display = (dist <= arTutorialRange && Math.abs(diff) < 35) ? 'flex' : 'none';
+  });
+}
+
+// 드래그 (튜토리얼 전용 — 실제 startDesktopDrag와 별개)
+function attachArTutorialDrag() {
+  const vp = document.getElementById("ar-viewport");
+  let dragging = false, lastX = 0;
+
+  const onDown = e => { dragging = true; lastX = (e.touches ? e.touches[0].clientX : e.clientX); };
+  const onMove = e => {
+    if (!dragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = x - lastX;
+    arTutorialHeading = (arTutorialHeading - dx * 0.3 + 360) % 360;
+    lastX = x;
+    updateRuler(arTutorialHeading);
+    positionArTutorialMarkers();
+  };
+  const onUp = () => { dragging = false; };
+
+  vp.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  vp.addEventListener("touchstart", onDown, { passive: true });
+  vp.addEventListener("touchmove", onMove, { passive: true });
+  vp.addEventListener("touchend", onUp);
+
+  arTutorialDragHandlers = { onDown, onMove, onUp, vp };
+}
+
+function detachArTutorialDrag() {
+  if (!arTutorialDragHandlers) return;
+  const { onDown, onMove, onUp, vp } = arTutorialDragHandlers;
+  vp.removeEventListener("mousedown", onDown);
+  window.removeEventListener("mousemove", onMove);
+  window.removeEventListener("mouseup", onUp);
+  vp.removeEventListener("touchstart", onDown);
+  vp.removeEventListener("touchmove", onMove);
+  vp.removeEventListener("touchend", onUp);
+  arTutorialDragHandlers = null;
+}
+
+// 폰 기울이기 (튜토리얼 전용 — 실제 attachSensorHandler와 별개)
+function attachArTutorialSensor() {
+  let hasAbsolute = false;
+  const handler = (e) => {
+    let heading = null;
+    if (e.webkitCompassHeading != null) heading = e.webkitCompassHeading;
+    else if (e.absolute === true && e.alpha != null) heading = (360 - e.alpha) % 360;
+    else if (e.alpha != null) heading = (360 - e.alpha) % 360;
+    if (heading === null) return;
+
+    let diff = heading - arTutorialSmoothHeading;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    const smoothFactor = e.webkitCompassHeading != null ? 0.15 : 0.06;
+    arTutorialSmoothHeading += diff * smoothFactor;
+    arTutorialSmoothHeading = (arTutorialSmoothHeading + 360) % 360;
+    arTutorialHeading = (arTutorialSmoothHeading + 8 + 360) % 360;
+
+    updateRuler(arTutorialHeading);
+    positionArTutorialMarkers();
+  };
+  const onAbs = e => { hasAbsolute = true; handler(e); };
+  const onRel = e => { if (hasAbsolute) return; handler(e); };
+  window.addEventListener("deviceorientationabsolute", onAbs, true);
+  window.addEventListener("deviceorientation", onRel, true);
+  arTutorialSensorFns = { onAbs, onRel };
+}
+
+function detachArTutorialSensor() {
+  if (!arTutorialSensorFns) return;
+  window.removeEventListener("deviceorientationabsolute", arTutorialSensorFns.onAbs, true);
+  window.removeEventListener("deviceorientation", arTutorialSensorFns.onRel, true);
+  arTutorialSensorFns = null;
+}
+
+// ════════════════════════════════════════
+//  AR 사용법 안내 (3단계)
+// ════════════════════════════════════════
+const AR_TUTORIAL_STEPS = [
+  { img: 'tutorial-mascot-1.png', text: '실제 등대와 비교해보세요!', chevrons: false },
+  { img: 'tutorial-mascot-2.png', text: '좌우로 드래그하거나 폰을 움직여서 근처 등대를 찾아보세요!', chevrons: true },
+  { img: 'tutorial-mascot-1.png', text: '표시 범위를 조절하면 등대가 보이는 범위를 조절할 수 있어요!', chevrons: false },
+];
+let arTutorialIdx = 0;
+
+function renderArTutorialStep() {
+  const step = AR_TUTORIAL_STEPS[arTutorialIdx];
+  document.getElementById('ar-tutorial-mascot-img').src = step.img;
+  document.getElementById('ar-tutorial-text').textContent = step.text;
+  document.getElementById('ar-tutorial-progress').textContent = (arTutorialIdx + 1) + ' / ' + AR_TUTORIAL_STEPS.length;
+  document.getElementById('ar-tutorial-prev-btn').style.visibility = (arTutorialIdx === 0) ? 'hidden' : 'visible';
+  document.getElementById('ar-tutorial-next-btn').textContent =
+    (arTutorialIdx === AR_TUTORIAL_STEPS.length - 1) ? '시작하기' : '다음 ▶';
+  document.getElementById('ar-tutorial-chevrons').style.display = step.chevrons ? 'flex' : 'none';
+
+  if (arTutorialIdx === 2) {
+    // 3단계: 거리 조절 데모 — 지금 보고 있는 방향 근처에 3개를 모아서 배치
+    document.getElementById('range-control').style.display = 'flex';
+    arTutorialRange = parseFloat(document.getElementById('range-slider').value) || 1.5;
+    const base = arTutorialHeading;
+    buildArTutorialMarkers([
+      { name: '문어등대',   bearing: base,      dist: 0.3, light: 'R' },
+      { name: '오징어등대', bearing: base + 15, dist: 1.2, light: 'G' },
+      { name: '새우등대',   bearing: base - 15, dist: 2.8, light: 'Y' },
+    ]);
+  } else {
+    document.getElementById('range-control').style.display = 'none';
+    arTutorialRange = 3;
+    buildArTutorialMarkers([
+      { name: '문어등대',   bearing: 0,   dist: 0.3, light: 'R' },
+      { name: '오징어등대', bearing: 90,  dist: 1.2, light: 'G' },
+      { name: '새우등대',   bearing: 270, dist: 2.8, light: 'Y' },
+    ]);
+  }
+}
+
+function finishArTutorial() {
+  document.getElementById("ar-tutorial-overlay").style.display = "none";
+  arTutorialActive = false;
+  detachArTutorialDrag();
+  detachArTutorialSensor();
+  document.getElementById("range-slider").value = "1.5";
+  document.getElementById("range-value").textContent = "1.5km";
+  document.getElementById("range-control").style.display = "none";
+  beginARExperience();
+}
+
+// ════════════════════════════════════════
+//  시작 버튼 — 클릭 즉시 센서 권한 요청 → 투어 시작
+// ════════════════════════════════════════
+document.getElementById("start-btn").addEventListener("click", () => {
+  document.getElementById("start-overlay").style.display = "none";
+
+  const beginTutorial = () => {
+    arTutorialActive = true;
+    arTutorialHeading = 0;
+    arTutorialSmoothHeading = 0;
+    buildRuler();
+    updateRuler(0);
+    attachArTutorialDrag();
+    document.getElementById("ar-tutorial-overlay").style.display = "block";
+    arTutorialIdx = 0;
+    renderArTutorialStep();
+  };
+
+  const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
+                typeof DeviceOrientationEvent.requestPermission === "function";
+
+  if (isIOS) {
+    // iOS: 클릭 컨텍스트 안에서 바로 권한 요청
+    DeviceOrientationEvent.requestPermission()
+      .then(res => {
+        if (res === "granted") attachArTutorialSensor();
+        beginTutorial();
+      })
+      .catch(() => { beginTutorial(); });
+  } else if (isMobile) {
+    // Android: 팝업 없이 바로 센서 연결
+    attachArTutorialSensor();
+    beginTutorial();
+  } else {
+    // 데스크탑: 센서 없음, 드래그만
+    beginTutorial();
+  }
 });
 
+document.getElementById("ar-tutorial-next-btn").addEventListener("click", () => {
+  if (arTutorialIdx === AR_TUTORIAL_STEPS.length - 1) {
+    finishArTutorial();
+  } else {
+    arTutorialIdx++;
+    renderArTutorialStep();
+  }
+});
+
+document.getElementById("ar-tutorial-prev-btn").addEventListener("click", () => {
+  if (arTutorialIdx > 0) {
+    arTutorialIdx--;
+    renderArTutorialStep();
+  }
+});
+
+document.getElementById("ar-tutorial-skip-btn").addEventListener("click", finishArTutorial);
 // 🧭 나침반 버튼: 센서 다시 켜기
 document.getElementById("compass-btn").addEventListener("click", () => {
   sensorActive = true;

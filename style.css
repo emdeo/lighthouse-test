@@ -1041,40 +1041,88 @@ body.ar-page nav a:hover {
 #status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); }
 #status-dot.warn   { background: var(--accent); }
 
-/* ── 시작 오버레이 ── */
 #start-overlay {
   position: fixed;
   inset: 52px 0 0 0;
   background: rgba(5, 10, 22, 0.92);
   backdrop-filter: blur(20px);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
   z-index: 80;
-  text-align: center;
-  padding: 40px 24px;
+  padding: 24px;
 }
 
-#start-overlay h2 {
+.start-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  max-width: 600px;
+}
+
+.start-mascot-img {
+  width: 130px; height: 130px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+
+.start-bubble {
+  position: relative;
+  background: var(--sky);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.45);
+  padding: 1.7rem 1.9rem;
+  text-align: left;
+}
+
+.start-bubble-tail {
+  position: absolute;
+  left: -16px; bottom: 50px;
+  width: 0; height: 0;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-right: 18px solid var(--sky);
+}
+
+.start-bubble h2 {
   font-family: 'Noto Serif KR', serif;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 900;
   line-height: 1.3;
   letter-spacing: -.5px;
+  color: var(--navy);
+  margin-bottom: .6rem;
 }
 
-#start-overlay p {
-  font-size: .85rem;
-  color: rgba(255,255,255,0.55);
-  line-height: 1.7;
-  max-width: 320px;
+.start-bubble p {
+  font-size: .88rem;
+  color: var(--gray4);
+  line-height: 1.65;
+  margin-bottom: 1rem;
 }
+
+.start-features {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 1.2rem;
+}
+
+.start-feature {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: .78rem;
+  color: var(--gray4);
+}
+
+.start-feature span:first-child { font-size: 1rem; }
 
 #start-btn {
-  background: var(--accent);
-  color: #1b2e4b;
+  background: var(--navy);
+  color: var(--white);
   border: none;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: .9rem;
@@ -1083,29 +1131,13 @@ body.ar-page nav a:hover {
   border-radius: 12px;
   cursor: pointer;
   transition: transform .15s, box-shadow .15s;
-  margin-top: 8px;
+  width: 100%;
 }
 
 #start-btn:hover {
+  background: var(--ocean);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(245,158,11,0.35);
 }
-
-.start-icon {
-  font-size: 3rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 20px rgba(245,158,11,0.4));
-}
-
-.start-feature {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: .78rem;
-  color: rgba(255,255,255,0.45);
-}
-
-.start-feature span:first-child { font-size: 1rem; }
 
 /* ── 방위각 표시 ── */
 #heading-display {
@@ -1205,9 +1237,28 @@ body.ar-page nav a:hover {
   }
   #info-panel-name { font-size: 1.05rem; }
 
-  #start-overlay h2 { font-size: 1.35rem; }
-  #start-overlay p  { font-size: .82rem; }
-  #start-btn { padding: 14px 36px; font-size: .88rem; }
+  .start-wrap {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .start-mascot-img { width: 92px; height: 92px; margin-bottom: 0; }
+  .start-bubble {
+    width: 100%;
+    padding: 1.3rem 1.4rem;
+    margin-top: 8px;
+  }
+  .start-bubble-tail {
+    left: 50%; bottom: auto; top: -14px;
+    transform: translateX(-50%);
+    border-top: none;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 16px solid var(--sky);
+  }
+  .start-bubble h2 { font-size: 1.2rem; }
+  .start-bubble p  { font-size: .82rem; }
+  #start-btn { padding: 14px 0; font-size: .88rem; }
 
   .ruler-tick .tick-label { font-size: 10px; }
   .ruler-tick.major .tick-label { font-size: 11px; }
@@ -1874,6 +1925,7 @@ html:has(body.detail-page) {
 
 .tutorial-bottom-row {
   display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
 }
 
 .tutorial-progress {
@@ -1920,6 +1972,7 @@ html:has(body.detail-page) {
 @media (max-width: 768px) {
   .tutorial-bubble {
     width: auto;
+    min-width: 260px;
     max-width: calc(100vw - 180px);
     padding: 1.2rem 1.4rem 1.1rem;
     border-radius: 20px;
@@ -1942,4 +1995,56 @@ html:has(body.detail-page) {
     font-size: .85rem;
     border-radius: 9px;
   }
+}
+/* ── AR 페이지 사용법 안내 (3단계) ── */
+#ar-tutorial-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+#ar-tutorial-overlay .tutorial-skip-btn,
+#ar-tutorial-overlay .tutorial-wrap {
+  pointer-events: auto;
+}
+.ar-tutorial-chevrons {
+  justify-content: space-between;
+  width: 280px;
+  font-size: 2.6rem;
+  color: rgba(255,229,200,0.9);
+  font-weight: 700;
+  letter-spacing: 2px;
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+@media (max-width: 768px) {
+  .ar-tutorial-chevrons { font-size: 2rem; width: 200px; top: 32%; }
+}
+/* ── AR 사용법 안내: 가짜 등대 마커들 ── */
+.ar-tutorial-marker {
+  position: absolute;
+  bottom: 200px;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  transition: left .15s ease;
+}
+.ar-tutorial-marker-label {
+  background: rgba(10,20,50,0.82);
+  border: 1px solid rgba(255,200,80,0.5);
+  border-radius: 7px;
+  padding: 3px 8px;
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+.ar-tutorial-marker-name { color:#fff; font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; }
+.ar-tutorial-marker-dist { color:rgba(255,210,100,0.85); font-size:10px; font-family:'Noto Sans KR',sans-serif; }
+.ar-tutorial-marker-line { width:1px; height:10px; background:rgba(255,200,80,0.5); }
+@media (max-width: 768px) {
+  .ar-tutorial-marker { bottom: 230px; }
+  .ar-tutorial-marker svg { width: 48px; height: 118px; }
 }
