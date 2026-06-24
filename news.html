@@ -117,13 +117,14 @@
 
 <!-- ── 하단 등대 정보 패널 ── -->
 <div id="info-panel">
+  <div class="info-panel-handle"></div>
   <button id="info-panel-close">✕</button>
-  <div id="info-panel-name">–</div>
-  <div id="info-panel-region">–</div>
-  <div id="info-panel-dist">–</div>
+  <div class="info-panel-header">
+    <div id="info-panel-name">–</div>
+    <div id="info-panel-dist">–</div>
+  </div>
   <div id="info-panel-tags"></div>
-  <div id="info-panel-desc">–</div>
-  <button id="btn-map-link" onclick="window.location.href='index.html'">상세정보 보기</button>
+  <button id="btn-map-link" onclick="goToLighthouseDetail()">상세정보 보기 <span class="btn-arrow">→</span></button>
 </div>
 
 <!-- ── 상태 표시 ── -->
@@ -248,9 +249,6 @@ let isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 let arActive = false;
 let sensorActive = false; // 센서 켜짐 여부
 
-// ════════════════════════════════════════
-//  등대 데이터 준비
-// ════════════════════════════════════════
 function prepareLighthouses() {
   if (typeof LIGHTHOUSE_DATA === "undefined") return;
   lighthouses = LIGHTHOUSE_DATA
@@ -259,6 +257,7 @@ function prepareLighthouses() {
       const stamp = typeof findStampData === "function" ? findStampData(d.name) : null;
       const year  = typeof findYearData  === "function" ? findYearData(d.name, d.lat, d.lng) : null;
       return {
+        id: d.id,
         name: d.name,
         region: d.sea || "",
         lat: d.lat, lng: d.lng,
@@ -459,15 +458,13 @@ let offsetX = -(adjustedHeading * pxPerDeg) + vw / 2 - totalW;
 function renderMarkers() {
   buildMarkers();
 }
+let currentInfoLighthouse = null; // 지금 정보 패널에 떠있는 등대 (상세정보 보기 버튼이 이걸 참고함)
 
-// ════════════════════════════════════════
-//  정보 패널
-// ════════════════════════════════════════
 function openInfoPanel(lh, distStr) {
-  document.getElementById("info-panel-name").textContent   = lh.name;
-  document.getElementById("info-panel-region").textContent = lh.region;
-  document.getElementById("info-panel-dist").textContent   = `📍 ${distStr} 거리`;
-  document.getElementById("info-panel-desc").textContent   = lh.desc || "등록된 소개 정보가 없습니다.";
+  currentInfoLighthouse = lh;
+
+  document.getElementById("info-panel-name").textContent = lh.name;
+  document.getElementById("info-panel-dist").textContent = `📍 ${distStr}`;
 
   const tags = document.getElementById("info-panel-tags");
   tags.innerHTML = "";
@@ -486,6 +483,20 @@ function openInfoPanel(lh, distStr) {
 
   document.getElementById("info-panel").classList.add("open");
   document.getElementById("status-bar").style.opacity = "0";
+}
+
+function goToLighthouseDetail() {
+  if (!currentInfoLighthouse) return;
+  const lh = currentInfoLighthouse;
+  const params = new URLSearchParams({
+    name: lh.name,
+    lat: lh.lat,
+    lng: lh.lng,
+    sea: lh.region || "",
+    light: lh.light || "",
+  });
+  if (lh.id) params.set("id", lh.id);
+  window.location.href = "detail.html?" + params.toString();
 }
 
 document.getElementById("info-panel-close").addEventListener("click", () => {
