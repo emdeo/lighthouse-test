@@ -161,6 +161,7 @@
   <div class="section-card" id="ferry-section" style="display:none;">
     <div class="section-title">⛴ 배편/교통 정보</div>
     <div class="ferry-table" id="detail-ferry"></div>
+    <button class="ferry-toggle-btn" id="ferry-toggle-btn" style="display:none;">더보기 ▾</button>
     <button class="reserve-btn" id="detail-reserve">배편 예매하기</button>
   </div>
 
@@ -813,6 +814,20 @@ function buildLightSimCard(code) {
         </table>`;
     }
     ferryEl.appendChild(block);
+  });
+
+  // 내용이 주간예보 섹션 정도보다 길면 접어두고, 더보기 버튼으로 펼치게
+  requestAnimationFrame(() => {
+    const toggleBtn = document.getElementById("ferry-toggle-btn");
+    if (ferryEl.scrollHeight > ferryEl.clientHeight + 10) {
+      toggleBtn.style.display = "block";
+      toggleBtn.onclick = () => {
+        const expanded = ferryEl.classList.toggle("expanded");
+        toggleBtn.textContent = expanded ? "접기 ▴" : "더보기 ▾";
+      };
+    } else {
+      toggleBtn.style.display = "none";
+    }
   });
 
   document.getElementById("detail-reserve").onclick = () => {

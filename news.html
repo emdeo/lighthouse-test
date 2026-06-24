@@ -460,6 +460,14 @@ let offsetX = -(adjustedHeading * pxPerDeg) + vw / 2 - totalW;
 function renderMarkers() {
   buildMarkers();
 }
+
+// 화면 회전(가로 ↔ 세로) 시, 새 화면 폭 기준으로 등대 마커 다시 배치
+let orientationResizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(orientationResizeTimer);
+  orientationResizeTimer = setTimeout(buildMarkers, 200);
+});
+
 let currentInfoLighthouse = null; // 지금 정보 패널에 떠있는 등대 (상세정보 보기 버튼이 이걸 참고함)
 
 function openInfoPanel(lh, distStr) {

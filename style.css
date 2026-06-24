@@ -2112,3 +2112,35 @@ html:has(body.detail-page) {
   z-index: 60;
   margin-bottom: 0;
 }
+/* ── 배편 정보: 접기/더보기 ── */
+.ferry-table {
+  max-height: 300px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height .3s ease;
+}
+.ferry-table.expanded {
+  max-height: none;
+}
+.ferry-table:not(.expanded)::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), var(--white));
+  pointer-events: none;
+}
+.ferry-toggle-btn {
+  width: 100%;
+  margin-top: .6rem;
+  margin-bottom: .8rem;
+  padding: .55rem;
+  background: var(--gray1);
+  border: none;
+  border-radius: 8px;
+  color: var(--gray4);
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ferry-toggle-btn:hover { background: var(--gray2); color: var(--navy); }
