@@ -288,7 +288,10 @@ function getLightColors(code) {
 // ════════════════════════════════════════
 
 // 1도당 픽셀 수 (FOV 70도 = 화면 너비)
-const DEG_PER_PX = () => window.innerWidth / 70;
+const DEG_PER_PX = () => {
+  const isLandscape = window.innerWidth > window.innerHeight;
+  return window.innerWidth / (isLandscape ? 100 : 70);
+};
 
 // 파노라마 컨테이너: 360도 * DEG_PER_PX px 너비
 let markerEls = []; // 마커 DOM 요소 캐시
