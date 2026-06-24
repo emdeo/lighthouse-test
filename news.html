@@ -287,11 +287,7 @@ function getLightColors(code) {
 //  heading이 바뀌면 컨테이너만 이동
 // ════════════════════════════════════════
 
-// 1도당 픽셀 수 (FOV 70도 = 화면 너비)
-const DEG_PER_PX = () => {
-  const isLandscape = window.innerWidth > window.innerHeight;
-  return window.innerWidth / (isLandscape ? 100 : 70);
-};
+const DEG_PER_PX = () => window.innerWidth / 70;
 
 // 파노라마 컨테이너: 360도 * DEG_PER_PX px 너비
 let markerEls = []; // 마커 DOM 요소 캐시
@@ -551,9 +547,6 @@ function startGPS() {
   );
 }
 
-// ════════════════════════════════════════
-//  센서 (모바일 나침반)
-// ════════════════════════════════════════
 function attachSensorHandler() {
   sensorActive = true;
 
@@ -562,17 +555,20 @@ function attachSensorHandler() {
 
     let heading = null;
 
-    // iOS 사파리: webkitCompassHeading이 진짜 나침반 값
+    // 화면이 가로로 돌아가 있으면 그만큼 보정 (세로일 땐 0이라 영향 없음)
+    const screenAngle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+
+    // iOS 사파리: webkitCompassHeading이 진짜 나침반 값 (이미 보정된 값이라 그대로 사용)
     if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
       heading = e.webkitCompassHeading;
 
-    // Android absolute: 360 - alpha가 자북 기준
+    // Android absolute: 360 - alpha가 자북 기준 (화면 회전 보정 추가)
     } else if (e.absolute === true && e.alpha !== null) {
-      heading = (360 - e.alpha) % 360;
+      heading = (360 - e.alpha - screenAngle + 720) % 360;
 
-    // 그 외 (일반 deviceorientation): alpha는 상대값이라 신뢰도 낮음
+    // 그 외 (일반 deviceorientation): alpha는 상대값이라 신뢰도 낮음 (화면 회전 보정 추가)
     } else if (e.alpha !== null) {
-      heading = (360 - e.alpha) % 360;
+      heading = (360 - e.alpha - screenAngle + 720) % 360;
     }
 
     if (heading === null) return;
