@@ -759,6 +759,8 @@ let arTutorialSmoothHeading = 0;
 let arTutorialRange = 3;
 let arTutorialDragHandlers = null;
 let arTutorialSensorFns = null;
+let arTutorialSensorGranted = false; // 센서 권한 허용 여부 (1단계 때 받아두고, 2단계부터 사용)
+let arTutorialMovementEnabled = false; // 1단계: false(고정) / 2단계부터: true
 
 function buildArTutorialMarkers(list) {
   const container = document.getElementById('ar-tutorial-markers');
@@ -849,6 +851,22 @@ function detachArTutorialDrag() {
   arTutorialDragHandlers = null;
 }
 
+// 1단계: 고정(문어등대만 보임) / 2단계부터: 드래그+센서 작동
+function setArTutorialMovementEnabled(enabled) {
+  if (enabled === arTutorialMovementEnabled) return;
+  arTutorialMovementEnabled = enabled;
+  if (enabled) {
+    attachArTutorialDrag();
+    if (arTutorialSensorGranted) attachArTutorialSensor();
+  } else {
+    detachArTutorialDrag();
+    detachArTutorialSensor();
+    arTutorialHeading = 0;
+    arTutorialSmoothHeading = 0;
+    updateRuler(0);
+  }
+}
+
 // 폰 기울이기 (튜토리얼 전용 — 실제 attachSensorHandler와 별개)
 function attachArTutorialSensor() {
   let hasAbsolute = false;
@@ -862,7 +880,7 @@ function attachArTutorialSensor() {
     let diff = heading - arTutorialSmoothHeading;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
-    const smoothFactor = e.webkitCompassHeading != null ? 0.15 : 0.06;
+    const smoothFactor = e.webkitCompassHeading != null ? 0.3 : 0.15;
     arTutorialSmoothHeading += diff * smoothFactor;
     arTutorialSmoothHeading = (arTutorialSmoothHeading + 360) % 360;
     arTutorialHeading = (arTutorialSmoothHeading + 8 + 360) % 360;
@@ -896,6 +914,7 @@ let arTutorialIdx = 0;
 
 function renderArTutorialStep() {
   const step = AR_TUTORIAL_STEPS[arTutorialIdx];
+  setArTutorialMovementEnabled(arTutorialIdx >= 1); // 1단계만 고정, 2단계부터 작동
   document.getElementById('ar-tutorial-mascot-img').src = step.img;
   document.getElementById('ar-tutorial-text').textContent = step.text;
   document.getElementById('ar-tutorial-progress').textContent = (arTutorialIdx + 1) + ' / ' + AR_TUTORIAL_STEPS.length;
@@ -936,9 +955,6 @@ function finishArTutorial() {
   beginARExperience();
 }
 
-// ════════════════════════════════════════
-//  시작 버튼 — 클릭 즉시 센서 권한 요청 → 투어 시작
-// ════════════════════════════════════════
 document.getElementById("start-btn").addEventListener("click", () => {
   document.getElementById("start-overlay").style.display = "none";
 
@@ -946,31 +962,31 @@ document.getElementById("start-btn").addEventListener("click", () => {
     arTutorialActive = true;
     arTutorialHeading = 0;
     arTutorialSmoothHeading = 0;
+    arTutorialMovementEnabled = false;
     buildRuler();
     updateRuler(0);
-    attachArTutorialDrag();
     document.getElementById("ar-tutorial-overlay").style.display = "block";
     arTutorialIdx = 0;
-    renderArTutorialStep();
+    renderArTutorialStep(); // 1단계 — 고정 상태로 시작
   };
 
   const isIOS = typeof DeviceOrientationEvent !== "undefined" &&
                 typeof DeviceOrientationEvent.requestPermission === "function";
 
   if (isIOS) {
-    // iOS: 클릭 컨텍스트 안에서 바로 권한 요청
+    // iOS: 클릭 컨텍스트 안에서 바로 권한 요청 (작동은 2단계부터)
     DeviceOrientationEvent.requestPermission()
       .then(res => {
-        if (res === "granted") attachArTutorialSensor();
+        arTutorialSensorGranted = (res === "granted");
         beginTutorial();
       })
       .catch(() => { beginTutorial(); });
   } else if (isMobile) {
-    // Android: 팝업 없이 바로 센서 연결
-    attachArTutorialSensor();
+    // Android: 권한 팝업 없음 → 바로 허용된 걸로 처리 (작동은 2단계부터)
+    arTutorialSensorGranted = true;
     beginTutorial();
   } else {
-    // 데스크탑: 센서 없음, 드래그만
+    // 데스크탑: 센서 없음, 드래그만 (2단계부터)
     beginTutorial();
   }
 });
