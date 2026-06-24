@@ -862,7 +862,8 @@ function attachArTutorialSensor() {
     let diff = heading - arTutorialSmoothHeading;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
-    const smoothFactor = e.webkitCompassHeading != null ? 0.15 : 0.06;
+    if (Math.abs(diff) < 0.5) return; // 미세한 센서 떨림은 무시 (투어는 안정감이 더 중요)
+    const smoothFactor = e.webkitCompassHeading != null ? 0.08 : 0.03;
     arTutorialSmoothHeading += diff * smoothFactor;
     arTutorialSmoothHeading = (arTutorialSmoothHeading + 360) % 360;
     arTutorialHeading = (arTutorialSmoothHeading + 8 + 360) % 360;
