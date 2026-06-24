@@ -1551,5 +1551,16 @@ document.addEventListener("click", e => {
   }
 });
 </script>
+
+<!-- 맨 위로 가기 버튼 -->
+<button id="scroll-top-btn" class="scroll-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
+<script>
+window.addEventListener("scroll", () => {
+  document.getElementById("scroll-top-btn").classList.toggle("visible", window.scrollY > 300);
+});
+</script>
+</body>
+</html>
 </body>
 </html>
