@@ -1950,9 +1950,8 @@ html:has(body.detail-page) {
 
 .tutorial-bottom-row {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  row-gap: 6px;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .tutorial-progress {
@@ -2013,17 +2012,22 @@ html:has(body.detail-page) {
     margin-bottom: 1rem;
   }
   .tutorial-progress {
-    font-size: .78rem;
+    font-size: .72rem;
+    flex-shrink: 0;
   }
   .tutorial-next-btn {
-    padding: .55rem 1.1rem;
-    font-size: .85rem;
+    padding: .5rem .85rem;
+    font-size: .78rem;
     border-radius: 9px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .tutorial-prev-btn {
-    padding: .5rem 1rem;
-    font-size: .85rem;
+    padding: .45rem .75rem;
+    font-size: .78rem;
     border-radius: 9px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
 /* ── AR 페이지 사용법 안내 (3단계) ── */
