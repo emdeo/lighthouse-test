@@ -113,7 +113,7 @@
   <div id="info-panel-dist">–</div>
   <div id="info-panel-tags"></div>
   <div id="info-panel-desc">–</div>
-  <button id="btn-map-link" onclick="window.location.href='index.html'">🗺 지도에서 보기</button>
+  <button id="btn-map-link" onclick="window.location.href='index.html'">상세정보 보기</button>
 </div>
 
 <!-- ── 상태 표시 ── -->
@@ -862,8 +862,7 @@ function attachArTutorialSensor() {
     let diff = heading - arTutorialSmoothHeading;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
-    if (Math.abs(diff) < 0.5) return; // 미세한 센서 떨림은 무시 (투어는 안정감이 더 중요)
-    const smoothFactor = e.webkitCompassHeading != null ? 0.08 : 0.03;
+    const smoothFactor = e.webkitCompassHeading != null ? 0.15 : 0.06;
     arTutorialSmoothHeading += diff * smoothFactor;
     arTutorialSmoothHeading = (arTutorialSmoothHeading + 360) % 360;
     arTutorialHeading = (arTutorialSmoothHeading + 8 + 360) % 360;
