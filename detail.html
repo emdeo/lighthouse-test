@@ -1132,7 +1132,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=공영주차장
       <div style="flex:1; min-width:0;">
         <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
         <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
-        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m${p.phone ? ' · 📞 ' + p.phone : ''}</div>
+        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${(p.distance/1000).toFixed(1)}km${p.phone ? ' · 📞 ' + p.phone : ''}</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
         <a href="https://map.naver.com/p/search/${p.place_name.replace(/ /g,'+')}" target="_blank"
@@ -1165,7 +1165,7 @@ fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?query=공중화장실
       <div style="flex:1; min-width:0;">
         <div style="font-weight:600; margin-bottom:0.2rem;">${p.place_name}</div>
         <div style="font-size:0.85rem; color:var(--gray4);">${p.road_address_name || p.address_name}</div>
-        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${Math.round(p.distance)}m</div>
+        <div style="font-size:0.85rem; color:var(--ocean); margin-top:0.2rem;">📍등대로부터${(p.distance/1000).toFixed(1)}km</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0;">
         <a href="https://map.naver.com/p/search/${p.place_name.replace(/ /g,'+')}" target="_blank"
