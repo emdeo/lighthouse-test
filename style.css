@@ -2030,7 +2030,7 @@ html:has(body.detail-page) {
 /* ── AR 사용법 안내: 가짜 등대 마커들 ── */
 .ar-tutorial-marker {
   position: absolute;
-  bottom: 200px;
+  bottom: 280px;
   transform: translateX(-50%);
   display: none;
   flex-direction: column;
@@ -2050,6 +2050,6 @@ html:has(body.detail-page) {
 .ar-tutorial-marker-dist { color:rgba(255,210,100,0.85); font-size:10px; font-family:'Noto Sans KR',sans-serif; }
 .ar-tutorial-marker-line { width:1px; height:10px; background:rgba(255,200,80,0.5); }
 @media (max-width: 768px) {
-  .ar-tutorial-marker { bottom: 230px; }
+  .ar-tutorial-marker { bottom: 310px; }
   .ar-tutorial-marker svg { width: 48px; height: 118px; }
 }
