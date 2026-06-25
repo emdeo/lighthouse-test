@@ -1582,13 +1582,13 @@ html:has(body.detail-page) {
   /* 팝업: 화면 중앙 */
   #popup {
     position: fixed !important;
-    top: 25vh !important;
+    top: 25dvh !important;
     left: 50vw !important;
     transform: translateX(-50%) !important;
     width: calc(100% - 2.5rem) !important;
     max-width: 380px !important;
-    height: 70vh !important;
-    max-height: 60vh !important;
+    height: 70dvh !important;
+    max-height: 60dvh !important;
     right: auto !important;
     bottom: auto !important;
     border-radius: 16px !important;
