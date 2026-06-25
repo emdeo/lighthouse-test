@@ -658,7 +658,9 @@ function selectLighthouse(lh) {
     : null;
 
   if (markerObj) {
-    window.selectedMarkerOriginalImage = markerObj.getImage();
+    if (window.selectedLhId !== lh.id) {
+      window.selectedMarkerOriginalImage = markerObj.getImage();
+    }
     markerObj.setImage(markerImages.selected);
     markerObj.setMap(window.kakaoMap);
     window.selectedMarker = markerObj;
@@ -1469,8 +1471,10 @@ kakao.maps.event.addListener(marker, "click", () => {
     window.selectedLhId = null;
   }
 
-  // 현재 마커 빨간색으로
-  window.selectedMarkerOriginalImage = marker.getImage();
+  // 현재 마커 빨간색으로 (이미 선택된 마커면 원래색 다시 저장하지 않음)
+  if (window.selectedLhId !== lh.id) {
+    window.selectedMarkerOriginalImage = marker.getImage();
+  }
   marker.setImage(markerImages.selected);
   window.selectedMarker = marker;
   window.selectedLhId = lh.id;
