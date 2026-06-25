@@ -1582,7 +1582,7 @@ html:has(body.detail-page) {
   /* 팝업: 화면 중앙 */
   #popup {
     position: fixed !important;
-    top: 15vh !important;
+    top: 25vh !important;
     left: 50vw !important;
     transform: translateX(-50%) !important;
     width: calc(100% - 2.5rem) !important;

@@ -697,10 +697,20 @@ function selectLighthouse(lh) {
       centerPoint.x -= offsetPx;
       window.kakaoMap.setCenter(proj.coordsFromPoint(centerPoint));
     } else {
-      const sheetH = window.innerHeight * 0.4;
+      // 모바일: 헤더(56px) ~ 팝업(top:20vh) 사이 빈 공간 정중앙에 마커 핀을 둠
+      const headerH = 56; // style.css의 --header-h 값과 동일하게 유지
+      const pinH = 36;     // makeMarkerImage()로 만든 핀 아이콘 높이
+      const margin = 8;
+      const popupTopPx = window.innerHeight * 0.25; // style.css #popup의 top:25vh
+      let targetY = (headerH + popupTopPx) / 2 + pinH / 2;
+      const minY = headerH + pinH + margin;
+      const maxY = popupTopPx - margin;
+      if (targetY < minY) targetY = minY;
+      if (targetY > maxY) targetY = maxY;
+      const containerCenterY = (window.innerHeight + headerH) / 2;
       const proj = window.kakaoMap.getProjection();
       const cp = proj.pointFromCoords(pos);
-      cp.y += sheetH / 2;
+      cp.y += (containerCenterY - targetY);
       window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
     }
   }
@@ -1487,13 +1497,31 @@ kakao.maps.event.addListener(marker, "click", () => {
       font-size:.72rem; font-weight:700;
       padding:.3rem .7rem; border-radius:6px;
       box-shadow:0 2px 8px rgba(0,0,0,.2);
-      white-space:nowrap; margin-top:4px;
+      white-space:nowrap; margin-top:0px;
     ">${lh.name}</div>`,
     yAnchor: -0.3,
     zIndex: 10,
   });
   nameOverlay.setMap(map);
   window._nameOverlay = nameOverlay;
+
+  if (isMobileDevice() && window.kakaoMap) {
+    const headerH = 56; // style.css의 --header-h 와 동일하게 유지
+    const pinH = 36;     // makeMarkerImage()로 만든 핀 아이콘 높이
+    const margin = 8;
+    const popupTopPx = window.innerHeight * 0.25; // style.css #popup의 top:25vh
+    let targetY = (headerH + popupTopPx) / 2 + pinH / 2;
+    const minY = headerH + pinH + margin;
+    const maxY = popupTopPx - margin;
+    if (targetY < minY) targetY = minY;
+    if (targetY > maxY) targetY = maxY;
+    const containerCenterY = (window.innerHeight + headerH) / 2;
+    const proj = window.kakaoMap.getProjection();
+    const cp = proj.pointFromCoords(position);
+    cp.y += (containerCenterY - targetY);
+    window.kakaoMap.setCenter(proj.coordsFromPoint(cp));
+  }
+
   openPopup(lh, null);
 });
 
