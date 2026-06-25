@@ -379,6 +379,9 @@
   </div>
   <div id="popup-fog-content"></div>
 </div>
+<div id="popup-scroll-hint" style="position:sticky; bottom:0; height:0; pointer-events:none; z-index:5; display:none;">
+  <div style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:9px solid var(--gray3); animation:popup-scroll-bounce 1.4s ease-in-out infinite;"></div>
+</div>
         </div>
       </div>
 
@@ -721,9 +724,19 @@ function selectLighthouse(lh) {
 // ════════════════════════════════════════
 //  팝업
 // ════════════════════════════════════════
+function updatePopupScrollHint() {
+  const popup = document.getElementById("popup");
+  const hint = document.getElementById("popup-scroll-hint");
+  if (!popup || !hint) return;
+  const isScrollable = popup.scrollHeight > popup.clientHeight + 2;
+  hint.style.display = (isScrollable && popup.scrollTop < 5) ? "block" : "none";
+}
+document.getElementById("popup").addEventListener("scroll", updatePopupScrollHint);
+
 function openPopup(lh, markerEl) {
   activeId = lh.id;
   const popup = document.getElementById("popup");
+  popup.scrollTop = 0;
 
   // 내용 채우기
   document.getElementById("popup-emoji").textContent = lh.emoji;
@@ -901,6 +914,7 @@ document.getElementById("fog-cctv-modal").addEventListener("click", function(e) 
   popup.style.animation = "none";
   popup.offsetHeight;
   popup.style.animation = "";
+  updatePopupScrollHint();
 
   // 클릭한 마커를 지도 중앙으로 이동 (시각적 효과)
   const layer = document.getElementById("markers-layer");

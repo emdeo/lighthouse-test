@@ -972,6 +972,7 @@ function renderArTutorialStep() {
     // 나침반 소개 단계 + 범위조절 단계: 범위 바 + 나침반 버튼 같이 보여주고, 지금 보는 방향 근처에 3개를 모아서 배치
     document.getElementById('range-control').style.display = 'flex';
     document.getElementById('compass-btn').style.display = isMobile ? 'block' : 'none';
+    document.getElementById('compass-btn').classList.toggle('compass-btn-pulse', !!step.introduceCompass);
     arTutorialRange = parseFloat(document.getElementById('range-slider').value) || 1.5;
     const base = arTutorialHeading;
     buildArTutorialMarkers([
@@ -982,6 +983,7 @@ function renderArTutorialStep() {
   } else {
     document.getElementById('range-control').style.display = 'none';
     document.getElementById('compass-btn').style.display = 'none';
+    document.getElementById('compass-btn').classList.remove('compass-btn-pulse');
     arTutorialRange = 3;
     buildArTutorialMarkers([
       { name: '문어등대',   bearing: 0,   dist: 0.3, light: 'R' },
@@ -1000,6 +1002,7 @@ function finishArTutorial() {
   document.getElementById("range-value").textContent = "1.5km";
   document.getElementById("range-control").style.display = "none";
   document.getElementById("compass-btn").style.display = "none";
+  document.getElementById("compass-btn").classList.remove("compass-btn-pulse");
   beginARExperience();
 }
 
