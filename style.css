@@ -1963,6 +1963,18 @@ html:has(body.detail-page) {
   font-size: .95rem; color: var(--ocean); font-weight: 700;
 }
 
+.tutorial-dismiss-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: .8rem;
+  font-size: .82rem; color: var(--gray4);
+  cursor: pointer;
+  user-select: none;
+}
+.tutorial-dismiss-row input[type="checkbox"] {
+  width: 15px; height: 15px;
+  cursor: pointer;
+}
+
 .tutorial-next-btn {
   background: var(--navy);
   color: var(--white);

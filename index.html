@@ -307,6 +307,10 @@
         <span class="tutorial-progress" id="tutorial-progress"></span>
         <button class="tutorial-next-btn" id="tutorial-next-btn">다음 ▶</button>
       </div>
+      <label class="tutorial-dismiss-row">
+        <input type="checkbox" id="tutorial-dismiss-checkbox">
+        다시 보지 않기
+      </label>
     </div>
   </div>
 </div>
@@ -1832,8 +1836,14 @@ function openFilterSheet() {
   sheetMode = "filter";
 }
 
-// 필터/목록 버튼
-document.getElementById("mobile-sheet-btn").addEventListener("click", openFilterSheet);
+// 필터/목록 버튼 (이미 열려있으면 다시 누르면 닫힘 — 토글)
+document.getElementById("mobile-sheet-btn").addEventListener("click", () => {
+  if (sheetMode === "filter") {
+    closeSheet();
+  } else {
+    openFilterSheet();
+  }
+});
 
 // 관련사이트 버튼
 document.getElementById("mobile-links-btn").addEventListener("click", () => {
@@ -1962,6 +1972,9 @@ function openTutorial() {
 }
 
 function closeTutorial() {
+  if (document.getElementById('tutorial-dismiss-checkbox').checked) {
+    localStorage.setItem('lh-tutorial-dismissed', '1');
+  }
   document.getElementById('tutorial-overlay').classList.remove('active');
   if (sheetMode === 'filter') closeSheet();
 }
@@ -1998,6 +2011,11 @@ window.addEventListener('resize', () => {
     renderTutorialStep();
   }
 });
+
+// 처음 방문(또는 "다시 보지 않기" 안 누른 사용자)이면 자동으로 사용법 띄우기
+if (!localStorage.getItem('lh-tutorial-dismissed')) {
+  openTutorial();
+}
 </script>
 </body>
 </html>
