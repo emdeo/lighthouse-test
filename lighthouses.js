@@ -1541,16 +1541,6 @@ const LIGHTHOUSE_DATA =
     "lng": 130.9194167
   },
   {
-    "id": "1275.1",
-    "name": "도동 \n등대 조사등",
-    "nameEn": "Dodong",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 58m",
-    "lat": 37.48675,
-    "lng": 130.9203056
-  },
-  {
     "id": "1276.1",
     "name": "사동1리항\n방파제 등대",
     "nameEn": "Sadong-1ri",
@@ -3161,16 +3151,6 @@ const LIGHTHOUSE_DATA =
     "lng": 129.45925
   },
   {
-    "id": "1353.7",
-    "name": "어물항\n방파제 등대 조사등",
-    "nameEn": "Eomul Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 13m",
-    "lat": 35.5782778,
-    "lng": 129.4533889
-  },
-  {
     "id": "1354.1",
     "name": "주전항\n북방파제 등대",
     "nameEn": "Jujeon Hang",
@@ -3721,26 +3701,6 @@ const LIGHTHOUSE_DATA =
     "lng": 129.2785278
   },
   {
-    "id": "1439.26",
-    "name": "신암항\n방파제 등대 조사등",
-    "nameEn": "Sinam Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 13m",
-    "lat": 35.3463889,
-    "lng": 129.3264167
-  },
-  {
-    "id": "1439.27",
-    "name": "당사항\n방파제 등대 조사등",
-    "nameEn": "Dangsa Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 14m",
-    "lat": 35.5833889,
-    "lng": 129.4585556
-  },
-  {
     "id": "1439.28",
     "name": "나사항\n이안제 동단 등대",
     "nameEn": "Nasa Hang Offshore Breakwater",
@@ -3891,16 +3851,6 @@ const LIGHTHOUSE_DATA =
     "lng": 129.2449167
   },
   {
-    "id": "1440.51",
-    "name": "월전항\n방파제 등대 조사등",
-    "nameEn": "Woljeon Hang",
-    "type": "고정표지",
-    "sea": "동해안",
-    "light": "F W 12m",
-    "lat": 35.2373333,
-    "lng": 129.2449167
-  },
-  {
     "id": "1440.6",
     "name": "칠암항\n남방파제 등대",
     "nameEn": "Chiram Hang",
@@ -4019,16 +3969,6 @@ const LIGHTHOUSE_DATA =
     "light": "Fl G 5s 11m 8M",
     "lat": 35.1805,
     "lng": 129.2075
-  },
-  {
-    "id": "1443.6",
-    "name": "공수항\n방파제 등대 조사등",
-    "nameEn": "Gongsu Hang Breakwater",
-    "type": "고정표지",
-    "sea": "남해안",
-    "light": "F W 13m",
-    "lat": 35.1833333,
-    "lng": 129.2137222
   },
   {
     "id": "1450.1",
@@ -12899,16 +12839,6 @@ const LIGHTHOUSE_DATA =
     "light": "Fl G 4s 17m 7M",
     "lat": 36.7493056,
     "lng": 126.12775
-  },
-  {
-    "id": "3298.10",
-    "name": "모항항\n북방파제 등대 조사등",
-    "nameEn": "Mohang Hang",
-    "type": "고정표지",
-    "sea": "서해안",
-    "light": "F W 11m",
-    "lat": 36.7781111,
-    "lng": 126.1271111
   },
   {
     "id": "3298.4",
