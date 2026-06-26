@@ -907,6 +907,11 @@ function restoreFilterState() {
       filterState.stamp = new Set(saved.stamp || []);
       filterState.year  = new Set(saved.year  || []);
       filterState.month = new Set(saved.month || []);
+    } else {
+      // 저장된 기록이 없는 첫 방문자: '모든 등대 표시'를 기본값으로
+      filterState.stamp = new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]);
+      filterState.year  = new Set(["year-all","year-2025","year-2024","year-2023","year-2022","year-2021","year-2020","year-2019"]);
+      filterState.month = new Set(["month-all"]);
     }
   } catch (e) {}
 }
@@ -1937,5 +1942,6 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
   openTutorial();
 }
 </script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
