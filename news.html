@@ -276,11 +276,10 @@ function prepareLighthouses() {
 function getLightColors(code) {
   const t = (code || "").toUpperCase();
   if (t.includes("R")) return { main:"#ef4444", light:"#fca5a5", dark:"#b91c1c" };
-  if (t.includes("G")) return { main:"#22c55e", light:"#86efac", dark:"#15803d" };
+  if (t.includes("G")) return { main:"#e5e7eb", light:"#f9fafb", dark:"#9ca3af" }; // 흰색 등대
   if (t.includes("Y")) return { main:"#eab308", light:"#fde047", dark:"#a16207" };
   return { main:"#e5e7eb", light:"#f9fafb", dark:"#9ca3af" }; // 흰색 등대
 }
-
 // ════════════════════════════════════════
 //  AR 마커 — 파노라마 방식
 //  360도 전체를 한 번에 그려두고
