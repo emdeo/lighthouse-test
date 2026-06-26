@@ -618,9 +618,10 @@
   animation: popup-in .22s cubic-bezier(.34,1.56,.64,1) both;
 }
 #links-title {
-  font-family: var(--font-serif);
-  font-size: 1.1rem; font-weight: 900;
-  color: var(--navy); margin-bottom: 1.2rem;
+  font-size: 1rem; font-weight: 700;
+  color: var(--gray4, #6b7280);
+  letter-spacing: 0.02em;
+  margin-bottom: 1.2rem;
 }
 #links-close {
   position: absolute; top: 1.2rem; right: 1.2rem;
@@ -646,12 +647,14 @@
   background: var(--sky);
   transform: translateY(-2px);
 }
-.link-icon { font-size: 1.5rem; flex-shrink: 0; }
+.link-icon { font-size: 1.15rem; flex-shrink: 0; }
+.link-item-compact { padding: .55rem 1rem; }
 .link-info { flex: 1; }
 .link-name { font-size: .88rem; font-weight: 700; color: var(--navy); }
 .link-desc { font-size: .75rem; color: var(--gray3); margin-top: .15rem; }
 .link-arrow { color: var(--gray3); font-size: .9rem; flex-shrink: 0; }
 .link-item:hover .link-arrow { color: var(--ocean); }
+.link-item-compact { padding: .55rem 1rem; }
 
 #search-dropdown {
   position: absolute;
@@ -1991,9 +1994,8 @@ html:has(body.detail-page) {
   top: 10px; right: 10px; left: auto;
   width: 28px; height: 28px;
   font-size: .85rem;
-  background: rgba(255,255,255,.7);
+  border: 1px solid var(--gray2);
   box-shadow: none;
-  color: var(--gray4);
 }
 /* ── 사용법 튜토리얼: 모바일 전체 최적화 (이미지 크기는 그대로) ── */
 @media (max-width: 768px) {
@@ -2041,6 +2043,14 @@ html:has(body.detail-page) {
 #ar-tutorial-overlay .tutorial-skip-btn,
 #ar-tutorial-overlay .tutorial-wrap {
   pointer-events: auto;
+}
+#ar-tutorial-overlay .tutorial-skip-btn {
+  position: absolute;
+  top: 10px; right: 10px; left: auto;
+  width: 28px; height: 28px;
+  font-size: .85rem;
+  border: 1px solid var(--gray2);
+  box-shadow: none;
 }
 .ar-tutorial-chevrons {
   justify-content: space-between;
