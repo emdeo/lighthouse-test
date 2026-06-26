@@ -75,6 +75,7 @@ async function main() {
 
   const filtered = allItems
     .filter(d => d.name.includes('등대'))
+    .filter(d => !d.name.includes('조사등'))
     .filter(d => d.type === '고정표지')
     .filter(d => isKorea(d.lat, d.lng))
     .filter(d => !EXCLUDE_IDS.includes(d.id));
