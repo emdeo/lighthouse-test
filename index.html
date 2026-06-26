@@ -270,18 +270,6 @@
   </div>
 </div>
 
-<!-- 해무 CCTV 모달 -->
-<div id="fog-cctv-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:#fff; border-radius:16px; padding:1.5rem; width:90%; max-width:480px; max-height:80vh; overflow-y:auto; position:relative;">
-    <button onclick="document.getElementById('fog-cctv-modal').style.display='none'" style="position:absolute; top:0.8rem; right:0.8rem; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--gray4);">✕</button>
-    <div style="font-size:1rem; font-weight:700; margin-bottom:0.3rem;">📷 해무 CCTV</div>
-    <div id="fog-cctv-modal-station" style="font-size:0.78rem; color:var(--gray4); margin-bottom:1rem;"></div>
-    <div id="fog-cctv-modal-content">
-      <div style="text-align:center; color:var(--gray4); padding:2rem;">불러오는 중...</div>
-    </div>
-  </div>
-</div>
-
 <!-- 등대 사진 전체화면 뷰어 -->
 <div id="idx-photo-viewer" onclick="document.getElementById('idx-photo-viewer').style.display='none'" style="
   display:none; position:fixed; inset:0; background:rgba(0,0,0,.92);
@@ -296,10 +284,10 @@
 <!-- 사용법 튜토리얼 -->
 <div id="tutorial-overlay">
   <div class="tutorial-highlight" id="tutorial-highlight"></div>
-  <button class="tutorial-skip-btn" id="tutorial-skip-btn" title="닫기">✕</button>
   <div class="tutorial-wrap" id="tutorial-wrap">
     <img id="tutorial-mascot-img" class="tutorial-mascot-img" src="tutorial-mascot-1.png" alt="등대 안내자">
     <div class="tutorial-bubble" id="tutorial-bubble">
+      <button class="tutorial-skip-btn" id="tutorial-skip-btn" title="닫기">✕</button>
       <div class="tutorial-bubble-tail"></div>
       <div class="tutorial-text" id="tutorial-text"></div>
       <div class="tutorial-bottom-row">
@@ -324,9 +312,7 @@
         <div class="popup-body">
           <div class="popup-header-link" id="popup-header-link">
             <div class="popup-name" id="popup-name">등대 이름</div>
-            <div class="popup-desc" id="popup-desc">설명</div>
           </div>
-          <div class="popup-dist" id="popup-dist">📍 내 위치로부터 — km</div>
           <div class="popup-meta" id="popup-meta"></div>
           <div class="popup-divider"></div>
 
@@ -337,11 +323,6 @@
     <div class="weather-temp" id="popup-temp">—°</div>
     <div class="weather-desc" id="popup-weather-desc">날씨 정보 준비 중</div>
   </div>
-</div>
-
-<div class="popup-bottom-buttons" style="margin-top:0.6rem;">
-  <button class="popup-cctv-btn" id="btn-cctv">실시간 CCTV</button>
-  <button class="popup-cctv-btn" id="btn-coastal-cctv" onclick="window.open('https://coast.mof.go.kr/coastScene/coastMediaService.do','_blank')">연안 CCTV</button>
 </div>
 
 <div class="popup-divider"></div>
@@ -375,14 +356,6 @@
    onmouseout="this.style.background='var(--white)';this.style.borderColor='var(--gray2)'">
   상세정보 보기 &nbsp;›
 </button>
-
-<!-- 해무 CCTV -->
-<div id="popup-fog-cctv" style="display:none; margin-top:0.8rem;">
-  <div style="font-size:0.72rem; color:var(--gray4); margin-bottom:0.3rem;">${item.imgDt}</div>
-    📷 해무 CCTV <span id="popup-fog-station" style="font-weight:400;"></span>
-  </div>
-  <div id="popup-fog-content"></div>
-</div>
 <div id="popup-scroll-hint" style="position:sticky; bottom:0; height:0; pointer-events:none; z-index:5; display:none;">
   <div style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:9px solid var(--gray3); animation:popup-scroll-bounce 1.4s ease-in-out infinite;"></div>
 </div>
@@ -772,7 +745,6 @@ function openPopup(lh, markerEl) {
     .catch(() => {});
 
 document.getElementById("popup-name").textContent = lh.name;
-document.getElementById("popup-desc").textContent = [lh.region, lh.desc].filter(Boolean).join(" · ");
 document.getElementById("popup-header-link").onclick = () => {
   const params = new URLSearchParams({
   id:     lh.id   || "",
@@ -845,17 +817,6 @@ window.location.href = `detail.html?${params.toString()}`;
     showToast("카카오맵으로 이동합니다");
   };
 
-  const distEl = document.getElementById("popup-dist");
-if (myLat !== null && myLng !== null) {
-  const km = calcDistance(myLat, myLng, lh.lat, lh.lng);
-  const display = km >= 10
-    ? Math.round(km) + " km"
-    : km.toFixed(1) + " km";
-  distEl.textContent = "📍 내 위치로부터 " + display;
-} else {
-  distEl.textContent = "📍 내 위치로부터 — km";
-}
-
   const stamp = findStampData(lh.name, lh.lat, lh.lng);
 
   // 날씨 불러오기
@@ -878,40 +839,6 @@ fetch(`${CONFIG.WEATHER_API_URL}/?lat=${lh.lat}&lng=${lh.lng}`)
   .catch(() => {
     document.getElementById("popup-weather-desc").textContent = "날씨 정보를 불러올 수 없어요";
   });
-
-// 해무 CCTV 버튼
-document.getElementById("btn-cctv").onclick = function() {
-  const modal = document.getElementById("fog-cctv-modal");
-  const content = document.getElementById("fog-cctv-modal-content");
-  const stationEl = document.getElementById("fog-cctv-modal-station");
-  modal.style.display = "flex";
-  content.innerHTML = '<div style="text-align:center; color:var(--gray4); padding:2rem;">불러오는 중...</div>';
-  stationEl.textContent = "";
-
-  fetch(`${CONFIG.WEATHER_API_URL}/fog-cctv?lat=${lh.lat}&lng=${lh.lng}`)
-    .then(r => r.json())
-    .then(data => {
-      if (!data.station || !data.items || !data.items.length) {
-        content.innerHTML = '<div style="text-align:center; color:var(--gray4); padding:2rem;">근처 해무 관측소가 없습니다 (30km 이내)</div>';
-        return;
-      }
-      stationEl.textContent = `${data.station} 관측소 · ${data.distKm}km`;
-      content.innerHTML = data.items.map(item => `
-        <div style="margin-bottom:1rem;">
-          <div style="font-size:0.72rem; color:var(--gray4); margin-bottom:0.3rem;">${item.imgDt}</div>
-          <img src="${item.uri}" alt="해무 CCTV" style="width:100%; border-radius:8px;" onerror="this.parentElement.style.display='none'">
-        </div>
-      `).join('');
-    })
-    .catch(() => {
-      content.innerHTML = '<div style="text-align:center; color:var(--gray4); padding:2rem;">CCTV 정보를 불러올 수 없어요</div>';
-    });
-};
-
-// 모달 바깥 클릭시 닫기
-document.getElementById("fog-cctv-modal").addEventListener("click", function(e) {
-  if (e.target === this) this.style.display = "none";
-});
 
   // 팝업 표시 (오른쪽 고정)
   popup.classList.add("visible");
