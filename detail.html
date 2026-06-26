@@ -604,10 +604,10 @@ tagsEl.innerHTML = lh.tags.filter(t => TAG_INFO[t]).map(t => {
   const info = TAG_INFO[t];
   let label = info.label;
   if (t === "year" && yearInfo && yearInfo.year) {
-    label = `${info.label} - ${yearInfo.year}`;
+    label = `${yearInfo.year} ${info.label}`;
   } else if (t === "month" && monthlyInfo && monthlyInfo.year && monthlyInfo.month) {
     const mm = String(monthlyInfo.month).padStart(2, "0");
-    label = `${info.label} - ${monthlyInfo.year}.${mm}`;
+    label = `${monthlyInfo.year}.${mm} ${info.label}`;
   }
   return `<span class="detail-tag" style="background:${info.color};color:${info.text};">${label}</span>`;
 }).join("");

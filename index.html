@@ -314,7 +314,6 @@
             <div class="popup-name" id="popup-name">등대 이름</div>
           </div>
           <div class="popup-meta" id="popup-meta"></div>
-          <div class="popup-divider"></div>
 
 <!-- 날씨 -->
 <div class="popup-weather">
@@ -325,8 +324,6 @@
   </div>
 </div>
 
-<div class="popup-divider"></div>
-
 <!-- 길찾기 버튼 -->
 <div class="dir-buttons">
   <button class="dir-btn dir-naver" id="btn-naver">
@@ -336,8 +333,6 @@
     카카오맵 길찾기
   </button>
 </div>
-
-<div class="popup-divider"></div>
 
 <!-- 정보 더보기 버튼 -->
 <button id="btn-detail" style="
@@ -778,10 +773,10 @@ window.location.href = `detail.html?${params.toString()}`;
     if (!info) return;
     let label = info.label;
     if (t === "year" && lh.yearData && lh.yearData.year) {
-      label = `${info.label} - ${lh.yearData.year}`;
+      label = `${lh.yearData.year} ${info.label}`;
     } else if (t === "month" && lh.monthlyData && lh.monthlyData.year && lh.monthlyData.month) {
       const mm = String(lh.monthlyData.month).padStart(2, "0");
-      label = `${info.label} - ${lh.monthlyData.year}.${mm}`;
+      label = `${lh.monthlyData.year}.${mm} ${info.label}`;
     }
     badges.push(`<span class="popup-badge" style="background:${info.color};color:${info.text};">${label}</span>`);
   });

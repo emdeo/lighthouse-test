@@ -1472,7 +1472,6 @@ body.ar-page nav a:hover {
     .info-grid { grid-template-columns: 1fr; }
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .detail-name { font-size: 1.4rem; }
-    .dir-buttons { flex-direction: column; }
   }
 /* 상단 이름/소개/세부정보 카드 */
 .detail-top-card {
