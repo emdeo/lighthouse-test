@@ -702,6 +702,7 @@ async function startCamera() {
       video: { facingMode: "environment", width: { ideal: 1280 } }
     });
     const vid = document.getElementById("camera-feed");
+    vid.addEventListener('loadedmetadata', () => setStatus(`영상크기 ${vid.videoWidth}x${vid.videoHeight} / 화면 ${window.innerWidth}x${window.innerHeight}`, "active"));
     vid.srcObject = stream;
     vid.style.display = "block";
 
