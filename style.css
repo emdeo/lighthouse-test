@@ -2177,4 +2177,27 @@ html:has(body.detail-page) {
   font-weight: 600;
   cursor: pointer;
 }
-.ferry-toggle-btn:hover { background: var(--gray2); color: var(--navy); }
+.ferry-toggle-btn:hover { background: var(--gray2); color: var(--navy); 
+}
+/* ── detail.html 사용법 튜토리얼 (예시 페이지) ── */
+#detail-tutorial-overlay {
+  position: fixed; inset: 0;
+  z-index: 10000;
+  display: none;
+  background: var(--gray1);
+  overflow-y: auto;
+}
+#detail-tutorial-overlay.active { display: block; }
+#detail-tutorial-overlay .tutorial-skip-btn {
+  position: absolute;
+  top: 10px; right: 10px; left: auto;
+  width: 28px; height: 28px;
+  font-size: .85rem;
+  border: 1px solid var(--gray2);
+  box-shadow: none;
+}
+.dt-fake-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 6rem;
+}
