@@ -1569,7 +1569,6 @@ html:has(body.detail-page) {
     transform: translateX(-50%) !important;
     width: calc(100% - 2.5rem) !important;
     max-width: 380px !important;
-    height: 70dvh !important;
     max-height: 60dvh !important;
     right: auto !important;
     bottom: auto !important;
