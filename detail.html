@@ -101,7 +101,7 @@
   <!-- 뒤로 가기 -->
   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
     <a class="back-btn" id="back-btn" style="margin-bottom:0;">← 지도로 돌아가기</a>
-    <button id="detail-tutorial-btn" style="display:inline-flex; align-items:center; gap:.4rem; padding:.5rem 1rem; background:var(--white); border:1.5px solid var(--gray2); border-radius:8px; font-size:.82rem; font-weight:600; color:var(--gray4); cursor:pointer; font-family:var(--font-sans);">📖 상세 기능 설명</button>
+    <button id="detail-tutorial-btn" style="display:inline-flex; align-items:center; gap:.4rem; padding:.5rem 1rem; background:var(--white); border:1.5px solid var(--gray2); border-radius:8px; font-size:.82rem; font-weight:600; color:var(--gray4); cursor:pointer; font-family:var(--font-sans);">❓ 상세 기능 설명</button>
   </div>
 
   <!-- 빵 부스러기(breadcrumb) 탐색 -->
@@ -1618,9 +1618,20 @@ document.addEventListener("click", e => {
 <div id="detail-tutorial-overlay">
   <div class="dt-fake-page">
 
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+      <span class="back-btn" style="margin-bottom:0; cursor:default;">← 지도로 돌아가기</span>
+      <span id="dt-fake-tutorial-btn" style="display:inline-flex; align-items:center; gap:.4rem; padding:.5rem 1rem; background:var(--white); border:1.5px solid var(--gray2); border-radius:8px; font-size:.82rem; font-weight:600; color:var(--gray4); font-family:var(--font-sans); cursor:default;">❓ 상세 기능 설명</span>
+    </div>
+
+    <div class="breadcrumb">
+      <span>🏠 등대 지도</span>
+      <span class="breadcrumb-sep">›</span>
+      <span>문어 등대</span>
+    </div>
+
     <div id="dt-fake-top">
       <div class="hero">
-        <span>🐙</span>
+        <img src="image01.png" alt="문어 등대 예시 사진" style="width:100%; height:100%; object-fit:cover;">
       </div>
       <div class="detail-top-card">
         <div class="detail-oneline">Muneo, 동해안</div>
@@ -1815,12 +1826,6 @@ document.addEventListener("click", e => {
           <div class="light-explain-desc"><b>등질</b>이란, 야간에 항해자가 길을 찾도록, 불빛의 색깔·횟수·주기를 다르게 정해 놓은 신호예요</div>
           🦑 <b>등대 가이드 TIME!</b><br>
           이 등대는 방파제 위에 세워진 등대야.<br>
-          배가 들어오는 방향 기준으로<br>
-          ➡️ 왼쪽 = 초록색 등대 + 초록색 불빛 💚<br>
-          ➡️ 오른쪽 = 빨간색 등대 + 빨간색 불빛 ❤️<br>
-          🤔 왜 어떤 등대는 흰색일까?<br>
-          산이 많은 우리나라는 초록색 등대가 자연에 묻힐 수 있어서<br>
-          주변 환경에 따라 흰색 등대를 사용하기도 해 😊
         </div>
       </div>
     </div>
@@ -1836,7 +1841,10 @@ document.addEventListener("click", e => {
         </div>
       </div>
     </div>
-
+      <div id="dt-fake-photo-sample" style="display:none; padding:1rem 0;">
+      <img src="image01.png" alt="인증 사진 예시" style="width:100%; border-radius:14px; box-shadow:var(--shadow); display:block;">
+      <div style="text-align:center; font-size:.8rem; color:var(--gray3); margin-top:.5rem;">📸 이렇게 인증 사진이 모여요 (예시)</div>
+    </div>
     <div class="section-card" id="dt-fake-ai">
       <div class="section-title">🐙 AI 등대 정보</div>
       <div style="font-size:.85rem; color:var(--gray4); margin-bottom:.8rem;">버튼을 누르면 AI가 검색해서 이 등대의 역사, 맛집, 주변 명소를 정리해줘요.</div>
@@ -1883,7 +1891,7 @@ const DETAIL_TUTORIAL_STEPS = [
   { target: '#dt-fake-ferry', img: 'tutorial-mascot-2.png',
     text: '<b>[배편 정보]</b><br>가까운 항구의 배편 시간표를 보여줘. 운항 정보가 없는 기간엔 이렇게 안내 문구가 나와.' },
   { target: '#dt-fake-weather', img: 'tutorial-mascot-1.png',
-    text: '<b>[현재 날씨]</b><br>실시간 날씨랑 "바다여행지수"(여행하기 좋은 날인지)를 보여줘. CCTV로 실제 모습도 볼 수 있어.' },
+    text: '<b>[현재 날씨]</b><br>실시간 날씨랑 "바다여행지수"(여행하기 좋은 날인지)를 보여줘. CCTV로 등대 근처 날씨도 볼 수 있어.' },
   { target: '#dt-fake-forecast', img: 'tutorial-mascot-2.png',
     text: '<b>[주간 예보]</b><br>앞으로 4일 동안의 날씨랑 바다여행지수·뱃멀미·갯벌체험지수를 한눈에 볼 수 있어.' },
   { target: '#dt-fake-tide', img: 'tutorial-mascot-1.png',
@@ -1894,9 +1902,11 @@ const DETAIL_TUTORIAL_STEPS = [
     text: '<b>[등질 정보 &amp; 이야기]</b><br>등대 불빛 색깔과 주기 등의 정보를 알려줘.' },
   { target: '#dt-fake-gallery', img: 'tutorial-mascot-2.png',
     text: '<b>[인증 사진]</b><br>등대 앞에서 사진을 찍어서 나만의 등대 인증 사진을 모아둘 수 있어.' },
+  { target: '#dt-fake-photo-sample', img: 'tutorial-mascot-1.png',
+    text: '<b>[사진 예시]</b><br>이렇게 찍은 사진들이 인증 사진으로 차곡차곡 쌓여!' },
   { target: '#dt-fake-ai', img: 'tutorial-mascot-1.png',
     text: '<b>[AI 등대 정보]</b><br>버튼을 누르면 AI가 검색해서 이 등대의 역사·맛집·주변 관광지를 정리해줘.' },
-  { target: null, img: 'tutorial-mascot-1.png',
+  { target: '#dt-fake-tutorial-btn', img: 'tutorial-mascot-1.png',
     text: '이제 실제 등대 페이지로 돌아가자?<br>나를 다시 보고 싶으면 우측 상단의 "상세 기능 설명" 버튼을 누르면 돼!' },
 ];
 
@@ -1923,13 +1933,13 @@ function positionDetailTutorial(targetSel) {
     if (wrapTop + wrapH > window.innerHeight) {
       wrapTop = Math.max(topSafe, r.top - pad - 18 - wrapH);
     }
-    let wrapLeft = Math.min(r.left, window.innerWidth - wrapW - 10);
+    let wrapLeft = Math.min(r.left, window.innerWidth - wrapW - 24);
     wrapLeft = Math.max(10, wrapLeft);
 
     wrap.style.top = wrapTop + 'px';
     wrap.style.left = wrapLeft + 'px';
   } else {
-    highlight.style.opacity = '0';
+    highlight.style.opacity = '1';
     highlight.style.width = '0px';
     highlight.style.height = '0px';
     highlight.style.top = '50%';
@@ -1951,6 +1961,7 @@ function renderDetailTutorialStep() {
 
   mascotImg.src = step.img;
   textEl.innerHTML = step.text;
+  document.getElementById('dt-fake-photo-sample').style.display = (step.target === '#dt-fake-photo-sample') ? 'block' : 'none';
   progressEl.textContent = (dtTutorialIdx + 1) + ' / ' + DETAIL_TUTORIAL_STEPS.length;
   nextBtn.textContent = (dtTutorialIdx === DETAIL_TUTORIAL_STEPS.length - 1) ? '확인' : '다음 ▶';
   prevBtn.style.visibility = (dtTutorialIdx === 0) ? 'hidden' : 'visible';
@@ -1962,7 +1973,9 @@ function renderDetailTutorialStep() {
     requestAnimationFrame(() => { wrap.style.opacity = '1'; });
   };
 
-  if (step.target) {
+  if (step.target === '#dt-fake-tutorial-btn') {
+    document.getElementById('detail-tutorial-overlay').scrollTo({ top: 0 });
+  } else if (step.target) {
     document.querySelector(step.target).scrollIntoView({ block: 'center' });
   } else {
     document.getElementById('detail-tutorial-overlay').scrollTo({ top: 0 });
