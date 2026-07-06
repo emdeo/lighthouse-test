@@ -2081,13 +2081,13 @@ html:has(body.detail-page) {
 /* ── 맨 위로 가기 버튼 ── */
 .scroll-top-btn {
   position: fixed;
-  bottom: 24px;
+  bottom: 80px;
   right: 20px;
   z-index: 500;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--navy);
+  background: var(--ocean);
   color: #fff;
   border: none;
   box-shadow: var(--shadow-lg);
@@ -2100,6 +2100,24 @@ html:has(body.detail-page) {
 }
 .scroll-top-btn.visible {
   display: flex;
+}
+/* ── 페이지 공유하기 버튼 (맨 위로 가기 버튼 위에 쌓임) ── */
+.page-share-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 500;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ocean);
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 /* ── AR 페이지: 지도로 돌아가기 버튼 (detail.html과 같은 .back-btn 스타일 재사용) ── */
 .ar-back-btn {
@@ -2163,4 +2181,47 @@ html:has(body.detail-page) {
   max-width: 780px;
   margin: 0 auto;
   padding: 2rem 1.5rem 6rem;
+}
+/* ── 등질 정보 & 등대 이야기: 모바일 전용 접기/더보기 ── */
+.light-story-toggle-btn {
+  display: none; /* 데스크탑에서는 숨김 */
+}
+
+@media (max-width: 768px) {
+  .light-story-toggle-btn {
+    display: block;
+    width: 100%;
+    margin-top: .6rem;
+    margin-bottom: .8rem;
+    padding: .55rem;
+    background: var(--gray1);
+    border: none;
+    border-radius: 8px;
+    color: var(--gray4);
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .light-story-toggle-btn:hover {
+    background: var(--gray2);
+    color: var(--navy);
+  }
+
+  .light-story-content {
+    max-height: 0;
+    overflow: hidden;
+    position: relative;
+    transition: max-height .3s ease;
+  }
+  .light-story-content.expanded {
+    max-height: 2000px;
+  }
+  .light-story-content:not(.expanded)::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), var(--white));
+    pointer-events: none;
+  }
 }

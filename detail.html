@@ -231,21 +231,26 @@
   <div class="section-card" id="section-basic-info">
     <div class="section-title">💡 등질 정보 &amp; 등대 이야기</div>
 
-    <!-- 핑크 배지 줄 -->
+    <!-- 핑크 배지 줄 (항상 표시) -->
     <div id="light-badge-row" class="light-badge-row"></div>
 
-    <!-- 초록(SVG 애니메이션) + 보라(말풍선) -->
-    <div class="light-explain-row">
-      <div id="light-sim-icon" class="light-explain-icon"></div>
-      <div class="light-explain-bubble">
-        <div class="light-explain-tip"></div>
-        <div class="light-explain-tip-inner"></div>
-        <span id="mascot-message">등대 불빛의 의미는 ~</span>
-      </div>
-    </div>
+    <!-- 더보기/접기 버튼 (모바일에서만 보임) -->
+    <button class="light-story-toggle-btn" id="light-story-toggle-btn">등대 이야기 더보기 ▾</button>
 
-    <!-- 사진 (방파제/방사제일 때만 표시) -->
-    <img id="mascot-img" src="흰색등대(낮)_PC버전.png" class="light-explain-photo" style="display:none;">
+    <!-- 모바일에서만 접히는 영역: 초록(SVG 애니메이션) + 보라(말풍선) + 사진 -->
+    <div id="light-story-content" class="light-story-content">
+      <div class="light-explain-row">
+        <div id="light-sim-icon" class="light-explain-icon"></div>
+        <div class="light-explain-bubble">
+          <div class="light-explain-tip"></div>
+          <div class="light-explain-tip-inner"></div>
+          <span id="mascot-message">등대 불빛의 의미는 ~</span>
+        </div>
+      </div>
+
+      <!-- 사진 (방파제/방사제일 때만 표시) -->
+      <img id="mascot-img" src="흰색등대(낮)_PC버전.png" class="light-explain-photo" style="display:none;">
+    </div>
   </div>
 
   <!-- 사진 갤러리 -->
@@ -718,6 +723,15 @@ function buildLightSimCard(code) {
   if (mascotMsgEl) {
     mascotMsgEl.innerHTML = descHtml + mascotMsgEl.innerHTML;
   }
+}
+// 등질 정보 & 등대 이야기: 더보기/접기 토글 (모바일 전용, CSS 미디어쿼리와 함께 동작)
+const lightStoryToggleBtn = document.getElementById("light-story-toggle-btn");
+const lightStoryContent = document.getElementById("light-story-content");
+if (lightStoryToggleBtn && lightStoryContent) {
+  lightStoryToggleBtn.onclick = () => {
+    const expanded = lightStoryContent.classList.toggle("expanded");
+    lightStoryToggleBtn.textContent = expanded ? "등대 이야기 접기 ▴" : "등대 이야기 더보기 ▾";
+  };
 }
 
 // 배편 정보 로드
@@ -1559,6 +1573,25 @@ function shareLhViewerImage() {
   shareLhImage(src, fname);
 }
 
+// 페이지 자체 공유하기 (우측 하단 공유 버튼)
+async function shareLhPage() {
+  const shareData = {
+    title: `${(lh.name || '등대').replace(/\n/g, ' ')} - 안녕, 등대`,
+    text: `${(lh.name || '등대').replace(/\n/g, ' ')} 정보를 확인해보세요!`,
+    url: window.location.href
+  };
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareData.url);
+      alert('링크가 복사되었어요!');
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('공유 오류', err);
+  }
+}
+
 async function deleteLhPhoto(photoId) {
   if (!confirm('이 사진을 삭제하시겠습니까?')) return;
   await LhPhotoDB.delete(photoId);
@@ -1894,6 +1927,11 @@ document.addEventListener("click", e => {
     </div>
   </div>
 </div>
+<!-- 페이지 공유하기 버튼 -->
+<button id="page-share-btn" class="page-share-btn" onclick="shareLhPage()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+</button>
+
 <!-- 맨 위로 가기 버튼 -->
 <button id="scroll-top-btn" class="scroll-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
 
