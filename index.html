@@ -1330,11 +1330,11 @@ document.querySelectorAll(".map-ctrl-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     if (!window.kakaoMap) return;
     const title = btn.getAttribute("title");
-    if (title === "확대") window.kakaoMap.setLevel(window.kakaoMap.getLevel() - 1);
-    if (title === "축소") window.kakaoMap.setLevel(window.kakaoMap.getLevel() + 1);
+    if (title === "확대") window.kakaoMap.setLevel(window.kakaoMap.getLevel() - 1, { animate: { duration: 300 } });
+    if (title === "축소") window.kakaoMap.setLevel(window.kakaoMap.getLevel() + 1, { animate: { duration: 300 } });
     if (title === "현위치") {
       if (myLat && myLng) {
-        window.kakaoMap.setLevel(6);
+        window.kakaoMap.setLevel(6, { animate: { duration: 300 } });
         window.kakaoMap.panTo(new kakao.maps.LatLng(myLat, myLng));      }
     }
     if (title === "레이어") {
