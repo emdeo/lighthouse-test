@@ -972,14 +972,14 @@ function openMyLhModal() {
       <div style="border-top:1px solid var(--gray1);">
         <div id="my-modal-row-visited" onclick="toggleTempMyLh('visited')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;border-bottom:1px solid var(--gray1);">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:1.2rem;">✅</span>
+            <span style="font-size:1.2rem;">🆗</span>
             <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">다녀온 등대</span>
           </div>
           <div id="my-modal-check-visited" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
         </div>
         <div id="my-modal-row-wishlist" onclick="toggleTempMyLh('wishlist')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:1.2rem;">🔖</span>
+            <span style="font-size:1.2rem;">⭐</span>
             <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">가고싶은 등대</span>
           </div>
           <div id="my-modal-check-wishlist" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
@@ -1578,7 +1578,7 @@ const onlyMonthFilter = filterState.stamp.size === 0 && filterState.year.size ==
 
       const position = new kakao.maps.LatLng(lh.lat, lh.lng);
         const lhId3 = String(lh.id || lh.name);
-        const isMyLh = (showMyVisited2 || showMyWishlist2) && (myVisited2.has(lhId3) || myWishlist2.has(lhId3));
+        const isMyLh = (showMyVisited2 && myVisited2.has(lhId3)) || (showMyWishlist2 && myWishlist2.has(lhId3));
         const markerImage = isMyLh ? (markerImages.my || markerImages.none)
                  : onlyStampFilter ? markerImages.stamp
                  : onlyYearFilter ? markerImages.year
