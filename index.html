@@ -764,6 +764,7 @@ document.getElementById("popup-header-link").onclick = () => {
   const params = new URLSearchParams({
   id:     lh.id   || "",
   name:   (lh.name || "").replace(/\n/g, ' '),
+  nameEn: lh.nameEn || "",
   sea:    lh.sea  || "",
   light: lh.light || "",
   lat:    lh.lat  || "",
@@ -806,6 +807,7 @@ window.location.href = `detail.html?${params.toString()}`;
   const params = new URLSearchParams({
     id:     lh.id   || "",
     name:   (lh.name || "").replace(/\n/g, ' '),
+    nameEn: lh.nameEn || "",
     sea:    lh.sea  || "",
     light: lh.light || "",
     lat:    lh.lat  || "",
