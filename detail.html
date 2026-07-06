@@ -842,11 +842,11 @@ function buildLightSimCard(code) {
     }
   });
 
-  document.getElementById("detail-reserve").onclick = () => {
-    window.open("https://island.theksa.co.kr/", "_blank");
-  };
-})();
+  })();
 
+document.getElementById("detail-reserve").onclick = () => {
+  window.open("https://island.theksa.co.kr/", "_blank");
+};
 document.getElementById("back-btn").onclick = () => {
   window.location.href = `index.html?focus=${encodeURIComponent(lh.id)}`;
 };
@@ -1403,7 +1403,6 @@ function pickLhPhoto() {
   const inp = document.createElement('input');
   inp.type    = 'file';
   inp.accept  = 'image/*';
-  inp.capture = 'environment';
   inp.style.display = 'none';
   inp.onchange = async e => {
     const file = e.target.files?.[0];
@@ -1413,12 +1412,29 @@ function pickLhPhoto() {
       const lhId = String(lh.id || lh.name);
       await LhPhotoDB.save(lhId, dataUrl, thumb, date);
 
-      // 갤러리(다운로드) 자동 저장
+      // 다운로드 저장
       const fname = `${(lh.name||'등대').replace(/\s+/g,'')}_${_lhFmtDateFile(date)}.jpg`;
       const a = document.createElement('a');
       a.href = dataUrl; a.download = fname;
       document.body.appendChild(a); a.click();
       setTimeout(() => document.body.removeChild(a), 500);
+
+      // 아이폰(iOS)에서만 사진 앱 저장 안내 토스트 표시
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        const toast = document.createElement('div');
+        toast.textContent = '📸 사진 앱에 저장하려면 사진을 열고 상단 공유 버튼을 눌러주세요';
+        toast.style.cssText = `
+          position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+          background:rgba(15,23,42,0.85); color:#fff;
+          padding:12px 18px; border-radius:12px;
+          font-size:13px; font-weight:500; line-height:1.5;
+          text-align:center; max-width:calc(100vw - 48px);
+          z-index:99999; pointer-events:none;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
 
       await renderLhGallery();
     } catch(err) {
@@ -1837,14 +1853,14 @@ document.addEventListener("click", e => {
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
         <div style="grid-column:1/-1;text-align:center;padding:32px 0;color:#aaa;font-size:13px;">
-          <span style="font-size:13px">📸 버튼으로 사진을 찍어보세요</span>
+          <span style="font-size:13px">왼쪽 상단의 버튼으로 사진을 찍어보세요</span>
         </div>
       </div>
     </div>
-      <div id="dt-fake-photo-sample" style="display:none; padding:1rem 0;">
-      <img src="image01.png" alt="인증 사진 예시" style="width:100%; border-radius:14px; box-shadow:var(--shadow); display:block;">
-      <div style="text-align:center; font-size:.8rem; color:var(--gray3); margin-top:.5rem;">📸 이렇게 인증 사진이 모여요 (예시)</div>
-    </div>
+      <div id="dt-fake-photo-sample" style="display:none; padding:1rem 0; display:none; text-align:center;">
+        <img src="조사리항인증사진.png" alt="인증 사진 예시" style="width:60%; max-width:280px; border-radius:14px; box-shadow:var(--shadow); display:inline-block;">
+        <div style="text-align:center; font-size:.8rem; color:var(--gray4); margin-top:.5rem;">실제 조사리항 북방파제 등대 인증사진 (예시)</div>
+      </div>
     <div class="section-card" id="dt-fake-ai">
       <div class="section-title">🐙 AI 등대 정보</div>
       <div style="font-size:.85rem; color:var(--gray4); margin-bottom:.8rem;">버튼을 누르면 AI가 검색해서 이 등대의 역사, 맛집, 주변 명소를 정리해줘요.</div>
@@ -1883,31 +1899,31 @@ window.addEventListener("scroll", () => {
 <script>
 const DETAIL_TUTORIAL_STEPS = [
   { target: null, img: 'tutorial-mascot-1.png',
-    text: '안녕! 지금 보이는 건 진짜 등대가 아니라, 예시로 만든 "문어 등대" 페이지야.<br>등대 상세페이지에 뭐가 있는지 하나씩 보여줄게.' },
+    text: '안녕! 이건 예시로 만든 "문어 등대" 페이지야.<br>등대 상세 페이지를 설명해줄게.' },
   { target: '#dt-fake-top', img: 'tutorial-mascot-2.png',
     text: '<b>[기본 정보]</b><br>등대 사진과 등대 이름, 한줄 소개, 위치 같은 기본 정보가 여기 보여.' },
-  { target: '#dt-fake-dir', img: 'tutorial-mascot-1.png',
+  { target: '#dt-fake-dir', img: 'tutorial-mascot-4.png',
     text: '<b>[길찾기]</b><br>네이버지도나 카카오맵으로 바로 길찾기를 할 수 있어.' },
   { target: '#dt-fake-ferry', img: 'tutorial-mascot-2.png',
     text: '<b>[배편 정보]</b><br>가까운 항구의 배편 시간표를 보여줘. 운항 정보가 없는 기간엔 이렇게 안내 문구가 나와.' },
-  { target: '#dt-fake-weather', img: 'tutorial-mascot-1.png',
+  { target: '#dt-fake-weather', img: 'tutorial-mascot-3.png',
     text: '<b>[현재 날씨]</b><br>실시간 날씨랑 "바다여행지수"(여행하기 좋은 날인지)를 보여줘. CCTV로 등대 근처 날씨도 볼 수 있어.' },
-  { target: '#dt-fake-forecast', img: 'tutorial-mascot-2.png',
-    text: '<b>[주간 예보]</b><br>앞으로 4일 동안의 날씨랑 바다여행지수·뱃멀미·갯벌체험지수를 한눈에 볼 수 있어.' },
+  { target: '#dt-fake-forecast', img: 'tutorial-mascot-4.png',
+    text: '<b>[주간 예보]</b><br>앞으로 4일 동안의 날씨와 바다여행·뱃멀미·갯벌체험지수를 한눈에 볼 수 있어.' },
   { target: '#dt-fake-tide', img: 'tutorial-mascot-1.png',
-    text: '<b>[조석 정보]</b><br>오늘의 만조·간조 시간이랑 물높이를 보여줘.' },
-  { target: '#dt-fake-parking', img: 'tutorial-mascot-2.png',
+    text: '<b>[조석 정보]</b><br>오늘의 만조·간조 시간과 물높이를 보여줘.' },
+  { target: '#dt-fake-parking', img: 'tutorial-mascot-3.png',
     text: '<b>[주차장 / 화장실]</b><br>등대 주변 가까운 공영주차장이랑 화장실 위치를 알려줘.' },
-  { target: '#dt-fake-light', img: 'tutorial-mascot-1.png',
+  { target: '#dt-fake-light', img: 'tutorial-mascot-4.png',
     text: '<b>[등질 정보 &amp; 이야기]</b><br>등대 불빛 색깔과 주기 등의 정보를 알려줘.' },
   { target: '#dt-fake-gallery', img: 'tutorial-mascot-2.png',
     text: '<b>[인증 사진]</b><br>등대 앞에서 사진을 찍어서 나만의 등대 인증 사진을 모아둘 수 있어.' },
   { target: '#dt-fake-photo-sample', img: 'tutorial-mascot-1.png',
-    text: '<b>[사진 예시]</b><br>이렇게 찍은 사진들이 인증 사진으로 차곡차곡 쌓여!' },
+    text: '<b>[사진 예시]</b><br>이렇게 찍은 사진들이 인증 사진으로 저장돼!' },
   { target: '#dt-fake-ai', img: 'tutorial-mascot-1.png',
     text: '<b>[AI 등대 정보]</b><br>버튼을 누르면 AI가 검색해서 이 등대의 역사·맛집·주변 관광지를 정리해줘.' },
-  { target: '#dt-fake-tutorial-btn', img: 'tutorial-mascot-1.png',
-    text: '이제 실제 등대 페이지로 돌아가자?<br>나를 다시 보고 싶으면 우측 상단의 "상세 기능 설명" 버튼을 누르면 돼!' },
+  { target: '#dt-fake-tutorial-btn', img: 'tutorial-mascot-2.png',
+    text: '이제 실제 등대 페이지로 돌아가자!<br>나를 다시 보고 싶으면 우측 상단의 "상세 기능 설명" 버튼을 누르면 돼!' },
 ];
 
 let dtTutorialIdx = 0;
@@ -1916,8 +1932,7 @@ function positionDetailTutorial(targetSel) {
   const highlight = document.getElementById('tutorial-highlight');
   const wrap = document.getElementById('tutorial-wrap');
   const targetEl = targetSel ? document.querySelector(targetSel) : null;
-  const wrapW = wrap.offsetWidth || 440;
-  const wrapH = wrap.offsetHeight || 280;
+  const isMobile = window.innerWidth <= 768;
   const topSafe = 76;
 
   if (targetEl) {
@@ -1929,15 +1944,35 @@ function positionDetailTutorial(targetSel) {
     highlight.style.width = (r.width + pad * 2) + 'px';
     highlight.style.height = (r.height + pad * 2) + 'px';
 
-    let wrapTop = r.bottom + pad + 18;
-    if (wrapTop + wrapH > window.innerHeight) {
-      wrapTop = Math.max(topSafe, r.top - pad - 18 - wrapH);
+    if (isMobile) {
+      const wrapH = wrap.offsetHeight || 200;
+      let wrapTop;
+      if (targetSel === '#dt-fake-ai') {
+        // AI 단계: 하이라이트 위에 배치
+        wrapTop = r.top - pad - wrapH - 10;
+        wrapTop = Math.max(topSafe, wrapTop);
+      } else {
+        wrapTop = r.bottom + pad + 10;
+        if (wrapTop + wrapH > window.innerHeight - 10) {
+          wrapTop = window.innerHeight - wrapH - 10;
+        }
+        wrapTop = Math.max(topSafe, wrapTop);
+      }
+      wrap.style.top = wrapTop + 'px';
+      wrap.style.left = '12px';
+    } else {
+      // 데스크탑: 기존 로직 그대로
+      const wrapW = wrap.offsetWidth || 440;
+      const wrapH = wrap.offsetHeight || 280;
+      let wrapTop = r.bottom + pad + 18;
+      if (wrapTop + wrapH > window.innerHeight) {
+        wrapTop = Math.max(topSafe, r.top - pad - 18 - wrapH);
+      }
+      let wrapLeft = Math.min(r.left, window.innerWidth - wrapW - 24);
+      wrapLeft = Math.max(10, wrapLeft);
+      wrap.style.top = wrapTop + 'px';
+      wrap.style.left = wrapLeft + 'px';
     }
-    let wrapLeft = Math.min(r.left, window.innerWidth - wrapW - 24);
-    wrapLeft = Math.max(10, wrapLeft);
-
-    wrap.style.top = wrapTop + 'px';
-    wrap.style.left = wrapLeft + 'px';
   } else {
     highlight.style.opacity = '1';
     highlight.style.width = '0px';
@@ -1945,8 +1980,10 @@ function positionDetailTutorial(targetSel) {
     highlight.style.top = '50%';
     highlight.style.left = '50%';
 
+    const wrapW = wrap.offsetWidth || 440;
+    const wrapH = wrap.offsetHeight || 280;
     wrap.style.top = Math.max(topSafe, (window.innerHeight - wrapH) / 2) + 'px';
-    wrap.style.left = ((window.innerWidth - wrapW) / 2) + 'px';
+    wrap.style.left = isMobile ? '12px' : ((window.innerWidth - wrapW) / 2) + 'px';
   }
 }
 
@@ -1976,7 +2013,15 @@ function renderDetailTutorialStep() {
   if (step.target === '#dt-fake-tutorial-btn') {
     document.getElementById('detail-tutorial-overlay').scrollTo({ top: 0 });
   } else if (step.target) {
-    document.querySelector(step.target).scrollIntoView({ block: 'center' });
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      const overlay = document.getElementById('detail-tutorial-overlay');
+      const el = document.querySelector(step.target);
+      const elTop = el.getBoundingClientRect().top + overlay.scrollTop - 24;
+      overlay.scrollTo({ top: elTop });
+    } else {
+      document.querySelector(step.target).scrollIntoView({ block: 'center' });
+    }
   } else {
     document.getElementById('detail-tutorial-overlay').scrollTo({ top: 0 });
   }

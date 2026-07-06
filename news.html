@@ -416,8 +416,10 @@ candidates.forEach(lh => {
         <polygon points="${cx-towerW/2+Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2-Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2},${topH+Math.round(30*scale)} ${cx-towerW/2},${topH+Math.round(30*scale)}" fill="${lc.dark}" opacity="0.6"/>
         <!-- 줄무늬 2 -->
         <polygon points="${cx-baseW/2+Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(2*scale)},${topH+Math.round(58*scale)} ${cx-baseW/2+Math.round(2*scale)},${topH+Math.round(58*scale)}" fill="${lc.dark}" opacity="0.6"/>
-        <!-- 창문 -->
-        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(35*scale)}" width="${Math.round(10*scale)}" height="${Math.round(8*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
+        <!-- 창문 1 -->
+        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(33*scale)}" width="${Math.round(10*scale)}" height="${Math.round(7*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
+        <!-- 창문 2 -->
+        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(50*scale)}" width="${Math.round(10*scale)}" height="${Math.round(7*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 문 -->
         <rect x="${cx-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH-Math.round(14*scale)}" width="${Math.round(8*scale)}" height="${Math.round(13*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 받침대 -->
@@ -578,7 +580,7 @@ function attachSensorHandler() {
     const smoothFactor = e.webkitCompassHeading !== undefined ? 0.15 : 0.06;
     smoothHeading += diff * smoothFactor;
     smoothHeading = (smoothHeading + 360) % 360;
-    const OFFSET = 0; // 왼쪽으로 치우쳐 있으면 양수, 오른쪽이면 음수
+    const OFFSET = 8; // 왼쪽으로 치우쳐 있으면 양수, 오른쪽이면 음수
     currentHeading = (smoothHeading + OFFSET + 360) % 360;
 
     if (e.beta !== null) {
@@ -702,7 +704,6 @@ async function startCamera() {
       video: { facingMode: "environment", width: { ideal: 1280 } }
     });
     const vid = document.getElementById("camera-feed");
-vid.addEventListener('loadedmetadata', () => alert(`영상 ${vid.videoWidth}x${vid.videoHeight} / 화면 ${window.innerWidth}x${window.innerHeight}`));
     vid.srcObject = stream;
     vid.style.display = "block";
 

@@ -476,57 +476,6 @@
   transition: border-color .15s;
 }
 .month-select:focus { border-color: var(--ocean); }
-/* ── 온보딩 오버레이 ── */
-#onboarding {
-  position: fixed; inset: 0; z-index: 999;
-  background: rgba(15, 25, 50, 0.7);
-  display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(3px);
-}
-#onboarding-card {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 2rem 2.2rem;
-  width: 340px;
-  box-shadow: var(--shadow-lg);
-  display: flex; flex-direction: column; gap: 1.4rem;
-}
-#onboarding-title {
-  font-family: var(--font-serif);
-  font-size: 1.15rem; font-weight: 900;
-  color: var(--navy);
-  text-align: center;
-}
-#onboarding-body {
-  display: flex; flex-direction: column; gap: .8rem;
-}
-.ob-row {
-  display: flex; align-items: center; gap: 1rem;
-  padding: .85rem 1rem;
-  background: var(--gray1);
-  border-radius: 10px;
-}
-.ob-highlight {
-  background: #ef4444;
-  color: white;
-  font-size: .78rem; font-weight: 700;
-  padding: .3rem .7rem;
-  border-radius: 5px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.ob-desc {
-  font-size: .85rem; color: var(--gray4); font-weight: 500;
-}
-#onboarding-close {
-  width: 100%; padding: .75rem;
-  background: var(--navy); color: var(--white);
-  border: none; border-radius: 10px;
-  font-family: var(--font-sans); font-size: .88rem; font-weight: 700;
-  cursor: pointer;
-  transition: background .15s;
-}
-#onboarding-close:hover { background: var(--ocean); }
 .stamp-site-link {
   display: block;
   margin: .4rem .6rem .6rem;
@@ -573,6 +522,15 @@
   text-align: center;
 }
 .detail-cctv-btn:hover { background: var(--gray2); }
+
+/* 모바일 팝업 공간 부족 시 압축용 클래스 */
+#popup.popup-compact .popup-body { padding-top: .5rem; }
+#popup.popup-compact .popup-meta { margin-bottom: .3rem; }
+#popup.popup-compact .popup-weather { margin-bottom: .3rem; padding: .4rem 1rem; }
+#popup.popup-compact .weather-icon { font-size: 1.6rem; }
+#popup.popup-compact .weather-temp { font-size: 1.3rem; }
+#popup.popup-compact .dir-buttons { margin-bottom: .3rem; }
+#popup.popup-compact #btn-detail { margin-top: .3rem; }
 
 /* ── 패널 토글 버튼 ── */
 #panel-toggle {
@@ -704,21 +662,6 @@
   text-align: center;
   color: #9ca3af;
   font-size: 0.82rem;
-}
-
-/* ── 마커 툴팁 ── */
-#marker-tooltip {
-  position: fixed;
-  background: var(--navy);
-  color: var(--white);
-  font-size: .72rem; font-weight: 600;
-  padding: .3rem .65rem;
-  border-radius: 5px;
-  pointer-events: none;
-  display: none;
-  z-index: 9999;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
 
 /* ════════════════════════════════════════
@@ -1210,11 +1153,6 @@ body.ar-page nav a:hover {
 @keyframes fadeHint {
   0%   { opacity: 1; }
   100% { opacity: 0; }
-}
-
-@keyframes popup-scroll-bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-  50%      { transform: translateX(-50%) translateY(5px); opacity: 1; }
 }
 
 /* 스크롤바 */
@@ -2030,6 +1968,32 @@ html:has(body.detail-page) {
     border-radius: 9px;
     flex-shrink: 0;
     white-space: nowrap;
+  }
+  /* ── detail 튜토리얼 모바일 전용: 캐릭터 왼쪽, 말풍선 오른쪽 ── */
+  #detail-tutorial-overlay .tutorial-wrap {
+    flex-direction: row;
+    align-items: flex-end;
+    width: calc(100vw - 24px);
+    left: 12px !important;
+  }
+  #detail-tutorial-overlay .tutorial-mascot-img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  #detail-tutorial-overlay .tutorial-bubble {
+    flex: 1;
+    width: 0;
+    max-width: 100%;
+    margin-left: 10px;
+    margin-top: 0;
+    border-radius: 16px;
+  }
+  #detail-tutorial-overlay .tutorial-bubble-tail {
+    display: block;
+    left: -16px;
+    bottom: 40px;
   }
 }
 /* ── AR 페이지 사용법 안내 (3단계) ── */
