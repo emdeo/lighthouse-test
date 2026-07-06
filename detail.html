@@ -120,7 +120,10 @@
   <!-- 등대 이름 + 한줄소개 + 세부정보 -->
   <div class="detail-top-card">
     <div class="detail-oneline" id="detail-desc">등대 설명이 들어갑니다.</div>
-    <div class="detail-name" id="detail-name">등대 이름</div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+      <div class="detail-name" id="detail-name" style="margin:0;">등대 이름</div>
+      <button id="detail-btn-my-star" onclick="openDetailMyLhModal()" title="내 등대 저장" style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--gray2);background:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.1);transition:all .15s;">☆</button>
+    </div>
     <div class="detail-tags" id="detail-tags"></div>
     <div class="detail-sub-rows" id="detail-sub-rows">
       <div class="detail-sub-row">
@@ -2077,6 +2080,111 @@ window.addEventListener('resize', () => {
 if (!localStorage.getItem('lh-detail-tutorial-dismissed')) {
   openDetailTutorial();
 }
+// ── 내 등대 저장 (detail.html) ──
+function getMyLh(type) {
+  try { return new Set(JSON.parse(localStorage.getItem('lh-my-' + type) || '[]')); }
+  catch { return new Set(); }
+}
+function saveMyLh(type, set) {
+  try { localStorage.setItem('lh-my-' + type, JSON.stringify([...set])); }
+  catch {}
+}
+
+function updateDetailMyStarBtn() {
+  const id = String(lh.id || lh.name);
+  const visited  = getMyLh('visited');
+  const wishlist = getMyLh('wishlist');
+  const btn = document.getElementById('detail-btn-my-star');
+  if (btn) btn.textContent = (visited.has(id) || wishlist.has(id)) ? '⭐' : '☆';
+}
+
+function openDetailMyLhModal() {
+  const id = String(lh.id || lh.name);
+  const tempVisited  = new Set(getMyLh('visited'));
+  const tempWishlist = new Set(getMyLh('wishlist'));
+
+  let modal = document.getElementById('detail-my-lh-modal');
+  if (modal) modal.remove();
+
+  modal = document.createElement('div');
+  modal.id = 'detail-my-lh-modal';
+  modal.style.cssText = `position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;`;
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:0;max-width:300px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
+      <div style="padding:20px 20px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:1rem;font-weight:800;color:var(--navy);">${(lh.name||'').replace(/\n/g,' ')}</div>
+          <button onclick="document.getElementById('detail-my-lh-modal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--gray3);padding:0 0 0 8px;">✕</button>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gray3);margin-bottom:16px;">저장할 리스트를 선택하세요</div>
+      </div>
+      <div style="border-top:1px solid var(--gray1);">
+        <div onclick="detailToggleTempMyLh('visited')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;border-bottom:1px solid var(--gray1);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.2rem;">✅</span>
+            <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">다녀온 등대</span>
+          </div>
+          <div id="detail-my-check-visited" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
+        </div>
+        <div onclick="detailToggleTempMyLh('wishlist')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.2rem;">🔖</span>
+            <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">가고싶은 등대</span>
+          </div>
+          <div id="detail-my-check-wishlist" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;">
+        <button id="detail-my-save-btn" style="width:100%;padding:.7rem;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--font-sans);">저장</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  window._detailMyLhTemp = { id, tempVisited, tempWishlist };
+  detailRenderMyLhUI();
+
+  window.detailToggleTempMyLh = function(type) {
+    const t = window._detailMyLhTemp;
+    if (type === 'visited') {
+      t.tempVisited.has(t.id) ? t.tempVisited.delete(t.id) : t.tempVisited.add(t.id);
+    } else {
+      t.tempWishlist.has(t.id) ? t.tempWishlist.delete(t.id) : t.tempWishlist.add(t.id);
+    }
+    detailRenderMyLhUI();
+  };
+
+  document.getElementById('detail-my-save-btn').onclick = function() {
+    const t = window._detailMyLhTemp;
+    saveMyLh('visited',  t.tempVisited);
+    saveMyLh('wishlist', t.tempWishlist);
+    updateDetailMyStarBtn();
+    document.getElementById('detail-my-lh-modal').remove();
+  };
+
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+function detailRenderMyLhUI() {
+  const t = window._detailMyLhTemp;
+  const cv = document.getElementById('detail-my-check-visited');
+  const cw = document.getElementById('detail-my-check-wishlist');
+  if (cv) {
+    cv.style.background = t.tempVisited.has(t.id) ? 'var(--navy)' : '#fff';
+    cv.style.borderColor = t.tempVisited.has(t.id) ? 'var(--navy)' : 'var(--gray2)';
+    cv.style.color = '#fff';
+    cv.textContent = t.tempVisited.has(t.id) ? '✓' : '';
+  }
+  if (cw) {
+    cw.style.background = t.tempWishlist.has(t.id) ? 'var(--navy)' : '#fff';
+    cw.style.borderColor = t.tempWishlist.has(t.id) ? 'var(--navy)' : 'var(--gray2)';
+    cw.style.color = '#fff';
+    cw.textContent = t.tempWishlist.has(t.id) ? '✓' : '';
+  }
+}
+
+// 페이지 로드 시 별 상태 초기화
+updateDetailMyStarBtn();
 </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

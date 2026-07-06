@@ -222,9 +222,26 @@
               <a href="https://www.lighthouse-museum.or.kr/sea/article/lighthouse/list" target="_blank" class="stamp-site-link">
               → 관련 사이트 보러가기
             </a>
-          </div>
+         </div>
         </div>
       </div>
+
+        <!-- 내 등대 -->
+        <div class="filter-group">
+          <div class="filter-item filter-parent" id="toggle-my">
+            <div class="filter-dot" style="background:#ec4899;"></div>
+            내 등대
+            <span class="filter-arrow" id="arrow-my">▶</span>
+          </div>
+          <div class="filter-children" id="my-group">
+            <div class="filter-item filter-child" data-group="my" data-key="my-visited">
+              <div class="filter-check">✓</div>다녀온 등대
+            </div>
+            <div class="filter-item filter-child" data-group="my" data-key="my-wishlist">
+              <div class="filter-check">✓</div>가고 싶은 등대
+            </div>
+          </div>
+        </div>
     </div>
   </div>
 
@@ -299,9 +316,14 @@
 
 <!-- 팝업 -->
       <div id="popup">
-        <div class="popup-img" id="popup-img">
-          <div class="popup-img-placeholder" id="popup-emoji">🏛️</div>
-          <button class="popup-close" id="popup-close">✕</button>
+       <div style="position:relative;">
+          <div class="popup-img" id="popup-img">
+            <div class="popup-img-placeholder" id="popup-emoji">🏛️</div>
+            <button class="popup-close" id="popup-close">✕</button>
+          </div>
+          <div style="position:absolute; bottom:-18px; right:12px; z-index:10;">
+            <button id="btn-my-star" onclick="openMyLhModal()" title="내 등대 저장" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--white);background:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all .15s;">☆</button>
+          </div>
         </div>
         <div class="popup-body">
           <div class="popup-header-link" id="popup-header-link">
@@ -345,9 +367,6 @@
    onmouseout="this.style.background='var(--white)';this.style.borderColor='var(--gray2)'">
   상세정보 보기 &nbsp;›
 </button>
-<div id="popup-scroll-hint" style="position:sticky; bottom:0; height:0; pointer-events:none; z-index:5; display:none;">
-  <div style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:9px solid var(--gray3); animation:popup-scroll-bounce 1.4s ease-in-out infinite;"></div>
-</div>
         </div>
       </div>
 
@@ -378,7 +397,6 @@
 
 <!-- toast -->
 <div id="toast"></div>
-<div id="marker-tooltip"></div>
 
 <script>
   // stamp_data.js 전역 변수로 연결
@@ -514,7 +532,10 @@ function getFilteredList() {
   const showStamp = filterState.stamp.size > 0;
   const showYear  = filterState.year.size  > 0;
   const showMonth = filterState.month.size > 0;
-
+  const showMyVisited  = filterState.my.has('my-visited');
+  const showMyWishlist = filterState.my.has('my-wishlist');
+  const myVisited  = getMyLh('visited');
+  const myWishlist = getMyLh('wishlist');
   const allData = [...LIGHTHOUSES, ...(window.REAL_LIGHTHOUSES || [])];
 
   // 스탬프 카테고리 필터 키 → category 매핑
@@ -554,10 +575,13 @@ function getFilteredList() {
           matchStamp = filterState.stamp.has("stamp-all") || filterState.stamp.size > 0;
         }
       }
+      const lhId = String(lh.id || lh.name);
       const matchFilter =
         matchStamp ||
         (lh.tags.includes("year")  && showYear)  ||
-        (lh.tags.includes("month") && showMonth);
+        (lh.tags.includes("month") && showMonth) ||
+        (showMyVisited  && myVisited.has(lhId))  ||
+        (showMyWishlist && myWishlist.has(lhId));
       return matchFilter;
     }
     return true;
@@ -570,10 +594,18 @@ const MARKER_COLORS = {
   stamp: "#f59e0b",
   month: "#3b82f6",
   year:  "#10b981",
+  my:    "#ec4899",
   default: "#6b7280",
 };
 
 function getMarkerColor(lh) {
+  const id = String(lh.id || lh.name);
+  const myFilterOn = filterState.my.has('my-visited') || filterState.my.has('my-wishlist');
+  if (myFilterOn) {
+    const visited  = getMyLh('visited');
+    const wishlist = getMyLh('wishlist');
+    if (visited.has(id) || wishlist.has(id)) return MARKER_COLORS.my;
+  }
   if (lh.tags.includes("stamp")) return MARKER_COLORS.stamp;
   if (lh.tags.includes("month")) return MARKER_COLORS.month;
   if (lh.tags.includes("year"))  return MARKER_COLORS.year;
@@ -596,7 +628,7 @@ function renderMarkers() {
       <div class="marker-pin" style="background:${color};">
         <span>${lh.emoji}</span>
       </div>
-      <div class="marker-label">${lh.name}</div>
+      <div class="marker-label">${lh.name.replace(/\n/g, ' ')}</div>
     `;
     el.addEventListener("click", () => openPopup(lh, el));
     layer.appendChild(el);
@@ -690,14 +722,6 @@ function selectLighthouse(lh) {
 // ════════════════════════════════════════
 //  팝업
 // ════════════════════════════════════════
-function updatePopupScrollHint() {
-  const popup = document.getElementById("popup");
-  const hint = document.getElementById("popup-scroll-hint");
-  if (!popup || !hint) return;
-  const isScrollable = popup.scrollHeight > popup.clientHeight + 2;
-  hint.style.display = (isScrollable && popup.scrollTop < 5) ? "block" : "none";
-}
-document.getElementById("popup").addEventListener("scroll", updatePopupScrollHint);
 
 function openPopup(lh, markerEl) {
   activeId = lh.id;
@@ -733,12 +757,13 @@ function openPopup(lh, markerEl) {
     })
     .catch(() => {});
 
-document.getElementById("popup-name").textContent = lh.name;
+window.currentPopupLh = lh;
+updateMyStarBtn(lh);
+document.getElementById("popup-name").textContent = lh.name.replace(/\n/g, ' ');
 document.getElementById("popup-header-link").onclick = () => {
   const params = new URLSearchParams({
   id:     lh.id   || "",
-  name:   lh.name || "",
-  nameEn: lh.nameEn || "",
+  name:   (lh.name || "").replace(/\n/g, ' '),
   sea:    lh.sea  || "",
   light: lh.light || "",
   lat:    lh.lat  || "",
@@ -780,8 +805,7 @@ window.location.href = `detail.html?${params.toString()}`;
   document.getElementById("btn-detail").onclick = () => {
   const params = new URLSearchParams({
     id:     lh.id   || "",
-    name:   lh.name || "",
-    nameEn: lh.nameEn || "",
+    name:   (lh.name || "").replace(/\n/g, ' '),
     sea:    lh.sea  || "",
     light: lh.light || "",
     lat:    lh.lat  || "",
@@ -834,8 +858,29 @@ fetch(`${CONFIG.WEATHER_API_URL}/?lat=${lh.lat}&lng=${lh.lng}`)
   popup.style.animation = "none";
   popup.offsetHeight;
   popup.style.animation = "";
-  updatePopupScrollHint();
 
+  // 모바일: 스크롤 필요 여부 확인 (overflow > 0 이면 내용이 잘린 상태)
+  if (isMobileDevice()) {
+    setTimeout(() => {
+      const overflow = popup.scrollHeight - popup.clientHeight;
+      if (overflow > 0) {
+        // 1순위: 여백 압축
+        popup.classList.add('popup-compact');
+        const overflow2 = popup.scrollHeight - popup.clientHeight;
+
+        // 2순위: 여백 압축으로도 부족하면 사진 높이만 줄이기
+        if (overflow2 > 0) {
+          const imgEl = document.getElementById('popup-img');
+          if (imgEl) {
+            const reduced = Math.max(60, imgEl.offsetHeight - overflow2 - 8);
+            imgEl.style.height = reduced + 'px';
+          }
+        }
+      } else {
+        popup.classList.remove('popup-compact');
+      }
+    }, 100);
+  }
   // 클릭한 마커를 지도 중앙으로 이동 (시각적 효과)
   const layer = document.getElementById("markers-layer");
 const mapWrap = document.getElementById("map-wrap");
@@ -859,6 +904,8 @@ if (markerEl && layer && mapWrap) {
 function closePopup() {
   if (window._nameOverlay) { window._nameOverlay.setMap(null); window._nameOverlay = null; }
   document.getElementById("popup").classList.remove("visible");
+  document.getElementById("popup").classList.remove("popup-compact");
+  document.getElementById("popup-img").style.height = '';
   activeId = null;
   renderMarkers();
 }
@@ -881,6 +928,138 @@ document.getElementById("popup-close").addEventListener("click", (e) => {
 });
 
 // ════════════════════════════════════════
+//  내 등대 (localStorage)
+// ════════════════════════════════════════
+function getMyLh(type) {
+  try { return new Set(JSON.parse(localStorage.getItem('lh-my-' + type) || '[]')); }
+  catch { return new Set(); }
+}
+function saveMyLh(type, set) {
+  try { localStorage.setItem('lh-my-' + type, JSON.stringify([...set])); }
+  catch {}
+}
+
+function openMyLhModal() {
+  const lh = window.currentPopupLh;
+  if (!lh) return;
+  const id = String(lh.id || lh.name);
+  const visited  = getMyLh('visited');
+  const wishlist = getMyLh('wishlist');
+
+  // 현재 상태를 임시 변수에 저장 (저장 버튼 누르기 전까진 실제로 안 바뀜)
+  let tempVisited  = new Set(visited);
+  let tempWishlist = new Set(wishlist);
+
+  let modal = document.getElementById('my-lh-modal');
+  if (modal) modal.remove();
+
+  modal = document.createElement('div');
+  modal.id = 'my-lh-modal';
+  modal.style.cssText = `
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.45);
+    display:flex; align-items:center; justify-content:center;
+  `;
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:0;max-width:300px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
+      <div style="padding:20px 20px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:1rem;font-weight:800;color:var(--navy);">${lh.name.replace(/\n/g,' ')}</div>
+          <button onclick="document.getElementById('my-lh-modal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--gray3);padding:0 0 0 8px;">✕</button>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gray3);margin-bottom:16px;">저장할 리스트를 선택하세요</div>
+      </div>
+      <div style="border-top:1px solid var(--gray1);">
+        <div id="my-modal-row-visited" onclick="toggleTempMyLh('visited')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;border-bottom:1px solid var(--gray1);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.2rem;">✅</span>
+            <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">다녀온 등대</span>
+          </div>
+          <div id="my-modal-check-visited" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
+        </div>
+        <div id="my-modal-row-wishlist" onclick="toggleTempMyLh('wishlist')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.2rem;">🔖</span>
+            <span style="font-size:0.95rem;font-weight:600;color:var(--navy);">가고싶은 등대</span>
+          </div>
+          <div id="my-modal-check-wishlist" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .15s;"></div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;">
+        <button id="my-modal-save-btn" style="width:100%;padding:.7rem;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--font-sans);">저장</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // 체크 UI 초기 반영
+  renderTempMyLhUI(id, tempVisited, tempWishlist);
+
+  // 항목 클릭 토글
+  window._myLhTemp = { id, tempVisited, tempWishlist };
+  window.toggleTempMyLh = function(type) {
+    const t = window._myLhTemp;
+    if (type === 'visited') {
+      t.tempVisited.has(t.id) ? t.tempVisited.delete(t.id) : t.tempVisited.add(t.id);
+    } else {
+      t.tempWishlist.has(t.id) ? t.tempWishlist.delete(t.id) : t.tempWishlist.add(t.id);
+    }
+    renderTempMyLhUI(t.id, t.tempVisited, t.tempWishlist);
+  };
+
+  // 저장 버튼
+  document.getElementById('my-modal-save-btn').onclick = function() {
+    const t = window._myLhTemp;
+    saveMyLh('visited',  t.tempVisited);
+    saveMyLh('wishlist', t.tempWishlist);
+    updateMyStarBtn(window.currentPopupLh);
+
+    // 마커 색 실시간 업데이트
+    const lh = window.currentPopupLh;
+    if (lh && window.MARKER_OVERLAY_MAP) {
+      const el = window.MARKER_OVERLAY_MAP.get(String(lh.id || lh.name));
+      if (el) {
+        const pin = el.querySelector('.kakao-marker-pin');
+        if (pin) pin.style.background = getMarkerColor(lh);
+      }
+    }
+
+    document.getElementById('my-lh-modal').remove();
+  };
+
+  // 바깥 클릭 닫기
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+function renderTempMyLhUI(id, tempVisited, tempWishlist) {
+  const cv = document.getElementById('my-modal-check-visited');
+  const cw = document.getElementById('my-modal-check-wishlist');
+  if (cv) {
+    cv.style.background = tempVisited.has(id) ? 'var(--navy)' : '#fff';
+    cv.style.borderColor = tempVisited.has(id) ? 'var(--navy)' : 'var(--gray2)';
+    cv.style.color = '#fff';
+    cv.textContent = tempVisited.has(id) ? '✓' : '';
+  }
+  if (cw) {
+    cw.style.background = tempWishlist.has(id) ? 'var(--navy)' : '#fff';
+    cw.style.borderColor = tempWishlist.has(id) ? 'var(--navy)' : 'var(--gray2)';
+    cw.style.color = '#fff';
+    cw.textContent = tempWishlist.has(id) ? '✓' : '';
+  }
+}
+
+function updateMyStarBtn(lh) {
+  if (!lh) return;
+  const id = String(lh.id || lh.name);
+  const visited  = getMyLh('visited');
+  const wishlist = getMyLh('wishlist');
+  const btn = document.getElementById('btn-my-star');
+  if (btn) btn.textContent = (visited.has(id) || wishlist.has(id)) ? '⭐' : '☆';
+}
+
+// ════════════════════════════════════════
 //  필터 상태 — JS 객체가 유일한 진실
 // ════════════════════════════════════════
 // 각 그룹의 체크 상태를 JS Set으로 관리
@@ -888,6 +1067,7 @@ const filterState = {
   stamp: new Set(),
   year:  new Set(),
   month: new Set(),
+  my:    new Set(),
 };
 
 // 필터 상태를 localStorage에 저장/복원 (페이지 이동 후에도 유지)
@@ -897,6 +1077,7 @@ function saveFilterState() {
       stamp: [...filterState.stamp],
       year:  [...filterState.year],
       month: [...filterState.month],
+      my:    [...filterState.my],
     }));
   } catch (e) {}
 }
@@ -907,6 +1088,7 @@ function restoreFilterState() {
       filterState.stamp = new Set(saved.stamp || []);
       filterState.year  = new Set(saved.year  || []);
       filterState.month = new Set(saved.month || []);
+      filterState.my    = new Set(saved.my    || []);
     } else {
       // 저장된 기록이 없는 첫 방문자: '모든 등대 표시'를 기본값으로
       filterState.stamp = new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]);
@@ -922,6 +1104,7 @@ const GROUP_KEYS = {
   stamp: ["stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"],
   year:  ["year-2025","year-2024","year-2023","year-2022","year-2021","year-2019"],
   month: [],
+  my:    ["my-visited","my-wishlist"],
 };
 
 // ── UI를 상태에 맞게 동기화 ──
@@ -955,7 +1138,7 @@ function syncGroupAll(group) {
 }
 
 // ── 드롭다운 토글 ──
-["stamp","year","month"].forEach(group => {
+["stamp","year","month","my"].forEach(group => {
   document.getElementById("toggle-" + group).addEventListener("click", () => {
     const children = document.getElementById(group + "-group");
     const arrow    = document.getElementById("arrow-" + group);
@@ -1087,7 +1270,7 @@ function renderSearchDropdown() {
         if (!lh) return;
         selectLighthouse(lh);
         dropdown.classList.remove("visible");
-        document.getElementById("search-input").value = lh.name;
+        document.getElementById("search-input").value = lh.name.replace(/\n/g, ' ');
       });
     });
   }
@@ -1193,6 +1376,7 @@ function loadKakaoMap() {
       stamp:    makeMarkerImage("#f59e0b"),
       year:     makeMarkerImage("#10b981"),
       month:    makeMarkerImage("#3b82f6"),
+      my:       makeMarkerImage("#ec4899"),
       none:     makeMarkerImage("#6b7280"),
       selected: makeMarkerImage("#ef4444", 1.3),
     };
@@ -1212,34 +1396,21 @@ if (navigator.geolocation) {
       // 해양조사원 API로 실제 등대 데이터 불러오기
       loadLighthouseData(map);
       // 등대 마커 찍기
+      window.MARKER_OVERLAY_MAP = new Map();
+
       LIGHTHOUSES.forEach(lh => {
         const position = new kakao.maps.LatLng(lh.lat, lh.lng);
-
-        // 커스텀 마커 이미지
-        const markerColor = lh.tags.includes("stamp") ? "#f59e0b"
-                          : lh.tags.includes("year")  ? "#10b981"
-                          : "#3b82f6";
-
-        const content = `
-          <div style="
-            display:flex; flex-direction:column; align-items:center;
-            cursor:pointer; filter:drop-shadow(0 2px 6px rgba(27,46,75,.3));
-          ">
-            <div style="
-              width:36px; height:36px;
-              background:${markerColor};
-              border-radius:50% 50% 50% 0;
-              transform:rotate(-45deg);
-              display:flex; align-items:center; justify-content:center;
-              border:2.5px solid white;
-            ">
-              <span style="transform:rotate(45deg);font-size:.95rem;">${lh.emoji}</span>
-            </div>
-            <div style="margin-top:4px;background:white;color:#1b2e4b;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.12);white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center;">${lh.name}</div>
-          </div>`;
+        const markerColor = getMarkerColor(lh);
 
         const el = document.createElement("div");
-        el.innerHTML = content;
+        el.dataset.lhId = String(lh.id || lh.name);
+        el.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(27,46,75,.3));">
+            <div class="kakao-marker-pin" style="width:36px;height:36px;background:${markerColor};border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2.5px solid white;">
+              <span style="transform:rotate(45deg);font-size:.95rem;">${lh.emoji}</span>
+            </div>
+            <div style="margin-top:4px;background:white;color:#1b2e4b;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.12);white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center;">${lh.name.replace(/\n/g, ' ')}</div>
+          </div>`;
         el.style.cursor = "pointer";
         el.addEventListener("click", function () {
           map.panTo(position);
@@ -1247,11 +1418,10 @@ if (navigator.geolocation) {
         });
 
         const customOverlay = new kakao.maps.CustomOverlay({
-          position,
-          content: el,
-          yAnchor: 1.1
+          position, content: el, yAnchor: 1.1
         });
         customOverlay.setMap(map);
+        window.MARKER_OVERLAY_MAP.set(String(lh.id || lh.name), el);
       });
     });
   };
@@ -1329,6 +1499,10 @@ clusterer.setStyles([{
   lineHeight: "44px", fontSize: "13px", fontWeight: "700",
   border: "2px solid white", boxShadow: "0 2px 8px rgba(0,0,0,.2)"
 }]);
+// 필터 하나만 단독으로 켰는지 여부 (개별 마커 색상 강제 지정용)
+const onlyStampFilter = filterState.month.size === 0 && filterState.year.size === 0 && filterState.stamp.size > 0;
+const onlyYearFilter  = filterState.stamp.size === 0 && filterState.month.size === 0 && filterState.year.size > 0;
+const onlyMonthFilter = filterState.stamp.size === 0 && filterState.year.size === 0 && filterState.month.size > 0;
       const activeStampCats = Object.entries(stampCatMap)
         .filter(([key]) => filterState.stamp.has(key))
         .map(([, cat]) => cat);
@@ -1357,7 +1531,11 @@ clusterer.setStyles([{
       const showMonth2 = filterState.month.size > 0;
 
       // 아무것도 선택 안 했으면 아무것도 표시 안 함
-      if (!isShowAll && !showStamp2 && !showYear2 && !showMonth2) return;
+      const showMyVisited2  = filterState.my.has('my-visited');
+      const showMyWishlist2 = filterState.my.has('my-wishlist');
+      const myVisited2  = getMyLh('visited');
+      const myWishlist2 = getMyLh('wishlist');
+      if (!isShowAll && !showStamp2 && !showYear2 && !showMonth2 && !showMyVisited2 && !showMyWishlist2) return;
       window.REAL_LIGHTHOUSES.forEach(lh => {
         const isStamp = lh.tags.includes("stamp");
         const isYear  = lh.tags.includes("year");
@@ -1391,14 +1569,23 @@ clusterer.setStyles([{
             }
           }
           // isNone은 모든 등대 표시일 때만 보임 (개별 필터에서는 숨김)
+          const lhId2 = String(lh.id || lh.name);
+          if (showMyVisited2  && myVisited2.has(lhId2))  shouldShow = true;
+          if (showMyWishlist2 && myWishlist2.has(lhId2)) shouldShow = true;
         }
 
         if (!shouldShow) return;
 
       const position = new kakao.maps.LatLng(lh.lat, lh.lng);
-        const markerImage = lh.tags.includes("month") && !isYear && !isStamp ? markerImages.month
-                 : isYear ? markerImages.year
+        const lhId3 = String(lh.id || lh.name);
+        const isMyLh = (showMyVisited2 || showMyWishlist2) && (myVisited2.has(lhId3) || myWishlist2.has(lhId3));
+        const markerImage = isMyLh ? (markerImages.my || markerImages.none)
+                 : onlyStampFilter ? markerImages.stamp
+                 : onlyYearFilter ? markerImages.year
+                 : onlyMonthFilter ? markerImages.month
                  : isStamp ? markerImages.stamp
+                 : isYear ? markerImages.year
+                 : lh.tags.includes("month") ? markerImages.month
                  : markerImages.none;
         const marker = new kakao.maps.Marker({ position, image: markerImage });
         marker._lhId = lh.id;
@@ -1441,7 +1628,7 @@ kakao.maps.event.addListener(marker, "click", () => {
       padding:.3rem .7rem; border-radius:6px;
       box-shadow:0 2px 8px rgba(0,0,0,.2);
       white-space:nowrap; margin-top:0px;
-    ">${lh.name}</div>`,
+    ">${lh.name.replace(/\n/g, ' ')}</div>`,
     yAnchor: -0.3,
     zIndex: 10,
   });
@@ -1795,7 +1982,7 @@ const TUTORIAL_STEPS = [
   { target: '#map-container', img: 'tutorial-mascot-1.png',
     text: '<b>[상세페이지]</b><br>지도에서 등대 마커를 누르면 여행 정보가 담긴 팝업이 열려.<br>거기 "상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
   { target: null, img: 'tutorial-mascot-1.png',
-    text: '이제 소개는 끝났어!<br>우리 사이트를 활용해서 편리한 여행 하길 바랄게:)<br><br>P.S. 참고로 내 실물은 호미곶에서 볼 수 있어 &gt;&lt;' },
+    text: '이제 소개는 끝났어!<br>우리 사이트를 활용해서 편리한 여행 하길 바랄게:)<br><br>P.S. 참고로 내 실물은 올해 10월에 호미곶에서 볼 수 있어 &gt;&lt;' },
 ];
 
 let tutorialIdx = 0;
