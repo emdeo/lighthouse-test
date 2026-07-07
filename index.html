@@ -1469,6 +1469,8 @@ async function loadLighthouseData(map) {
         boxShadow: "0 2px 8px rgba(0,0,0,.2)"
       }]
     });
+    window._clusterer = clusterer; // 튜토리얼 6단계에서 잠깐 숨기기 위해 외부 노출
+
 
     window.REAL_LIGHTHOUSES = [];
     const markers = [];
@@ -1969,22 +1971,22 @@ document.getElementById("mobile-links-btn").addEventListener("click", () => {
 <script>
 const TUTORIAL_STEPS = [
   { target: null, img: 'tutorial-mascot-1.png',
-    text: '안녕! 나는 등대 안내자야.<br>사이트 이용법을<br>소개해줄게.' },
+    text: '안녕! 나는 아기문어야.<br>사이트 이용법을 소개할게.' },
   { target: '#filter-list', mobileNeedsPanel: true, img: 'tutorial-mascot-2.png',
     text: '옵션을 선택하면 테마별 등대만 볼 수 있어.<br>• 노란색: 스탬프 등대<br>• 초록색: 올해의 등대 <br>• 파란색: 이달의 등대' },
   { target: '.header-search', img: 'tutorial-mascot-1.png',
     text: '궁금한 등대 이름을 검색해봐.' },
   { target: '#header nav', targetMobile: '#mobile-nav', img: 'tutorial-mascot-3.png',
-    text: '• 등대 지도 → 지도로 보기<br>• 실시간 등대 식별 → AR로 등대 확인<br>• 관련 사이트 바로가기 → 관련 사이트로 이동',
-    textMobile: '하단 메뉴에서<br>• 필터 → 등대 필터<br>• 등대 식별 → AR로 등대 확인<br>• 관련사이트 → 관련 사이트로 이동<br>• 사용법 → 이 설명 다시 보기' },
+    text: '• 등대 지도 → 지도로 보기<br>• 실시간 등대 식별 → AR로 등대 확인',
+    textMobile: '하단 메뉴에서<br>• 필터 → 등대 필터<br>• 등대 식별 → AR로 등대 확인' },
   { target: '.map-controls', img: 'tutorial-mascot-2.png',
-    text: ' 위성지도 → 위성지도로 전환<br> ⦿ → 내 위치 보기<br> ＋ / － → 지도 확대·축소' },
+    text: ' ⦿ → 내 위치 보기<br> ＋ / － → 지도 확대·축소' },
   { target: '#map-container', img: 'tutorial-mascot-3.png',
-    text: '원 안의 숫자는 그 지역의 등대 수야.<br>아이콘을 누르면 그 지역 등대들이 자세히 보여.' },
+    text: '원 안의 숫자는 그 지역 등대 수야.<br>원을 누르면 그 지역 등대들이 자세히 보여.' },
   { target: '#map-container', img: 'tutorial-mascot-1.png',
-    text: '지도에서 등대 마커를 누르면 여행 정보가 담긴 팝업이 열려.<br>거기 "상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
+    text: '등대 마커를 누르면 팝업이 떠.<br>거기 "상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
   { target: null, img: 'tutorial-mascot-1.png',
-    text: '이제 소개는 끝났어!<br>우리 사이트를 활용해서 편리한 여행 하길 바랄게:)<br><br>P.S. 참고로 내 실물은 올해 10월에 호미곶에서 볼 수 있어 &gt;&lt;' },
+    text: '소개 끝!<br>편리한 여행 되기를 바랄게:)<br>* 설명 다시보기 → 사용법 클릭 <br><br>내 실물은 올해 10월에 호미곶에서 볼 수 있어 &gt;&lt;' },
 ];
 
 let tutorialIdx = 0;
@@ -2038,12 +2040,28 @@ function renderTutorialStep() {
   const progressEl = document.getElementById('tutorial-progress');
 
   const isMobile = window.innerWidth <= 768;
-  const targetSel = (isMobile && step.targetMobile !== undefined) ? step.targetMobile : step.target;
+  const targetSel = (tutorialIdx === 6) ? '#btn-detail'
+                   : (isMobile && step.targetMobile !== undefined) ? step.targetMobile : step.target;
   const stepText  = (isMobile && step.textMobile) ? step.textMobile : step.text;
   const needsPanel = isMobile && step.mobileNeedsPanel;
 
   mascotImg.src = step.img;
   textEl.innerHTML = stepText;
+  // 튜토리얼 6단계: 실제 지도 위에 가짜 클러스터를 잠깐 보여주기
+  if (tutorialIdx === 5 && !window._fakeClusterActive) {
+    enterFakeClusterView();
+    window._fakeClusterActive = true;
+  } else if (tutorialIdx !== 5 && window._fakeClusterActive) {
+    exitFakeClusterView();
+    window._fakeClusterActive = false;
+  }
+
+  // 튜토리얼 7단계: 마커 클릭 시 뜨는 팝업 예시 보여주기
+  if (tutorialIdx === 6 && !window._tutorialFakePopupActive) {
+    showFakePopupExample();
+  } else if (tutorialIdx !== 6 && window._tutorialFakePopupActive) {
+    hideFakePopupExample();
+  }
   progressEl.textContent = (tutorialIdx + 1) + ' / ' + TUTORIAL_STEPS.length;
   nextBtn.textContent = (tutorialIdx === TUTORIAL_STEPS.length - 1) ? '확인' : '다음 ▶';
   prevBtn.style.visibility = (tutorialIdx === 0) ? 'hidden' : 'visible';
@@ -2078,7 +2096,106 @@ function renderTutorialStep() {
     setTimeout(settle, 90); // 짧게 사라졌다가 새 위치에 나타남
   }
 }
+function enterFakeClusterView() {
+  const map = window.kakaoMap;
+  if (!map) return;
 
+  // 현재 필터 상태 저장
+  window._tutorialSavedFilter = {
+    stamp: [...filterState.stamp],
+    year:  [...filterState.year],
+    month: [...filterState.month],
+    my:    [...filterState.my],
+  };
+
+  // 강제로 '모든 등대 표시' 전환
+  filterState.stamp = new Set(["stamp-all","stamp-beautiful","stamp-history","stamp-fun","stamp-rich","stamp-healing","stamp-sunrise"]);
+  filterState.year  = new Set(["year-all","year-2025","year-2024","year-2023","year-2022","year-2021","year-2020","year-2019"]);
+  filterState.month = new Set(["month-all"]);
+  syncFilterUI();
+  if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers();
+
+  // 호미곶 등대 중심으로 강제 이동 (사용자가 어디를 보고 있었든 항상 이 화면으로)
+  map.setCenter(new kakao.maps.LatLng(36.0762, 129.5673));
+  map.setLevel(8);
+
+  // 지도 조작 잠금 (실수로 드래그/줌 못 하게)
+  map.setDraggable(false);
+  map.setZoomable(false);
+
+  // 클러스터에 파란 글로우 효과 덧씌우기
+  if (window._clusterer) {
+    window._clusterer.setStyles([{
+      width: "44px", height: "44px",
+      background: "rgba(37,99,168,.9)",
+      borderRadius: "50%",
+      color: "#fff", textAlign: "center",
+      lineHeight: "44px", fontSize: "13px", fontWeight: "700",
+      border: "2px solid white",
+      boxShadow: "0 0 0 6px rgba(37,99,168,.25), 0 0 18px 6px rgba(96,165,250,.55)",
+      animation: "fakeClusterGlow 1.6s ease-in-out infinite"
+    }]);
+    window._clusterer.redraw(); // 이미 그려진 클러스터에 새 스타일 강제 반영
+  }
+}
+
+function exitFakeClusterView() {
+  const map = window.kakaoMap;
+  if (!map) return;
+
+  map.setDraggable(true);
+  map.setZoomable(true);
+
+  // 원래 필터 상태로 복원
+  if (window._tutorialSavedFilter) {
+    filterState.stamp = new Set(window._tutorialSavedFilter.stamp);
+    filterState.year  = new Set(window._tutorialSavedFilter.year);
+    filterState.month = new Set(window._tutorialSavedFilter.month);
+    filterState.my    = new Set(window._tutorialSavedFilter.my);
+    window._tutorialSavedFilter = null;
+  }
+  syncFilterUI();
+  if (window.redrawLighthouseMarkers) window.redrawLighthouseMarkers(); // 정상 클러스터 색상으로 재계산되며 글로우도 자동으로 사라짐
+}
+function showFakePopupExample() {
+  const fakeLh = {
+    id: '__tutorial_fake__',
+    name: '문어 등대',
+    emoji: '🐙',
+    tags: ['stamp', 'month'],
+    stampCategory: '재미',
+    monthlyData: { year: 2024, month: 6 },
+    sea: '동해안',
+    lat: 36.0762, lng: 129.5673,
+    light: '', region: '', desc: ''
+  };
+  openPopup(fakeLh, null);
+
+  // 실제 API 사진 대신 예시 이미지로 강제 교체
+  const popupImg = document.getElementById('popup-img');
+  const popupEmoji = document.getElementById('popup-emoji');
+  popupImg.style.backgroundImage = `url(image01.png)`;
+  popupImg.style.backgroundSize = 'contain';
+  popupImg.style.backgroundPosition = 'center';
+  popupImg.style.backgroundRepeat = 'no-repeat';
+  popupImg.style.backgroundColor = '#fff';
+  popupImg.style.cursor = 'default';
+  popupImg.onclick = null;
+  popupEmoji.style.display = 'none';
+
+  // 클릭해도 아무 반응 없게 (튜토리얼 중엔 보여주기만)
+  document.getElementById('popup').style.pointerEvents = 'none';
+  window._tutorialFakePopupActive = true;
+
+  // 모바일 팝업 압축(사진 높이 줄이기)이 끝난 뒤에 하이라이트 위치 다시 계산
+  setTimeout(() => positionTutorial('#btn-detail'), 150);
+}
+
+function hideFakePopupExample() {
+  closePopup();
+  document.getElementById('popup').style.pointerEvents = '';
+  window._tutorialFakePopupActive = false;
+}
 function openTutorial() {
   tutorialIdx = 0;
   document.getElementById('tutorial-overlay').classList.add('active');
@@ -2086,6 +2203,13 @@ function openTutorial() {
 }
 
 function closeTutorial() {
+  if (window._fakeClusterActive) {
+    exitFakeClusterView();
+    window._fakeClusterActive = false;
+  }
+  if (window._tutorialFakePopupActive) {
+    hideFakePopupExample();
+  }
   if (document.getElementById('tutorial-dismiss-checkbox').checked) {
     localStorage.setItem('lh-tutorial-dismissed', '1');
   }
