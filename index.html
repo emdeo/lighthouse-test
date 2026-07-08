@@ -57,7 +57,7 @@
         </a>
 
       <!-- 체험숙소 신청하기 섹션 -->
-      <div class="link-section-title">체험숙소 신청하기</div>
+      <div class="link-section-title no-border">체험숙소 신청하기</div>
       <div class="link-section-desc">등대 관사에서 즐기는 특별한 하룻밤,<br>지금 예약하세요</div>
       <a href="https://yeosu.mof.go.kr/ko/page.do?menuIdx=3971" target="_blank" class="link-item link-item-compact">
         <div class="link-info">
@@ -77,6 +77,11 @@
         </div>
         <span class="link-arrow">→</span>
       </a>
+
+      <div id="visit-counter-modal" class="visit-counter">
+        <span class="visit-counter-icon">👀</span>
+        <span class="visit-counter-text">누적 방문 <span id="visit-count-num-modal">-</span>명</span>
+      </div>
       </div>
       </div>
     </div>
@@ -2313,8 +2318,11 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
   fetch('https://lighthouse-weather.ehdgml5032.workers.dev/visit')
     .then(res => res.json())
     .then(data => {
-      const el = document.getElementById('visit-count-num');
-      if (el && data.count) el.textContent = data.count.toLocaleString();
+      if (!data.count) return;
+      const el1 = document.getElementById('visit-count-num');
+      const el2 = document.getElementById('visit-count-num-modal');
+      if (el1) el1.textContent = data.count.toLocaleString();
+      if (el2) el2.textContent = data.count.toLocaleString();
     })
     .catch(() => {});
 })();
