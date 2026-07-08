@@ -251,8 +251,9 @@
   </div>
 
   <div class="panel-footer">
-    <div style="text-align:center; padding: 0.8rem 1rem; border-top: 1px solid var(--gray1);">
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=emdeo.lighthouse-test" alt="방문자 수"/>
+    <div id="visit-counter" class="visit-counter">
+      <span class="visit-counter-icon">👀</span>
+      <span class="visit-counter-text">누적 방문 <span id="visit-count-num">-</span>명</span>
     </div>
     <button id="btn-tutorial" class="btn-tutorial">❓ 사용법 보기</button>
   </div>
@@ -2305,6 +2306,17 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
   document.getElementById('font-size-down').addEventListener('click', () => {
     if (idx > 0) { idx--; applyFontSize(); }
   });
+})();
+
+// ── 방문자 카운터 ──
+(function() {
+  fetch('https://lighthouse-weather.ehdgml5032.workers.dev/visit')
+    .then(res => res.json())
+    .then(data => {
+      const el = document.getElementById('visit-count-num');
+      if (el && data.count) el.textContent = data.count.toLocaleString();
+    })
+    .catch(() => {});
 })();
 </script>
 </body>
