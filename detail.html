@@ -512,6 +512,30 @@ const seaLabel = lh.sea === '서해안' ? '서해안' : lh.sea === '동해안' ?
 document.getElementById("detail-desc").textContent = (lh.nameEn ? lh.nameEn + (seaLabel ? ',  ' + seaLabel : '') : seaLabel);
 
 // 좌표 → 주소 변환 (카카오 API)
+// 1순위: coord2address (도로명/지번 주소) → 실패 시 2순위: coord2regioncode (행정구역명)
+function fetchRegionFallback() {
+  return fetch(`https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${lh.lng}&y=${lh.lat}`, {
+    headers: { Authorization: `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
+  })
+  .then(r => r.json())
+  .then(data => {
+    const doc = (data.documents || []).find(d => d.region_type === 'H') || data.documents?.[0];
+    const addr = doc?.address_name || '';
+    document.getElementById("detail-region").textContent = addr || lh.region || '';
+    const splitKeywords = (name) =>
+      (name || '').split(/\s+/).map(w => w.replace(/(시|군|구|읍|면|동|리)$/, '')).filter(Boolean);
+    const keywords = [
+      ...splitKeywords(doc?.region_2depth_name),
+      ...splitKeywords(doc?.region_3depth_name),
+    ];
+    return [...new Set(keywords)];
+  })
+  .catch(() => {
+    document.getElementById("detail-region").textContent = lh.region || '';
+    return [];
+  });
+}
+
 const regionKeywordsReady = fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lh.lng}&y=${lh.lat}`, {
   headers: { Authorization: `KakaoAK ${CONFIG.KAKAO_REST_KEY}` }
 })
@@ -519,7 +543,13 @@ const regionKeywordsReady = fetch(`https://dapi.kakao.com/v2/local/geo/coord2add
 .then(data => {
   const doc = data.documents?.[0];
   const addr = doc?.road_address?.address_name || doc?.address?.address_name || '';
-  document.getElementById("detail-region").textContent = addr || lh.region || '';
+
+  // coord2address 실패(주소 없음) → coord2regioncode로 재시도
+  if (!addr) {
+    return fetchRegionFallback();
+  }
+
+  document.getElementById("detail-region").textContent = addr;
   const a = doc?.address || {};
   // 단어 단위로 쪼개서 각 단어의 행정구역 접미사(시/군/구/읍/면/동/리)를 떼어냄
   const splitKeywords = (name) =>
@@ -530,10 +560,7 @@ const regionKeywordsReady = fetch(`https://dapi.kakao.com/v2/local/geo/coord2add
   ];
   return [...new Set(keywords)];
 })
-.catch(() => {
-  document.getElementById("detail-region").textContent = lh.region || '';
-  return [];
-});
+.catch(() => fetchRegionFallback());
 // 운영시간/전화/문화재 — 값 있을 때만 표시
 const openVal = (stampInfo && stampInfo.open) ? stampInfo.open : '';
 const contactVal = (stampInfo && stampInfo.contact) ? stampInfo.contact : '';
