@@ -97,12 +97,17 @@
   <div id="search-dropdown"></div>
 </div>
 
-  <nav>
+<nav>
     <a href="#" class="active">등대 지도</a>
-    <a href="news.html">실시간 등대 식별</a>
+    <a href="news.html">등대 식별</a>
     <a href="#" id="btn-links">관련 사이트 바로가기</a>
+    <div class="font-size-control">
+      <button id="font-size-down" title="글자 작게">가−</button>
+      <button id="font-size-up" title="글자 크게">가+</button>
+    </div>
   </nav>
 </header>
+
 
 <!-- ── APP LAYOUT ── -->
 <div id="app">
@@ -115,7 +120,7 @@
 
     <!-- 옵션 필터 -->
     <div class="panel-section">
-      <div class="panel-section-title">옵션 필터</div>
+      <div class="panel-section-title">등대 선택</div>
       <div class="filter-list" id="filter-list">
 
         <!-- 모든 등대 표시 -->
@@ -246,6 +251,9 @@
   </div>
 
   <div class="panel-footer">
+    <div style="text-align:center; padding: 0.8rem 1rem; border-top: 1px solid var(--gray1);">
+      <a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Femdeo.github.io%2Flighthouse-test&count_bg=%2379C83D&title_bg=%23801E1E&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false"/></a>
+    </div>
     <button id="btn-tutorial" class="btn-tutorial">❓ 사용법 보기</button>
   </div>
   </aside>
@@ -275,6 +283,13 @@
         <button class="map-ctrl-btn" title="축소">－</button>
       </div>
 
+      <!-- 모바일 전용: 글자 크기 슬라이더 -->
+      <div class="mobile-font-size-slider">
+        <span class="font-size-slider-label">가</span>
+        <input type="range" id="mobile-font-size-range" min="0" max="3" step="1" value="1">
+        <span class="font-size-slider-label big">가</span>
+      </div>
+
       <div class="map-scale">— 50 km</div>
       <div class="map-attr">© 카카오맵 / 네이버 지도 연동 예정</div>
     </div>
@@ -302,9 +317,9 @@
       <div class="tutorial-bubble-tail"></div>
       <div class="tutorial-text" id="tutorial-text"></div>
       <div class="tutorial-bottom-row">
-        <button class="tutorial-prev-btn" id="tutorial-prev-btn">◀ 이전</button>
+        <button class="tutorial-prev-btn" id="tutorial-prev-btn">◀</button>
         <span class="tutorial-progress" id="tutorial-progress"></span>
-        <button class="tutorial-next-btn" id="tutorial-next-btn">다음 ▶</button>
+        <button class="tutorial-next-btn" id="tutorial-next-btn">▶</button>
       </div>
       <label class="tutorial-dismiss-row">
         <input type="checkbox" id="tutorial-dismiss-checkbox">
@@ -373,7 +388,7 @@
 <!-- 모바일 하단 내비게이션 바 -->
 <nav id="mobile-nav">
   <button class="mobile-nav-item" id="mobile-sheet-btn">
-    <span class="mobile-nav-label">필터</span>
+    <span class="mobile-nav-label">등대 선택</span>
   </button>
   <div style="width:1px; min-width:1px; height:30px; background:#ddd; flex-shrink:0;"></div>  <a href="news.html" class="mobile-nav-item">
     <span class="mobile-nav-label">등대 식별</span>
@@ -1977,14 +1992,14 @@ const TUTORIAL_STEPS = [
   { target: '.header-search', img: 'tutorial-mascot-1.png',
     text: '궁금한 등대 이름을 검색해봐.' },
   { target: '#header nav', targetMobile: '#mobile-nav', img: 'tutorial-mascot-3.png',
-    text: '• 등대 지도 → 지도로 보기<br>• 실시간 등대 식별 → AR로 등대 확인',
-    textMobile: '하단 메뉴에서<br>• 필터 → 등대 필터<br>• 등대 식별 → AR로 등대 확인' },
+    text: '등대 식별을 누르면 AR로 등대를 확인할 수 있어!',
+    textMobile: '등대 식별을 누르면 AR로 등대를 확인할 수 있어!' },
   { target: '.map-controls', img: 'tutorial-mascot-2.png',
     text: ' ⦿ → 내 위치 보기<br> ＋ / － → 지도 확대·축소' },
   { target: '#map-container', img: 'tutorial-mascot-3.png',
     text: '원 안의 숫자는 그 지역 등대 수야.<br>원을 누르면 그 지역 등대들이 자세히 보여.' },
   { target: '#map-container', img: 'tutorial-mascot-1.png',
-    text: '등대 마커를 누르면 팝업이 떠.<br>거기 "상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
+    text: '등대 마커를 누르면 팝업이 떠.<br>"상세정보 보기" 버튼을 누르면 더 많은 정보를 볼 수 있어!' },
   { target: null, img: 'tutorial-mascot-1.png',
     text: '소개 끝!<br>편리한 여행 되기를 바랄게:)<br>* 설명 다시보기 → 사용법 클릭 <br><br>내 실물은 올해 10월에 호미곶에서 볼 수 있어 &gt;&lt;' },
 ];
@@ -2063,7 +2078,7 @@ function renderTutorialStep() {
     hideFakePopupExample();
   }
   progressEl.textContent = (tutorialIdx + 1) + ' / ' + TUTORIAL_STEPS.length;
-  nextBtn.textContent = (tutorialIdx === TUTORIAL_STEPS.length - 1) ? '확인' : '다음 ▶';
+  nextBtn.textContent = (tutorialIdx === TUTORIAL_STEPS.length - 1) ? '확인' : '▶';
   prevBtn.style.visibility = (tutorialIdx === 0) ? 'hidden' : 'visible';
 
   // 자리 옮기기 전에 살짝 투명하게 — 사라짐→자리잡음→나타남 흐름으로 자연스럽게 보이도록
@@ -2187,8 +2202,12 @@ function showFakePopupExample() {
   document.getElementById('popup').style.pointerEvents = 'none';
   window._tutorialFakePopupActive = true;
 
-  // 모바일 팝업 압축(사진 높이 줄이기)이 끝난 뒤에 하이라이트 위치 다시 계산
-  setTimeout(() => positionTutorial('#btn-detail'), 150);
+  // 모바일 팝업 압축(사진 높이 줄이기) 타이밍이 기기마다 달라서, 여러 번 다시 그려서 확실히 맞춤
+  [100, 200, 350, 500].forEach(delay => {
+    setTimeout(() => {
+      if (window._tutorialFakePopupActive) positionTutorial('#btn-detail');
+    }, delay);
+  });
 }
 
 function hideFakePopupExample() {
@@ -2256,5 +2275,37 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
 }
 </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
+<script>
+(function() {
+  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px, 지금 크기 그대로)
+  const STORAGE_KEY = 'lh-font-size-step';
+  let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+  if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1; // 기본값: 2단계(16px)
+
+  function applyFontSize() {
+    document.documentElement.style.fontSize = STEPS[idx] + 'px';
+    localStorage.setItem(STORAGE_KEY, idx);
+    const r = document.getElementById('mobile-font-size-range');
+    if (r) r.value = idx;
+  }
+  applyFontSize();
+  // 모바일 슬라이더 연동
+  const mobileRange = document.getElementById('mobile-font-size-range');
+  if (mobileRange) {
+    mobileRange.value = idx;
+    mobileRange.addEventListener('input', () => {
+      idx = parseInt(mobileRange.value, 10);
+      applyFontSize();
+    });
+  }
+
+  document.getElementById('font-size-up').addEventListener('click', () => {
+    if (idx < STEPS.length - 1) { idx++; applyFontSize(); }
+  });
+  document.getElementById('font-size-down').addEventListener('click', () => {
+    if (idx > 0) { idx--; applyFontSize(); }
+  });
+})();
+</script>
 </body>
 </html>

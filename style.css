@@ -1708,7 +1708,7 @@ html:has(body.detail-page) {
   background: #fff0f5;
   border: 1.5px solid #ffc4dd;
   color: #9d2960;
-  font-size: 12px;
+  font-size: .75rem;
   font-weight: 600;
   padding: 5px 11px;
   border-radius: 999px;
@@ -1898,7 +1898,9 @@ html:has(body.detail-page) {
   cursor: pointer;
   font-family: var(--font-sans);
 }
-.tutorial-next-btn:hover { background: var(--ocean); }
+@media (hover: hover) and (pointer: fine) {
+  .tutorial-next-btn:hover { background: var(--ocean); }
+}
 
 .tutorial-prev-btn {
   background: rgba(255,255,255,.7);
@@ -2243,4 +2245,66 @@ html:has(body.detail-page) {
 @keyframes fakeClusterGlow {
   0%, 100% { box-shadow: 0 0 0 6px rgba(37, 99, 168, .25), 0 0 18px 6px rgba(96, 165, 250, .55); }
   50%      { box-shadow: 0 0 0 10px rgba(37, 99, 168, .35), 0 0 26px 10px rgba(96, 165, 250, .75); }
+}
+/* ── 글자 크기 조절 버튼 (데스크탑) ── */
+.font-size-control {
+  display: flex;
+  gap: .3rem;
+  margin-left: .5rem;
+}
+.font-size-control button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--gray2);
+  background: var(--white);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.font-size-control button:hover {
+  background: var(--sky);
+  border-color: var(--ocean);
+}
+@media (max-width: 768px) {
+  .font-size-control {
+    display: none; /* 모바일은 다음 단계에서 별도로 진행 */
+  }
+}
+/* ── 글자 크기 슬라이더 (모바일 전용) ── */
+.mobile-font-size-slider {
+  display: none; /* 데스크탑에서는 숨김 */
+}
+
+@media (max-width: 768px) {
+  .mobile-font-size-slider {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    position: absolute;
+    left: 12px;
+    bottom: 74px;
+    z-index: 60; /* 필터 시트(200), 팝업(300), 관련사이트 팝업(500)보다 낮게 → 다 뒤로 가려짐 */
+    background: rgba(255,255,255,.92);
+    padding: .35rem .7rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+  }
+  .font-size-slider-label {
+    font-size: .7rem;
+    color: var(--gray4);
+    font-weight: 700;
+  }
+  .font-size-slider-label.big {
+    font-size: 1rem;
+  }
+  #mobile-font-size-range {
+    width: 90px;
+    height: 4px;
+    accent-color: var(--ocean);
+  }
 }
