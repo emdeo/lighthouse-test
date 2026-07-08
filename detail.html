@@ -92,6 +92,10 @@
     <a href="index.html">등대 지도</a>
     <a href="news.html">실시간 등대 식별</a>
     <a href="#" id="btn-links">관련 사이트 바로가기</a>
+    <div class="font-size-control">
+      <button id="font-size-down" title="글자 작게">가−</button>
+      <button id="font-size-up" title="글자 크게">가+</button>
+    </div>
   </nav>
 </header>
 
@@ -259,7 +263,7 @@
     <div class="section-title" style="margin:0">📷 인증 사진 찍기</div>
     <button onclick="pickLhPhoto()" style="
       background:var(--primary,#3b82f6);color:#fff;border:none;
-      border-radius:20px;padding:6px 14px;font-size:12px;
+      border-radius:20px;padding:6px 14px;font-size:.75rem;
       font-weight:600;cursor:pointer;">
       📸 사진 촬영
     </button>
@@ -267,8 +271,8 @@
   <div id="lhPhotoGrid" style="
     display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
     <div style="grid-column:1/-1;text-align:center;padding:32px 0;
-      color:#aaa;font-size:13px;">
-      <span style="font-size:13px">왼쪽 상단의 버튼으로 사진을 찍어보세요</span>
+      color:#aaa;font-size:.8125rem;">
+      <span style="font-size:.8125rem">왼쪽 상단의 버튼으로 사진을 찍어보세요<br>사진은 앨범에 저장할 수 있습니다</span>
     </div>
   </div>
 </div>
@@ -1471,7 +1475,8 @@ async function renderLhGallery() {
   const photos = await LhPhotoDB.list(lhId);
   if (!photos.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:#aaa;font-size:13px;">
-    <span style="font-size:13px">왼쪽 상단의 버튼으로 사진을 찍어보세요</span></div>`;
+    <span style="font-size:.8125rem">왼쪽 상단의 버튼으로 사진을 찍어보세요<br>사진은 앨범에 저장할 수 있습니다</span>
+    </div>`;
     return;
   }
   grid.innerHTML = photos.map(p => `
@@ -1888,11 +1893,11 @@ document.addEventListener("click", e => {
     <div class="section-card" id="dt-fake-gallery">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div class="section-title" style="margin:0">📷 인증 사진 찍기</div>
-        <button style="background:var(--primary,#3b82f6);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">📸 사진 촬영</button>
+        <button style="background:var(--primary,#3b82f6);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:.75rem;font-weight:600;cursor:pointer;">📸 사진 촬영</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
         <div style="grid-column:1/-1;text-align:center;padding:32px 0;color:#aaa;font-size:13px;">
-          <span style="font-size:13px">왼쪽 상단의 버튼으로 사진을 찍어보세요</span>
+          <span style="font-size:.8125rem">왼쪽 상단의 버튼으로 사진을 찍어보세요<br>사진은 앨범에 저장할 수 있습니다</span>
         </div>
       </div>
     </div>
@@ -2230,5 +2235,26 @@ function detailRenderMyLhUI() {
 updateDetailMyStarBtn();
 </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
+<script>
+(function() {
+  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px)
+  const STORAGE_KEY = 'lh-font-size-step'; // index.html이랑 같은 키 → 크기 선택이 페이지 넘어가도 유지됨
+  let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+  if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1;
+
+  function applyFontSize() {
+    document.documentElement.style.fontSize = STEPS[idx] + 'px';
+    localStorage.setItem(STORAGE_KEY, idx);
+  }
+  applyFontSize();
+
+  document.getElementById('font-size-up').addEventListener('click', () => {
+    if (idx < STEPS.length - 1) { idx++; applyFontSize(); }
+  });
+  document.getElementById('font-size-down').addEventListener('click', () => {
+    if (idx > 0) { idx--; applyFontSize(); }
+  });
+})();
+</script>
 </body>
 </html>
