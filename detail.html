@@ -83,9 +83,9 @@
     <img src="문어등대.png" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
     <span>안녕, 등대</span>
   </a>
-  <div class="header-search" style="position:relative;">
-    <span class="search-icon">🔍</span>
+ <div class="header-search" style="position:relative;">
     <input type="text" id="search-input" placeholder="검색: 등대 이름 입력" autocomplete="off">
+    <span class="search-icon">🔍</span>
     <div id="search-dropdown"></div>
   </div>
   <nav>
@@ -1633,7 +1633,6 @@ function renderDetailSearchDropdown() {
   } else {
     dropdown.innerHTML = results.map(item => `
       <div class="search-result-item" data-id="${item.id}">
-        <span>🔦</span>
         <div>
           <div class="sr-name">${(item.name || "").replace(/\n/g, ' ')}</div>
           <div class="sr-region">${item.sea || ""}</div>

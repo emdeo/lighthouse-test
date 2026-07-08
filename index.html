@@ -96,8 +96,8 @@
   </a>
 
   <div class="header-search" style="position:relative;">
-  <span class="search-icon">🔍</span>
   <input type="text" id="search-input" placeholder="검색: 등대 이름 입력" autocomplete="off">
+  <span class="search-icon">🔍</span>
   <!-- ★ 추가: 검색 결과 드롭다운 -->
   <div id="search-dropdown"></div>
 </div>
@@ -1278,7 +1278,6 @@ function renderSearchDropdown() {
   } else {
     dropdown.innerHTML = results.map(lh => `
       <div class="search-result-item" data-id="${lh.id}">
-        <span>${lh.emoji}</span>
         <div>
           <div class="sr-name">${lh.name.replace(/\n/g, ' ')}</div>
           <div class="sr-region">${lh.region || ""}</div>
