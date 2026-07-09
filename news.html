@@ -34,6 +34,10 @@
     <a href="index.html">등대 지도</a>
     <a href="news.html" class="active">실시간 등대 식별</a>
     <a href="#" onclick="event.preventDefault(); document.getElementById('links-overlay').classList.add('visible');">관련 사이트 바로가기</a>
+    <div class="font-size-control">
+      <button id="font-size-down" title="글자 작게">가−</button>
+      <button id="font-size-up" title="글자 크게">가+</button>
+    </div>
   </nav>
 </header>
 
@@ -71,9 +75,9 @@
       <div class="tutorial-bubble-tail"></div>
       <div class="tutorial-text" id="ar-tutorial-text"></div>
       <div class="tutorial-bottom-row">
-        <button class="tutorial-prev-btn" id="ar-tutorial-prev-btn">◀ 이전</button>
+        <button class="tutorial-prev-btn" id="ar-tutorial-prev-btn">◀</button>
         <span class="tutorial-progress" id="ar-tutorial-progress"></span>
-        <button class="tutorial-next-btn" id="ar-tutorial-next-btn">다음 ▶</button>
+        <button class="tutorial-next-btn" id="ar-tutorial-next-btn">▶</button>
       </div>
     </div>
   </div>
@@ -416,10 +420,8 @@ candidates.forEach(lh => {
         <polygon points="${cx-towerW/2+Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2-Math.round(1*scale)},${topH+Math.round(22*scale)} ${cx+towerW/2},${topH+Math.round(30*scale)} ${cx-towerW/2},${topH+Math.round(30*scale)}" fill="${lc.dark}" opacity="0.6"/>
         <!-- 줄무늬 2 -->
         <polygon points="${cx-baseW/2+Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(4*scale)},${topH+Math.round(50*scale)} ${cx+baseW/2-Math.round(2*scale)},${topH+Math.round(58*scale)} ${cx-baseW/2+Math.round(2*scale)},${topH+Math.round(58*scale)}" fill="${lc.dark}" opacity="0.6"/>
-        <!-- 창문 1 -->
-        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(33*scale)}" width="${Math.round(10*scale)}" height="${Math.round(7*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
-        <!-- 창문 2 -->
-        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(50*scale)}" width="${Math.round(10*scale)}" height="${Math.round(7*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
+        <!-- 창문 -->
+        <rect x="${cx-Math.round(5*scale)}" y="${topH+Math.round(35*scale)}" width="${Math.round(10*scale)}" height="${Math.round(8*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 문 -->
         <rect x="${cx-Math.round(4*scale)}" y="${topH+Math.round(12*scale)+towerH-Math.round(14*scale)}" width="${Math.round(8*scale)}" height="${Math.round(13*scale)}" rx="1" fill="#1a3a6a" stroke="${lc.dark}" stroke-width="0.8"/>
         <!-- 받침대 -->
@@ -966,7 +968,7 @@ function renderArTutorialStep() {
   document.getElementById('ar-tutorial-progress').textContent = (arTutorialIdx + 1) + ' / ' + AR_TUTORIAL_ACTIVE_STEPS.length;
   document.getElementById('ar-tutorial-prev-btn').style.visibility = (arTutorialIdx === 0) ? 'hidden' : 'visible';
   document.getElementById('ar-tutorial-next-btn').textContent =
-    (arTutorialIdx === AR_TUTORIAL_ACTIVE_STEPS.length - 1) ? '시작하기' : '다음 ▶';
+    (arTutorialIdx === AR_TUTORIAL_ACTIVE_STEPS.length - 1) ? '시작하기' : '▶';
   document.getElementById('ar-tutorial-chevrons').style.display = step.chevrons ? 'flex' : 'none';
 
   if (step.showRangeControl) {
@@ -1135,5 +1137,27 @@ document.getElementById("compass-btn").addEventListener("click", () => {
   </div>
 </div>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
+
+<script>
+(function() {
+  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px)
+  const STORAGE_KEY = 'lh-font-size-step'; // index.html/detail.html이랑 같은 키 → 크기 선택이 유지됨
+  let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+  if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1;
+
+  function applyFontSize() {
+    document.documentElement.style.fontSize = STEPS[idx] + 'px';
+    localStorage.setItem(STORAGE_KEY, idx);
+  }
+  applyFontSize();
+
+  document.getElementById('font-size-up').addEventListener('click', () => {
+    if (idx < STEPS.length - 1) { idx++; applyFontSize(); }
+  });
+  document.getElementById('font-size-down').addEventListener('click', () => {
+    if (idx > 0) { idx--; applyFontSize(); }
+  });
+})();
+</script>
 </body>
 </html>
