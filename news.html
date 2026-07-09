@@ -853,10 +853,7 @@ function attachArTutorialDrag() {
   const onDown = e => {
     dragging = true;
     lastX = (e.touches ? e.touches[0].clientX : e.clientX);
-    // 나침반 버튼이 소개된 단계부터: 드래그 시작 → 가짜 센서 끄기 (진짜 AR과 동일)
-    if (arTutorialCompassStepIdx !== -1 && arTutorialIdx >= arTutorialCompassStepIdx) {
-      arTutorialSensorActive = false;
-    }
+    arTutorialSensorActive = false;
   };
   const onMove = e => {
     if (!dragging) return;
