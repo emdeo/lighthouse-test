@@ -50,13 +50,13 @@
     <div class="start-bubble">
       <div class="start-bubble-tail"></div>
       <h2>실시간 등대 식별</h2>
-      <p>현재 위치를 기반으로 주변 등대를 실시간으로 식별해줄게.<br>폰을 돌리면 등대가 실제 방향으로 따라와!</p>
+      <p>현재 위치 중심으로 주변 등대를 식별해줄게.<br>폰을 돌리면 등대가 실제 방향으로 따라와!</p>
       <div class="start-features">
         <div class="start-feature"><span>📍</span><span>이 기능은 GPS 위치 권한이 필요해</span></div>
         <div class="start-feature"><span>📷</span><span>모바일은 카메라 권한이 필요해!</span></div>
         <div class="start-feature"><span>🖱️</span><span>데스크탑은 드래그로 방향 탐색하면 돼</span></div>
       </div>
-      <button id="start-btn">시작하기</button>
+      <button id="start-btn">시작</button>
     </div>
   </div>
 </div>
@@ -1137,7 +1137,7 @@ document.getElementById("compass-btn").addEventListener("click", () => {
 
 <script>
 (function() {
-  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px)
+  const STEPS = [14, 16, 18, 20, 22]; // px 단위, 5단계 (기본: 2단계 = 16px)
   const STORAGE_KEY = 'lh-font-size-step'; // index.html/detail.html이랑 같은 키 → 크기 선택이 유지됨
   let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
   if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1;

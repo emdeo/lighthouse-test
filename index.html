@@ -292,7 +292,7 @@
       <!-- 모바일 전용: 글자 크기 슬라이더 -->
       <div class="mobile-font-size-slider">
         <span class="font-size-slider-label">가</span>
-        <input type="range" id="mobile-font-size-range" min="0" max="3" step="1" value="1">
+        <input type="range" id="mobile-font-size-range" min="0" max="4" step="1" value="1">
         <span class="font-size-slider-label big">가</span>
       </div>
 
@@ -990,7 +990,7 @@ function openMyLhModal() {
           <div style="font-size:1rem;font-weight:800;color:var(--navy);">${lh.name.replace(/\n/g,' ')}</div>
           <button onclick="document.getElementById('my-lh-modal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--gray3);padding:0 0 0 8px;">✕</button>
         </div>
-        <div style="font-size:0.8rem;color:var(--gray3);margin-bottom:16px;">저장할 리스트를 선택하세요</div>
+        <div style="font-size:0.8rem;color:var(--gray3);margin-bottom:16px;">저장할 목록를 선택하세요</div>
       </div>
       <div style="border-top:1px solid var(--gray1);">
         <div id="my-modal-row-visited" onclick="toggleTempMyLh('visited')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;border-bottom:1px solid var(--gray1);">
@@ -2282,7 +2282,7 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
 <script>
 (function() {
-  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px, 지금 크기 그대로)
+  const STEPS = [14, 16, 18, 20, 22]; // px 단위, 5단계 (기본: 2단계 = 16px, 지금 크기 그대로)
   const STORAGE_KEY = 'lh-font-size-step';
   let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
   if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1; // 기본값: 2단계(16px)

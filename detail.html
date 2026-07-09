@@ -2263,7 +2263,7 @@ updateDetailMyStarBtn();
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "09f6da4e2c634c26b59fe1707086bf54"}'></script><!-- End Cloudflare Web Analytics -->
 <script>
 (function() {
-  const STEPS = [14, 16, 18, 20]; // px 단위, 4단계 (기본: 2단계 = 16px)
+  const STEPS = [14, 16, 18, 20, 22]; // px 단위, 5단계 (기본: 2단계 = 16px)
   const STORAGE_KEY = 'lh-font-size-step'; // index.html이랑 같은 키 → 크기 선택이 페이지 넘어가도 유지됨
   let idx = parseInt(localStorage.getItem(STORAGE_KEY), 10);
   if (isNaN(idx) || idx < 0 || idx >= STEPS.length) idx = 1;
