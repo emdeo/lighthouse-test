@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>안녕, 등대 — 방문자 추이</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #f0f4f8;
+    padding: 2rem 1rem;
+    color: #1a2332;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .header {
+    margin-bottom: 2rem;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a2332;
+    margin-bottom: 0.3rem;
+  }
+  .header p {
+    font-size: 0.85rem;
+    color: #6b7a8d;
+  }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: #6b7a8d;
+    margin-bottom: 0.4rem;
+  }
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a2332;
+  }
+  .stat-sub {
+    font-size: 0.72rem;
+    color: #aab;
+    margin-top: 0.2rem;
+  }
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .chart-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a2332;
+    margin-bottom: 1.2rem;
+  }
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: #6b7a8d;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  canvas {
+    width: 100%;
+    height: 280px;
+  }
+  .note {
+    font-size: 0.72rem;
+    color: #aab;
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🏠 안녕, 등대 — 방문자 추이</h1>
+    <p>2026년 6월 26일 ~ 9월 7일 · Cloudflare + Google Analytics 통합</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">누적 방문수</div>
+      <div class="stat-value">1,558</div>
+      <div class="stat-sub">6/26 ~ 9/7</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Cloudflare 기간</div>
+      <div class="stat-value">1,010</div>
+      <div class="stat-sub">6/26 ~ 7/22</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Google Analytics 기간</div>
+      <div class="stat-value">548</div>
+      <div class="stat-sub">7/22 ~ 9/7</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">일별 방문수 추이</div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#3b82f6;"></div>
+        Cloudflare (방문수)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#10b981;"></div>
+        Google Analytics (세션수)
+      </div>
+    </div>
+    <canvas id="chart"></canvas>
+    <div class="note">
+      ※ Cloudflare 데이터(~7/22)와 Google Analytics 데이터(7/22~)는 측정 기준이 다를 수 있어 직접 비교 시 참고용으로 활용하세요.
+    </div>
+  </div>
+</div>
+
+<script>
+const cfData = [
+  ["6/26",70],["6/27",40],["6/28",0],["6/29",80],["6/30",180],
+  ["7/1",100],["7/2",220],["7/3",60],["7/4",10],["7/5",10],
+  ["7/6",30],["7/7",30],["7/8",30],["7/9",0],["7/10",10],
+  ["7/11",0],["7/12",0],["7/13",10],["7/14",0],["7/15",50],
+  ["7/16",30],["7/17",10],["7/18",10],["7/19",0],["7/20",20],
+  ["7/21",10],["7/22",0]
+];
+
+const gaData = [
+  ["7/22",4],["7/23",10],["7/24",4],["7/25",4],["7/26",9],["7/27",7],["7/28",5],
+  ["7/29",43],["7/30",43],["7/31",9],["8/1",6],["8/2",18],["8/3",9],["8/4",46],
+  ["8/5",19],["8/6",7],["8/7",5],["8/8",6],["8/9",14],["8/10",11],["8/11",10],
+  ["8/12",3],["8/13",12],["8/14",5],["8/15",7],["8/16",3],["8/17",6],["8/18",7],
+  ["8/19",8],["8/20",6],["8/21",8],["8/22",5],["8/23",17],["8/24",11],["8/25",14],
+  ["8/26",15],["8/27",12],["8/28",9],["8/29",4],["8/30",10],["8/31",10],
+  ["9/1",13],["9/2",13],["9/3",32],["9/4",4],["9/5",6],["9/6",19]
+];
+
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  draw();
+}
+
+function draw() {
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 40, padR = 20, padT = 20, padB = 40;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  const allData = [...cfData, ...gaData.slice(1)];
+  const maxVal = Math.max(...allData.map(d => d[1]));
+  const maxY = Math.ceil(maxVal / 50) * 50 + 50;
+
+  // 그리드
+  ctx.strokeStyle = '#f0f4f8';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + chartH - (i / 4) * chartH;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + chartW, y);
+    ctx.stroke();
+    ctx.fillStyle = '#aab';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(maxY * i / 4), padL - 6, y + 3);
+  }
+
+  function xPos(i, total) {
+    return padL + (i / (total - 1)) * chartW;
+  }
+  function yPos(val) {
+    return padT + chartH - (val / maxY) * chartH;
+  }
+
+  // Cloudflare 영역
+  ctx.beginPath();
+  ctx.moveTo(xPos(0, allData.length), padT + chartH);
+  cfData.forEach((d, i) => {
+    ctx.lineTo(xPos(i, allData.length), yPos(d[1]));
+  });
+  ctx.lineTo(xPos(cfData.length - 1, allData.length), padT + chartH);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(59,130,246,0.1)';
+  ctx.fill();
+
+  // Cloudflare 선
+  ctx.beginPath();
+  cfData.forEach((d, i) => {
+    i === 0 ? ctx.moveTo(xPos(i, allData.length), yPos(d[1])) : ctx.lineTo(xPos(i, allData.length), yPos(d[1]));
+  });
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // GA 영역
+  const gaStart = cfData.length - 1;
+  ctx.beginPath();
+  ctx.moveTo(xPos(gaStart, allData.length), padT + chartH);
+  gaData.forEach((d, i) => {
+    ctx.lineTo(xPos(gaStart + i, allData.length), yPos(d[1]));
+  });
+  ctx.lineTo(xPos(gaStart + gaData.length - 1, allData.length), padT + chartH);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(16,185,129,0.1)';
+  ctx.fill();
+
+  // GA 선
+  ctx.beginPath();
+  gaData.forEach((d, i) => {
+    const x = xPos(gaStart + i, allData.length);
+    i === 0 ? ctx.moveTo(x, yPos(d[1])) : ctx.lineTo(x, yPos(d[1]));
+  });
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 구분선
+  const splitX = xPos(cfData.length - 1, allData.length);
+  ctx.beginPath();
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(splitX, padT);
+  ctx.lineTo(splitX, padT + chartH);
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // X축 레이블 (월초, 특정 날짜만)
+  const labels = ["6/26","7/1","7/15","7/22","8/1","8/15","9/1","9/7"];
+  ctx.fillStyle = '#aab';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  allData.forEach((d, i) => {
+    if (labels.includes(d[0])) {
+      ctx.fillText(d[0], xPos(i, allData.length), padT + chartH + 16);
+    }
+  });
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+</script>
+</body>
+</html>
