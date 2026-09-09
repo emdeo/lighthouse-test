@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>안녕, 등대 — 방문자 추이</title>
+<title>안녕, 등대 — 이용객 추이</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -101,13 +101,13 @@
 <body>
 <div class="container">
   <div class="header">
-    <h1>🏠 안녕, 등대 — 방문자 추이</h1>
+    <h1>안녕, 등대 — 이용객 추이</h1>
     <p>2026년 6월 26일 ~ 9월 7일 · Cloudflare + Google Analytics 통합</p>
   </div>
 
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-label">누적 방문수</div>
+      <div class="stat-label">누적 이용수</div>
       <div class="stat-value">1,558</div>
       <div class="stat-sub">6/26 ~ 9/7</div>
     </div>
@@ -124,11 +124,11 @@
   </div>
 
   <div class="chart-card">
-    <div class="chart-title">일별 방문수 추이</div>
+    <div class="chart-title">일별 이용수 추이</div>
     <div class="legend">
       <div class="legend-item">
         <div class="legend-dot" style="background:#3b82f6;"></div>
-        Cloudflare (방문수)
+        Cloudflare (이용수)
       </div>
       <div class="legend-item">
         <div class="legend-dot" style="background:#10b981;"></div>
@@ -136,9 +136,6 @@
       </div>
     </div>
     <canvas id="chart"></canvas>
-    <div class="note">
-      ※ Cloudflare 데이터(~7/22)와 Google Analytics 데이터(7/22~)는 측정 기준이 다를 수 있어 직접 비교 시 참고용으로 활용하세요.
-    </div>
   </div>
 </div>
 
