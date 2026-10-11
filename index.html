@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta name="description" content="전국의 등대 정보를 한눈에 확인하고, 여행 준비부터 등대 탐방까지 한 번에 할 수 있는 해양관광 플랫폼 안녕, 등대">
+  <meta 
+name="naver-site-verification" content="dfbb55e62986dc5dab9dadb1bd87322daa2180a9" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>안녕, 등대</title>
@@ -16,6 +19,15 @@
 <script src="stamp_data.js"></script>
 <script src="year_data.js"></script> 
 <script src="monthly_lighthouse.js"></script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DDMBTEH919"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-DDMBTEH919');
+</script>
 </head>
 <body>
 
@@ -1468,7 +1480,16 @@ function makeMarkerImage(color, scale = 1) {
 // ════════════════════════════════════════
 async function loadLighthouseData(map) {
   try {
-    const data = [...LIGHTHOUSE_DATA, ...LIGHTHOUSE_CUSTOM_DATA];
+        let remote = [];
+    try {
+      const res = await fetch("https://lighthouse-weather-test.ehdgml5032.workers.dev/lighthouses");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      remote = await res.json();
+    } catch (e) {
+      console.warn("원격 등대 데이터 로드 실패, 기존 파일 사용:", e);
+    }
+    const base = remote.length > 0 ? remote : LIGHTHOUSE_DATA;
+    const data = [...base, ...LIGHTHOUSE_CUSTOM_DATA];
     console.log(`✅ 등대 ${data.length}개 로드 완료`);
 
     const clusterer = new kakao.maps.MarkerClusterer({
@@ -2314,9 +2335,17 @@ if (!localStorage.getItem('lh-tutorial-dismissed')) {
 
 // ── 방문자 카운터 ──
 (function() {
-  fetch('https://lighthouse-weather.ehdgml5032.workers.dev/visit')
+  const KEY = 'lh-visit-counted';
+  const alreadyCounted = sessionStorage.getItem(KEY);
+
+  const url = alreadyCounted
+    ? 'https://lighthouse-weather.ehdgml5032.workers.dev/visit-count'  // 숫자만 조회, 카운트 안 올림
+    : 'https://lighthouse-weather.ehdgml5032.workers.dev/visit';       // 실제로 +1
+
+  fetch(url)
     .then(res => res.json())
     .then(data => {
+      if (!alreadyCounted) sessionStorage.setItem(KEY, '1');
       if (!data.count) return;
       const el1 = document.getElementById('visit-count-num');
       const el2 = document.getElementById('visit-count-num-modal');
