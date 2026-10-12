@@ -2409,3 +2409,18 @@ html:has(body.detail-page) {
   cursor: pointer;
 }
 #notice-confirm:hover { background: var(--ocean); }
+
+.notice-link {
+  display: block;
+  text-align: center;
+  padding: .65rem .8rem;
+  margin-bottom: 1rem;
+  background: var(--sky);
+  color: var(--ocean);
+  border: 1px solid var(--gray2);
+  border-radius: 10px;
+  font-size: .86rem; font-weight: 700;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.notice-link:hover { background: var(--ocean); color: var(--white); }
